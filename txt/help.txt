@@ -1,1 +1,71 @@
-<h1>Help</h1>
+<h1>Allostery Model Help Pages</h1>
+<div id="logo">
+<left>
+<a href="http://modbase.compbio.ucsf.edu/allosmod"><img src="http://modbase.compbio.ucsf.edu/allosmod/html/img/am_logo.gif" /></a>
+</left>
+</div><br />
+<p>
+The AllosMod logo is comprised of two probability density functions that are used for the nonbonded distance 
+interaction. The green probability density function translates to a single energy minima applied to the 
+allosteric site. The blue probability density function translates to a double energy minima that is applied to 
+the rest of the protein, i.e. the regulated region. Varying the radius of the allosteric site changes how the distance energy is distributed 
+across the structure, thereby driving the simulation to sample different regions of the conformational
+space relevant to the allosteric transition. See the paper for more details.
+</p>
+<a><h4>Input Files</h4></a>
+<ul>
+  <li><a id="email"><h5>Email</h5></a>
+      <p>If set, a notification will be sent once the job is completed.
+      </p></li><br />
+  <li><a id="file"><h5>Directories zip file</h5></a>
+      <p>Upload a zip file containing a set of directories for each landscape that you want to model. For an example directory, 
+         click <a href="http://modbase.compbio.ucsf.edu/allosmod/html/file/input.zip"> here</a>. 
+         Each directory should contain the following files:
+      </p></li>
+
+      <p><br /><b>PDB file(s):</b> all structures used to create the energy landscape for the simulation. <br />
+         <br /><b>Alignment file:</b> (align.ali) contains one entry for each PDB file. Another entry (named pm.pdb) pertains to the sequence to be simulated. 
+                  This alignment file should be generated after an alignment procedure, so that all sequences are aligned as you would. 
+                  Multiple chains can be specified if separated using a "/", the same specifications 
+		  used in Modeller. There are many ways to create an alignment file including: 1) <a href="http://salilab.org/modeller/tutorial/basic.html">Modeller</a>
+		  and 2) <a href="http://www.ebi.ac.uk/Tools/msa/clustalw2/">ClustalW</a>. <br />
+	 <br /><b>Structure list:</b> (list) contains a list of all PDB files used to create the energy landscape for the simulation. The first file is the 
+	          ligand bound structure and is used to define interactions in the allosteric site and the regulated region. All remaining files are used 
+		  to define interactions in the regulated region only. <br />
+	 <br /><b>Ligand File (optional):</b> (lig.pdb) contains the structure of the ligand taken from the ligand bound structure (i.e. the first in the list file).
+	          A radius (rAS) around the ligand is used to define the allosteric site. If excluded, the program will set the coordinates of lig.pdb to 
+		  the center of mass of the first structure in the list file. Then, setting rAS to a large number will allow a landscape with a single energy minimum
+		  corresponding to the first structure in the list file. Alternatively, setting rAS to zero will allow a landscape with multiple energy minima 
+		  corresponding to the remaining structures in the list file. <br />
+	 <br /><b>Input File:</b> (input.dat) contains one line per parameter as follows:
+	     <br /> rAS = X <ul> Radius (in &Aring;ngstroms) around the coordinates of the ligand that will specify the allosteric site. The lig.pdb file and 
+	                         the first structure in the list file are used. Therefore, it is important that lig.pdb is extracted from the first 
+				 structure in the list file.</ul>
+	     <br /> NTOT = X <ul> Number of distinct minima in the landscape. NTOT is typically 2 if one ligand bound and one ligand unbound structure. See paper 
+                                for more details. </ul>
+	     <br /> NRUNS = X <ul> Number of independent simulations to run. By default, each simulation will run for 6 ns. </ul>
+	     <br /> delEmax = X <ul> (optional) is the value of the maximum energy per distance interaction, typically between 0.09 and 0.12 kcal/mol. If excluded, 
+                                   the value will be assigned according to 3.6*(number of residues/number of distance interactions). See paper for more details. </ul>
+      </p><br />
+     
+
+  <li><a id="name"><h5>Name your model</h5></a>
+      <p>Name your job so you can refer to it later.
+      </p></li>
+</ul>
+<a name="output"><h4>Output</h4></a>
+<p>
+	The output is a zip file containing the same directories that were uploaded and subdirectories for each simulation. Each subdirectory will contain 
+	a Modeller script (model_run.py), a unique starting structure (random.ini), a restraint file containing interactions that will define the energy landscape 
+	(converted.rsr), log files, and other output files.
+</p><br />
+
+<a name="run"><h4>To run the simulation</h4></a>
+<p>
+	Three scripts within Modeller have been modified to run the the simulations: 1) automodel.py is the top level script 2) autosched.py sets up the initial 
+	structure and 3) refine.py runs the equilibration and simulation trajectories. Download these scripts 
+	(click <a href="http://modbase.compbio.ucsf.edu/allosmod/html/file/modeller_scripts.zip">here</a>) 
+	and move them to $MODELLER_HOME/modlib/modeller/automodel/. The scripts will not modify existing Modeller functionality. To modify the simulation 
+	time and/or the simulation temperature, modify the consttemp method in refine.py. To run, go to the downloaded directories 
+	and type: "$MODELLER_HOME/bin/modSVN model_run.py".
+</p><br />

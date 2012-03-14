@@ -21,10 +21,13 @@ sub get_navigation_links {
 sub get_project_menu {
     my $self = shift;
     my $version = $self->version;
+    my $htmlroot = $self->htmlroot;
     return <<MENU;
-<p>&nbsp;</p>
-<p>&nbsp;</p>
-<p>&nbsp;</p>
+<div id="logo">
+<left>
+<a href="http://modbase.compbio.ucsf.edu/allosmod"><img src="$htmlroot/img/am_logo.gif" /></a>
+</left>
+</div><br />
 <h4><small>Developer:</small></h4><p>Patrick Weinkam</p>
 <h4><small>Acknowledgements:</small></h4>
 <p>Elina Tjioe<br />
@@ -34,6 +37,7 @@ Ursula Pieper<br />
 Andrej Sali</p>
 <p><i>Version $version</i></p>
 MENU
+#<p>&nbsp;</p>
 }
 
 sub get_footer {
@@ -41,9 +45,10 @@ sub get_footer {
     my $htmlroot = $self->htmlroot;
     return <<FOOTER;
 <div id="address">
-<center><a href="http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?db=pubmed&amp;cmd=Retrieve&amp;dopt=AbstractPlus&amp;list_uids=11045621&amp;query_hl=2&amp;itool=pubmed_docsum">
-<b>P. Weinkam, J. Pons, and A. Sali, Proc Natl Acad Sci U S A., (2012) <i>V,</i> X-Y</b></a>
-<a href="http://salilab.org/pdf/Fiser_ProteinSci_2000.pdf"><img src="$htmlroot/img/pdf.gif" /></a>
+<center><a href="http://www.ncbi.nlm.nih.gov/pubmed/20143816">
+<b>P. Weinkam, J. Pons, and A. Sali, Proc Natl Acad Sci U S A., (2012) <i>V,</i> X-Y</b></a>:
+<a href="$htmlroot/file/Weinkam_PNAS_2012.pdf"><img src="$htmlroot/img/pdf.gif" /></a>,
+S.I.:<a href="http://modbase.compbio.ucsf.edu/allosmod/html/file/Weinkam_PNAS_2012_si.pdf"><img src="$htmlroot/img/pdf.gif" /></a>
 </center>
 </div>
 FOOTER
@@ -57,9 +62,18 @@ sub get_index_page {
 MODELLER. AllosMod creates a model of a protein\'s energy landscape. 
 Carefully designed energy landscapes allow efficient molecular 
 dynamics sampling at constant temperatures, thereby providing ergodic 
-sampling of conformational space. AllosMod was designed to study 
-transitions in large allosteric proteins but may be used to 
-study protein dynamics in general.
+sampling of conformational space. AllosMod is optimized to study 
+transitions in large allosteric proteins but a user can apply AllosMod to 
+study protein dynamics in general.<br />
+<br />
+The AllosMod server allows batch jobs to set up many simulations at 
+once. Upload a zip file containing directories for each 
+type of landscape that you want to create. AllosMod will set up many short 
+simulations for each landscape. Each constant temperature simulation 
+is ran at 300K for 6 ns by default, which will be completed 
+overnight on a single processor. By starting each simulation 
+at different points in conformational space, sampling is acheived efficiently. 
+For more details click on the help link (above) and read the paper (below).
 <br />&nbsp;</p>
 GREETING
     return "<div id=\"resulttable\">\n" .
@@ -69,24 +83,27 @@ GREETING
                            -action=>$self->submit_url}) .
            $q->table(
                $q->Tr($q->td({-colspan=>2}, $greeting)) .
-               $q->Tr($q->td($q->h3("AllosMod Inputs",
-                                    $self->help_link("general")))) .
+
+               $q->Tr($q->td($q->h3("AllosMod Inputs"))) .
+
                $q->Tr($q->td("Email address (optional)",
-                             $self->help_link("email")),
+                             $self->help_link("general")),
                       $q->td($q->textfield({-name=>"email",
                                             -value=>$self->email,
                                             -size=>"25"}))) .
+
                $q->Tr($q->td("Upload directories zip file",
                              $self->help_link("file"), $q->br),
                       $q->td($q->filefield({-name=>"zip"}))) .
-#               $q->Tr($q->td("Number of runs per directory",
-#			     $self->help_link("numrun"), $q->br),
-#                      $q->td($q->textfield({-name=>"numrun",
-#                                            -value=>10,-maxlength=>"3", -size=>"5"}))) .
-               $q->Tr($q->td($q->h3("Name your model",
-                                    $self->help_link("name"))),
+
+               $q->Tr($q->td("Name your model",
+                                    $self->help_link("name")),
                       $q->td($q->textfield({-name=>"name",
                                             -value=>"hemoglobin", -size=>"25"}))) .
+
+               $q->Tr($q->td($q->h3("Before running simulations, read this: ",
+                                    $self->help_link("run")))) .
+
                $q->Tr($q->td({-colspan=>"2"},
                              "<center>" .
                              $q->input({-type=>"submit", -value=>"RUN!"}) .
@@ -144,7 +161,7 @@ sub get_submit_page {
       $q->p("You can check on your job at the " .
             "<a href=\"" . $self->queue_url .
             "\">AllosMod queue status page</a>.").
-      $q->p("Your MODELLER input files should be finished within 10 mins, depending on the load").
+      $q->p("Your MODELLER input files should be finished shortly, depending on the number of landscapes to be created. ").
       $q->p("If you experience a problem or you do not receive the results " .
             "for more than 12 hours, please <a href=\"" .
             $self->contact_url . "\">contact us</a>.") .
@@ -197,19 +214,22 @@ sub get_results_page {
 
 sub display_ok_job {
     my ($self, $q, $job) = @_;
-    my $return= $q->p("Job '<b>" . $job->name . "</b>' has completed.");
+    my $return= $q->p("Job '<b>" . $job->name . "</b>' has completed, thank you for using AllosMod!");
 
     $return.= $q->p("<a href=\"" . $job->get_results_file_url("output.zip") .
-                    "\">Download output zip file containing run directories.</a>.");
+                    "\">Download output zip file.</a>.");
+    $return.=$q->p("<br />It would be wise to double check your run directories: <br /> 1) check that " .
+		   "allostericsite.pdb correctly represents the allosteric site (if applicable) <br /> 2) if some" .
+		   "directories were not set up correctly, then read error.log. <br />");
     $return .= $job->get_results_available_time();
     return $return;
 }
 
 sub display_failed_job {
     my ($self, $q, $job) = @_;
-    my $return= $q->p("AllosMod was unable to complete your request, job'<b>" . $job->name);
+    my $return= $q->p("AllosMod was unable to complete your request: job '<b>" . $job->name);
     $return.=$q->p("This is usually caused by incorrect inputs " .
-                   "(e.g. directories zip file, PDB files, etc.).");
+                   "(e.g. alignment file, PDB files, etc.).");
     $return.=$q->p("For a discussion of some common input errors, please see " .
                    "the " .
                    $q->a({-href=>$self->help_url . "#errors"}, "help page") .
