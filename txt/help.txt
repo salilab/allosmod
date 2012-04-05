@@ -6,8 +6,8 @@
 </div><br />
 <p>
 The AllosMod logo is comprised of two probability density functions that are used for the nonbonded distance 
-interaction. The green probability density function translates to a single energy minima applied to the 
-allosteric site. The blue probability density function translates to a double energy minima that is applied to 
+interaction. The green probability density function translates to a single energy minima for interactions in the 
+allosteric site. The blue probability density function translates to a double energy minima for interactions in 
 the rest of the protein, i.e. the regulated region. Varying the radius of the allosteric site changes how the distance energy is distributed 
 across the structure, thereby driving the simulation to sample different regions of the conformational
 space relevant to the allosteric transition. See the paper for more details.
@@ -25,8 +25,8 @@ space relevant to the allosteric transition. See the paper for more details.
 
       <p><br /><b>PDB file(s):</b> all structures used to create the energy landscape for the simulation. <br />
          <br /><b>Alignment file:</b> (align.ali) contains one entry for each PDB file. Another entry (named pm.pdb) pertains to the sequence to be simulated. 
-                  This alignment file should be generated after an alignment procedure, so that all sequences are aligned as you would. 
-                  Multiple chains can be specified if separated using a "/", the same specifications 
+                  This alignment file should be generated after an alignment procedure, as this alignment will be used to generate restraints for the simulation. 
+                  Multiple chains can be specified by using a "/" as a separater, the same specifications 
 		  used in Modeller. There are many ways to create an alignment file including: 1) <a href="http://salilab.org/modeller/tutorial/basic.html">Modeller</a>
 		  and 2) <a href="http://www.ebi.ac.uk/Tools/msa/clustalw2/">ClustalW</a>. <br />
 	 <br /><b>Structure list:</b> (list) contains a list of all PDB files used to create the energy landscape for the simulation. The first file is the 
@@ -66,6 +66,14 @@ space relevant to the allosteric transition. See the paper for more details.
 	structure and 3) refine.py runs the equilibration and simulation trajectories. Download these scripts 
 	(click <a href="http://modbase.compbio.ucsf.edu/allosmod/html/file/modeller_scripts.zip">here</a>) 
 	and move them to $MODELLER_HOME/modlib/modeller/automodel/. The scripts will not modify existing Modeller functionality. To modify the simulation 
-	time and/or the simulation temperature, modify the consttemp method in refine.py. To run, go to the downloaded directories 
-	and type: "$MODELLER_HOME/bin/modSVN model_run.py".
+	time and/or the simulation temperature, edit the consttemp method in refine.py. To run, navigate to the output subdirectories, each contains 
+	a unique starting structure (random.ini) and a unique run script (model_run.py), and type: "$MODELLER_HOME/bin/modSVN model_run.py". 
+</p><br />
+
+<a name="analysis"><h4>To analyze the simulation</h4></a>
+<p>
+	Download the analysis script to run on any linux/unix based machine 
+	(click <a href="http://modbase.compbio.ucsf.edu/allosmod/html/file/analysis.zip">here</a>).  This script will check the simulations for possible 
+	errors as well as output several files including: 1) energies 2) Boltzmann weighted probabilities 3) local structural similarity metrics Qi.  
+	See README file for a full desciption.
 </p><br />

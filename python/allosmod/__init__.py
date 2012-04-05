@@ -17,7 +17,7 @@ class Job(saliweb.backend.Job):
         jobcounter = int(CTRFILE.readline())
 
         #unzip input.zip, check inputs, make input scripts for subdirs
-        if jobcounter == 1:
+        if jobcounter == 1 or jobcounter == -1:
             subprocess.call(["/netapp/sali/allosmod/run_all.sh"])
             os.system("cp dirlist dirlist_all")
 

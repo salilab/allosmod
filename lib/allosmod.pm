@@ -45,8 +45,8 @@ sub get_footer {
     my $htmlroot = $self->htmlroot;
     return <<FOOTER;
 <div id="address">
-<center><a href="http://www.ncbi.nlm.nih.gov/pubmed/20143816">
-<b>P. Weinkam, J. Pons, and A. Sali, Proc Natl Acad Sci U S A., (2012) <i>V,</i> X-Y</b></a>:
+<center><a href="http://www.ncbi.nlm.nih.gov/pubmed/22403063">
+<b>P. Weinkam, J. Pons, and A. Sali, Proc Natl Acad Sci U S A., (2012) <i>109 (13),</i> 4875-4880</b></a>:
 <a href="$htmlroot/file/Weinkam_PNAS_2012.pdf"><img src="$htmlroot/img/pdf.gif" /></a>,
 S.I.:<a href="http://modbase.compbio.ucsf.edu/allosmod/html/file/Weinkam_PNAS_2012_si.pdf"><img src="$htmlroot/img/pdf.gif" /></a>
 </center>
@@ -103,6 +103,9 @@ GREETING
 
                $q->Tr($q->td($q->h3("Before running simulations, read this: ",
                                     $self->help_link("run")))) .
+
+               $q->Tr($q->td($q->h3("To analyze simulations, read this: ",
+                                    $self->help_link("analysis")))) .
 
                $q->Tr($q->td({-colspan=>"2"},
                              "<center>" .
@@ -217,7 +220,7 @@ sub display_ok_job {
     my $return= $q->p("Job '<b>" . $job->name . "</b>' has completed, thank you for using AllosMod!");
 
     $return.= $q->p("<a href=\"" . $job->get_results_file_url("output.zip") .
-                    "\">Download output zip file.</a>.");
+                    "\">Download output zip file.</a>");
     $return.=$q->p("<br />It would be wise to double check your run directories: <br /> 1) check that " .
 		   "allostericsite.pdb correctly represents the allosteric site (if applicable) <br /> 2) if some" .
 		   "directories were not set up correctly, then read error.log. <br />");
