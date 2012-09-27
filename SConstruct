@@ -7,6 +7,10 @@ Help(vars.GenerateHelpText(env))
 env.InstallAdminTools()
 env.InstallCGIScripts()
 
+f = env.Frontend('allosmod_foxs')
+f.InstallCGIScripts()
+f.InstallHTML(['allosmod_foxs/html/jquery-1.8.1.min.js'])
+
 Export('env')
 SConscript('python/allosmod/SConscript')
 SConscript('lib/SConscript')
