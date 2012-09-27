@@ -65,6 +65,40 @@ S.I.:<a href="http://modbase.compbio.ucsf.edu/allosmod/html/file/Weinkam_PNAS_20
 FOOTER
 }
 
+sub make_dropdown {
+    my ($self, $id, $title, $initially_visible, $text) = @_;
+   
+    my $style = "";
+    if (!$initially_visible) {
+      $style = " style=\"display:none\"";
+    }
+    return "<div class=\"dropdown_container\">\n" .
+           "<a onclick=\"\$('#${id}').slideToggle('fast')\" " .
+           "href=\"#\">$title</a>\n" .
+           "<div id=\"${id}\"$style>\n" . $text . "\n</div></div>\n";
+}
+
+sub get_advanced_modeling_options {
+    my $self = shift;
+    my $q = $self->cgi;
+    return $self->make_dropdown("advmodel", "Advanced Modeling Options", 0,
+                $q->p("number of modeller models" .
+                      $q->textfield({-name=>'NUM_MODELS', -value=>"10",
+                                     -size=>"3"})) .
+                $q->p("glycosylation sites" .
+                      $q->filefield({-name=>"sugar_file"}) .
+                      $q->checkbox({-name=>'flexible_glyc_sites',
+                                    -label=>'flexible'}) .
+                      "number of optimization steps" .
+                      $q->textfield({-name=>'number_of_steps_glyc',
+                                     -size=>"3"})));
+}
+
+sub get_all_advanced_options {
+    my $self = shift;
+    return $self->get_advanced_modeling_options();
+}
+
 sub get_index_page {
     my $self = shift;
     my $q = $self->cgi;
@@ -80,9 +114,29 @@ GREETING
     return "<div id=\"resulttable\">\n" .
            $q->h2({-align=>"center"},
                   "AllosMod-FoXS: Structure Generation and SAXS Profile Calculations") .
+           $greeting .
 
            $q->start_form({-name=>"allosmod-foxsform", -method=>"post",
-                           -action=>$self->submit_url}) .
+                           -action=>$self->index_url}) .
+           $q->p("PDB code " . $q->textfield({-name=>'pdbcode',
+                                              -size=>'5'}) .
+                 " or upload file(s) " .
+                 $q->filefield({-name=>'uploaded_file'})) .
+           $q->p("Sequence used in experiment:" . $q->br .
+                 $q->textarea({-name=>'sequence', -rows=>5, -cols=>80})) .
+           $q->table(
+               $q->Tr($q->td("Experimental profile"),
+                      $q->td($q->filefield({-name=>"saxs_profile",
+                                            -size=>"25"}))) .
+               $q->Tr($q->td("Email address (optional)"),
+                      $q->td($q->textfield({-name=>"email",
+                                            -value=>$self->email,
+                                            -size=>"25"})))) .
+           $q->p("<center>" .
+                 $q->input({-type=>"submit", -value=>"Submit"}) .
+                 $q->input({-type=>"reset", -value=>"Reset"}) .
+                 "</center>") .
+           $self->get_all_advanced_options() .
            $q->end_form .
            "</div>\n";
 }
