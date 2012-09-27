@@ -7,12 +7,13 @@ sub new {
     return saliweb::frontend::new(@_, @CONFIG@);
 }
 
-# Add our own JavaScript to the page header
+# Add our own JavaScript and CSS to the page header
 sub get_start_html_parameters {
   my ($self, $style) = @_;
   my %param = $self->SUPER::get_start_html_parameters($style);
   push @{$param{-script}}, {-language => 'JavaScript',
                             -src => 'html/jquery-1.8.1.min.js' };
+  push @{$param{-style}->{'-src'}}, 'html/allosmod_foxs.css';
   return %param;
 }
 

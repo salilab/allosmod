@@ -9,7 +9,8 @@ env.InstallCGIScripts()
 
 f = env.Frontend('allosmod_foxs')
 f.InstallCGIScripts()
-f.InstallHTML(['allosmod_foxs/html/jquery-1.8.1.min.js'])
+f.InstallHTML(['allosmod_foxs/html/jquery-1.8.1.min.js',
+               'allosmod_foxs/html/allosmod_foxs.css'])
 
 Export('env')
 SConscript('python/allosmod/SConscript')
