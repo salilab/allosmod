@@ -75,7 +75,8 @@ sub make_dropdown {
     return "<div class=\"dropdown_container\">\n" .
            "<a onclick=\"\$('#${id}').slideToggle('fast')\" " .
            "href=\"#\">$title</a>\n" .
-           "<div id=\"${id}\"$style>\n" . $text . "\n</div></div>\n";
+           "<div class=\"dropdown\" id=\"${id}\"$style>\n" .
+           $text . "\n</div></div>\n";
 }
 
 sub get_advanced_modeling_options {

@@ -4,6 +4,12 @@
   margin-bottom: 20px;
 }
 
+.dropdown {
+  margin-top: .5em;
+  margin-left: 1em;
+  margin-right: 1em;
+}
+
 .sampopts {
   margin-left: 5em;
 }
