@@ -224,16 +224,14 @@ scattering (SAXS) profile calculations.
 <br />&nbsp;</p>
 <br />&nbsp;</p>
 GREETING
-    return "<div id=\"resulttable\">\n" .
-           $q->h2({-align=>"center"},
+    return $q->h2({-align=>"center"},
                   "AllosMod-FoXS: Structure Generation and SAXS Profile Calculations") .
            $greeting .
 
            $q->start_form({-name=>"allosmod-foxsform", -method=>"post",
                            -action=>$action}) .
            $form .
-           $q->end_form .
-           "</div>\n";
+           $q->end_form;
 }
 
 sub get_submit_page {
