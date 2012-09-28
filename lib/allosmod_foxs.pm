@@ -104,12 +104,7 @@ sub get_sequence_or_alignment {
     my $q = $self->cgi;
 
     if (defined($alignment)) {
-      return $q->p("Alignment:" . $q->br .
-                   $q->textarea({-name=>'alignment', -rows=>5, -cols=>80,
-                                 -value=>$alignment}));
     } else {
-      return $q->p("Sequence used in experiment:" . $q->br .
-                   $q->textarea({-name=>'sequence', -rows=>5, -cols=>80}));
     }
 }
 
@@ -153,6 +148,35 @@ sub get_index_page {
     my $alignment = $self->get_alignment();
     my $action = (defined($alignment) ? $self->submit_url : $self->index_url);
 
+    my $form;
+    if (defined($alignment)) {
+      $form = $q->p("PDB code " . $q->textfield({-name=>'pdbcode',
+                                              -size=>'5'}) .
+                 " or upload file(s) " .
+                 $q->filefield({-name=>'uploaded_file'})) .
+           $q->p("Alignment:" . $q->br .
+                   $q->textarea({-name=>'alignment', -rows=>5, -cols=>80,
+                                 -value=>$alignment})) .
+           $q->table(
+               $q->Tr($q->td("Experimental profile"),
+                      $q->td($q->filefield({-name=>"saxs_profile",
+                                            -size=>"25"}))) .
+               $q->Tr($q->td("Email address (optional)"),
+                      $q->td($q->textfield({-name=>"email",
+                                            -value=>$self->email,
+                                            -size=>"25"})))) .
+           $q->p("<center>" .
+                 $q->input({-type=>"submit", -value=>"Submit"}) .
+                 "</center>") .
+           $self->get_all_advanced_options();
+    } else {
+      $form = $q->p("Sequence used in experiment:" . $q->br .
+                    $q->textarea({-name=>'sequence', -rows=>5, -cols=>80})) .
+              $q->p("<center>" .
+                    $q->input({-type=>"submit", -value=>"Submit"}) .
+                    "</center>");
+    }
+
     my $greeting = <<GREETING;
 <p>AllosMod-FoXS combines the <a href="http://modbase.compbio.ucsf.edu/allosmod/index.html"> AllosMod server</a> and 
 <a href="http://modbase.compbio.ucsf.edu/foxs/index.html"> FoXS </a> web servers. Our combined server allows various 
@@ -169,24 +193,7 @@ GREETING
 
            $q->start_form({-name=>"allosmod-foxsform", -method=>"post",
                            -action=>$action}) .
-           $q->p("PDB code " . $q->textfield({-name=>'pdbcode',
-                                              -size=>'5'}) .
-                 " or upload file(s) " .
-                 $q->filefield({-name=>'uploaded_file'})) .
-           $self->get_sequence_or_alignment($alignment) .
-           $q->table(
-               $q->Tr($q->td("Experimental profile"),
-                      $q->td($q->filefield({-name=>"saxs_profile",
-                                            -size=>"25"}))) .
-               $q->Tr($q->td("Email address (optional)"),
-                      $q->td($q->textfield({-name=>"email",
-                                            -value=>$self->email,
-                                            -size=>"25"})))) .
-           $q->p("<center>" .
-                 $q->input({-type=>"submit", -value=>"Submit"}) .
-                 $q->input({-type=>"reset", -value=>"Reset"}) .
-                 "</center>") .
-           $self->get_all_advanced_options() .
+           $form .
            $q->end_form .
            "</div>\n";
 }
