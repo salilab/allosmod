@@ -102,6 +102,36 @@ sub get_all_advanced_options {
 sub get_index_page {
     my $self = shift;
     my $q = $self->cgi;
+    if (defined($q->param('sequence'))) {
+      return $self->confirm_alignment();
+    } else {
+      return $self->get_first_index_page();
+    }
+}
+
+sub confirm_alignment {
+    my $self = shift;
+    my $q = $self->cgi;
+    return "<div id=\"resulttable\">\n" .
+           $q->h2({-align=>"center"},
+                  "Confirm or modify alignment") .
+
+           $q->start_form({-name=>"allosmod-foxsform", -method=>"post",
+                           -action=>$self->submit_url}) .
+           $q->p("Alignment:" . $q->br .
+                 $q->textarea({-name=>'alignment', -rows=>5, -cols=>80})) .
+           $q->p("<center>" .
+                 $q->input({-type=>"submit", -value=>"Submit"}) .
+                 $q->input({-type=>"reset", -value=>"Reset"}) .
+                 "</center>") .
+           $q->end_form .
+           "</div>\n";
+}
+
+sub get_first_index_page {
+    my $self = shift;
+    my $q = $self->cgi;
+
     my $greeting = <<GREETING;
 <p>AllosMod-FoXS combines the <a href="http://modbase.compbio.ucsf.edu/allosmod/index.html"> AllosMod server</a> and 
 <a href="http://modbase.compbio.ucsf.edu/foxs/index.html"> FoXS </a> web servers. Our combined server allows various 
