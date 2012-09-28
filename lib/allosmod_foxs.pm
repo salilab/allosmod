@@ -88,15 +88,53 @@ sub get_advanced_modeling_options {
                 $q->p("glycosylation sites" .
                       $q->filefield({-name=>"sugar_file"}) .
                       $q->checkbox({-name=>'flexible_glyc_sites',
-                                    -label=>'flexible'}) .
+                                    -label=>'flexible'}) . $q->br .
                       "number of optimization steps" .
                       $q->textfield({-name=>'number_of_steps_glyc',
                                      -size=>"3"})));
 }
 
+sub get_saxs_options {
+    my $self = shift;
+    my $q = $self->cgi;
+    return $self->make_dropdown("saxs", "SAXS Options", 0,
+                  $q->table(
+                      $q->Tr($q->td('Maximal q Value'),
+                             $q->td($q->textfield({-name=>'q', -size=>"10",
+                                                   -value=>"0.5"}))),
+                      $q->Tr($q->td('Profile Size'),
+                             $q->td($q->textfield({-name=>'psize', -size=>"10",
+                                                   -value=>"500"})),
+                             $q->td('# of points in the computed profile')),
+                      $q->Tr($q->td('Hydration Layer'),
+                             $q->td('<input type="checkbox" name="hlayer" ' .
+                                    'value="checked" />'),
+                             $q->td('use hydration layer to improve fitting')),
+                      $q->Tr($q->td('Excluded Volume Adjustment'),
+                             $q->td('<input type="checkbox" name="exvolume" ' .
+                                    'value="checked" />'),
+                             $q->td('adjust the protein excluded volume ' .
+                                    'to improve fitting')),
+                      $q->Tr($q->td('Implicit Hydrogens'),
+                             $q->td('<input type="checkbox" name="ihydrogens"' .
+                                    ' value="checked" />'),
+                             $q->td('implicitly consider hydrogen atoms')),
+                      $q->Tr($q->td('Background Adjustment'),
+                             $q->td('<input type="checkbox" name="background"' .
+                                    ' value="checked" />'),
+                             $q->td('adjust the background of the ' .
+                                    'experimental profile')),
+                      $q->Tr($q->td('Offset'),
+                             $q->td('<input type="checkbox" name="offset"' .
+                                    ' value="checked" />'),
+                             $q->td('use offset in profile fitting')),
+                  ));
+}
+
 sub get_all_advanced_options {
     my $self = shift;
-    return $self->get_advanced_modeling_options();
+    return $self->get_advanced_modeling_options() .
+           $self->get_saxs_options();
 }
 
 sub get_sequence_or_alignment {
