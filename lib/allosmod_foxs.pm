@@ -117,7 +117,7 @@ sub get_sampling_options {
                                          -value=>"300"}) .
       "</div>\n\n" .
 
-      "<input type=\"radio\" name=\"sampletype\" value=\"multiconf\" " .
+      "<input type=\"radio\" name=\"sampletype\" value=\"rareconf\" " .
       "onclick=\"\$('#multiconf').slideUp('fast'); " .
       "\$('#rareconf').slideDown('fast')\" />Sample low probability " .
       "conformations consistent with input crystal structure(s)" . $q->br .
