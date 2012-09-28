@@ -11,10 +11,11 @@ sub get_navigation_links {
     my $self = shift;
     my $q = $self->cgi;
     return [
-        $q->a({-href=>$self->index_url}, "Allostery Model Home"),
-        $q->a({-href=>$self->queue_url}, "Allostery Model Current queue"),
-        $q->a({-href=>$self->help_url}, "Allostery Model Help"),
-        $q->a({-href=>$self->contact_url}, "Allostery Model Contact")
+        $q->a({-href=>$self->index_url}, "AllosMod Home"),
+        $q->a({-href=>$self->help_url}, "About AllosMod"),
+        $q->a({-href=>$self->queue_url}, "AllosMod Queue"),
+        $q->a({-href=>$self->contact_url}, "Contact Us"),
+	$q->a({-href=>$self->cgiroot . "/help.cgi?type=resources"},"Resources")
         ];
 }
 
@@ -64,16 +65,25 @@ Carefully designed energy landscapes allow efficient molecular
 dynamics sampling at constant temperatures, thereby providing ergodic 
 sampling of conformational space. AllosMod is optimized to study 
 transitions in large allosteric proteins but a user can apply AllosMod to 
-study protein dynamics in general.<br />
+study protein dynamics for any case in which the main states are 
+crystalized or can be modeled.<br />
 <br />
 The AllosMod server allows batch jobs to set up many simulations at 
 once. Upload a zip file containing directories for each 
 type of landscape that you want to create. AllosMod will set up many short 
-simulations for each landscape. Each constant temperature simulation 
-is ran at 300K for 6 ns by default, which will be completed 
+simulations for each landscape. By default, each constant temperature simulation 
+is ran at 300K for 6 ns, which will be completed 
 overnight on a single processor. By starting each simulation 
-at different points in conformational space, sampling is acheived efficiently. 
-For more details click on the help link (above) and read the paper (below).
+at different points in conformational space, sampling is acheived efficiently. <br />
+<br />
+AllosMod has several options for conformational sampling and contains tools for simulation analysis. 
+The AllosMod server is integrated with a server for modeling glycosylated proteins (in development) 
+and the <a href="http://modbase.compbio.ucsf.edu/foxs/index.html"> FoXS server</a>
+for structure-based calculation of small angle X-ray scattering 
+profiles. For more details click on the "About AllosMod" link above and read the paper listed below. <br />
+<br />
+***<a style="color:red">NEW</a>*** AllosMod will run quick, constant temperature simulations of your 
+                        modeled energy landscape on our servers, see "About AllosMod" for details.
 <br />&nbsp;</p>
 GREETING
     return "<div id=\"resulttable\">\n" .
@@ -101,10 +111,10 @@ GREETING
                       $q->td($q->textfield({-name=>"name",
                                             -value=>"hemoglobin", -size=>"25"}))) .
 
-               $q->Tr($q->td($q->h3("Before running simulations, read this: ",
+               $q->Tr($q->td($q->h3("***Before running simulations, click here: ",
                                     $self->help_link("run")))) .
 
-               $q->Tr($q->td($q->h3("To analyze simulations, read this: ",
+               $q->Tr($q->td($q->h3("To analyze simulations, click here: ",
                                     $self->help_link("analysis")))) .
 
                $q->Tr($q->td({-colspan=>"2"},
@@ -245,6 +255,17 @@ sub display_failed_job {
                     $self->contact_url . "\">contact us</a> for " .
                     "further assistance.");
     return $return;
+}
+
+sub get_help_page {
+    my ($self, $display_type) = @_;
+    if ($display_type eq "resources") {
+	return $self->get_text_file("resources.txt");
+    } elsif ($display_type eq "glyc") {
+	return $self->get_text_file("help_glyc.txt");
+    } else {
+	return $self->SUPER::get_help_page($display_type);
+    }
 }
 
 1;

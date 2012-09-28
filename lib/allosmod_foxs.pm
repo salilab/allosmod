@@ -39,10 +39,11 @@ sub get_project_menu {
 <a href="http://modbase.compbio.ucsf.edu/allosmod-foxs"><img src="$htmlroot/img/am_logo.gif" /></a>
 </left>
 </div><br />
-<h4><small>Developers:</small></h4><p>Dina Schneidman & Patrick Weinkam</p>
+<h4><small>Developers:</small></h4><p>Dina Schneidman <br />
+Ben Webb<br />
+Patrick Weinkam</p>
 <h4><small>Acknowledgements:</small></h4>
-<p>Ben Webb<br />
-Elina Tjioe<br />
+<p>Elina Tjioe<br />
 Ursula Pieper<br />
 <br />
 Andrej Sali</p>
@@ -250,7 +251,7 @@ sub get_index_page {
 
     my $greeting = <<GREETING;
 <p>AllosMod-FoXS combines the <a href="http://modbase.compbio.ucsf.edu/allosmod/index.html"> AllosMod server</a> and 
-<a href="http://modbase.compbio.ucsf.edu/foxs/index.html"> FoXS </a> web servers. Our combined server allows various 
+<a href="http://modbase.compbio.ucsf.edu/foxs/index.html"> FoXS</a> web servers. Our combined server allows various 
 sampling algorithms from AllosMod to generate structures that are directly inputed into FoXS for small angle X-ray 
 scattering (SAXS) profile calculations.
 <br />

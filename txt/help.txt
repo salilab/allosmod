@@ -1,4 +1,4 @@
-<h1>Allostery Model Help Pages</h1>
+<h1>AllosMod Help Pages</h1>
 <div id="logo">
 <left>
 <a href="http://modbase.compbio.ucsf.edu/allosmod"><img src="http://modbase.compbio.ucsf.edu/allosmod/html/img/am_logo.gif" /></a>
@@ -12,13 +12,14 @@ the rest of the protein, i.e. the regulated region. Varying the radius of the al
 across the structure, thereby driving the simulation to sample different regions of the conformational
 space relevant to the allosteric transition. See the paper for more details.
 </p>
-<a><h4>Input Files</h4></a>
+<a><h4>Server Input</h4></a>
 <ul>
   <li><a id="email"><h5>Email</h5></a>
       <p>If set, a notification will be sent once the job is completed.
       </p></li><br />
   <li><a id="file"><h5>Directories zip file</h5></a>
-      <p>Upload a zip file containing a set of directories for each landscape that you want to model. For an example directory, 
+      <p>Upload a zip file containing a set of directories for each landscape that you want to model. To create such a file, put all the input files into one 
+         directory per landscape and type: zip -r input.zip dir1 dir2... For an example directory, 
          click <a href="http://modbase.compbio.ucsf.edu/allosmod/html/file/input.zip"> here</a>. 
          Each directory should contain the following files:
       </p></li>
@@ -26,26 +27,45 @@ space relevant to the allosteric transition. See the paper for more details.
       <p><br /><b>PDB file(s):</b> all structures used to create the energy landscape for the simulation. <br />
          <br /><b>Alignment file:</b> (align.ali) contains one entry for each PDB file. Another entry (named pm.pdb) pertains to the sequence to be simulated. 
                   This alignment file should be generated after an alignment procedure, as this alignment will be used to generate restraints for the simulation. 
-                  Multiple chains can be specified by using a "/" as a separater, the same specifications 
-		  used in Modeller. There are many ways to create an alignment file including: 1) <a href="http://salilab.org/modeller/tutorial/basic.html">Modeller</a>
-		  and 2) <a href="http://www.ebi.ac.uk/Tools/msa/clustalw2/">ClustalW</a>. <br />
-	 <br /><b>Structure list:</b> (list) contains a list of all PDB files used to create the energy landscape for the simulation. The first file is the 
-	          ligand bound structure and is used to define interactions in the allosteric site and the regulated region. All remaining files are used 
-		  to define interactions in the regulated region only. <br />
-	 <br /><b>Ligand File (optional):</b> (lig.pdb) contains the structure of the ligand taken from the ligand bound structure (i.e. the first in the list file).
-	          A radius (rAS) around the ligand is used to define the allosteric site. If excluded, the program will set the coordinates of lig.pdb to 
-		  the center of mass of the first structure in the list file. Then, setting rAS to a large number will allow a landscape with a single energy minimum
-		  corresponding to the first structure in the list file. Alternatively, setting rAS to zero will allow a landscape with multiple energy minima 
-		  corresponding to the remaining structures in the list file. <br />
-	 <br /><b>Input File:</b> (input.dat) contains one line per parameter as follows:
-	     <br /> rAS = X <ul> Radius (in &Aring;ngstroms) around the coordinates of the ligand that will specify the allosteric site. The lig.pdb file and 
-	                         the first structure in the list file are used. Therefore, it is important that lig.pdb is extracted from the first 
-				 structure in the list file.</ul>
-	     <br /> NTOT = X <ul> Number of distinct minima in the landscape. NTOT is typically 2 if one ligand bound and one ligand unbound structure. See paper 
-                                for more details. </ul>
-	     <br /> NRUNS = X <ul> Number of independent simulations to run. By default, each simulation will run for 6 ns. </ul>
-	     <br /> delEmax = X <ul> (optional) is the value of the maximum energy per distance interaction, typically between 0.09 and 0.12 kcal/mol. If excluded, 
+                  Multiple chains can be specified by using a "/" as a separator, the same specifications 
+		  used in MODELLER. There are many ways to create an alignment file including: 1) <a href="http://salilab.org/modeller/tutorial/basic.html">MODELLER</a>
+		  and 2) <a href="http://www.ebi.ac.uk/Tools/msa/clustalw2/">ClustalW</a>. A suggested alignment file will be made if the uploaded alignment file 
+		  is faulty. <br />
+		  ***<a style="color:red">WARNING</a>*** Small errors in the alignment can cause big errors during a simulation due to energy conservation problems. 
+		  Make sure there are no misalignments in which adjacent residues are aligned far apart in sequence (alignment programs often do this at the beginning 	
+		  or end of chains). <br />
+	 <br /><b>Structure list:</b> (list) contains a list of all PDB files used to create the energy landscape for the simulation. If LIGPDB is not specified in 
+	          input.dat, the first file is used to define interactions in the allosteric site and other regions of the protein. All remaining files are used 
+		  to define interactions in all regions of the protein except the allosteric site. <br />
+	 <br /><b>Ligand File (optional):</b> (lig.pdb) contains the structure of the ligand taken from the ligand bound structure (this structure is defined 
+	          by LIGPDB in input.dat). A radius (rAS) around the ligand is used to define the allosteric site. If lig.pdb is excluded and there is only one structure 
+		  in the list file, AllosMod will set up a simulation with a single energy minimum. If lig.pdb is excluded and there is two or more structures in the 
+		  list file, AllosMod will set up a simulation with as many energy minima described by structures in the list file. <br />
+	 <br /><b>Input file:</b> (input.dat) contains one line per parameter as follows:
+	     <br /> NRUNS = X <ul> is the number of independent simulations to run. </ul>
+	     <br /> rAS = X (optional) <ul> 
+				 is the radius (in &Aring;ngstroms) around the coordinates of the ligand that will specify the allosteric site. If the file lig.pdb 
+				 is included, the radius will be calculated using coordinates in LIGPDB. Therefore, it is important that lig.pdb is extracted 
+				 from LIGPDB. If lig.pdb is not specified or if there is only one structure in the list file, rAS is set to 1000 and the energy landscape 
+				 is modeled from a single structure in the list file. </ul>
+	     <br /> SAMPLING = X (optional) <ul> 
+			         simulation - <ul> (Default) A simulation is set up for the user to run on his/her computer. Due to the large number of files 
+				 generated, AllosMod cannot currently run full simulations without overwhelming our other severs. For help running the 
+				 simulation, see section below called "To run the simulation." </ul><br />
+	     			 moderate_am - <ul> Sampling is performed using a quick, unequilibrated simulation at 300 K. This quick sampling will give a 
+				 representation of the types of conformations that are consistent with the modeled energy landscape. Set "SAMPLING = simulation" 
+				 to predict the relative populations of the conformations. </ul>
+				 </ul>
+	     <br /> delEmax = X (optional) <ul> is the value of the maximum energy per distance interaction, typically between 0.09 and 0.12 kcal/mol. If excluded, 
                                    the value will be assigned according to 3.6*(number of residues/number of distance interactions). See paper for more details. </ul>
+	     <br /> LIGPDB = X (optional) <ul> is the PDB file used to define the allosteric site. AllosMod defines the allosteric site using the distance (rAS) 
+				   from the effector (lig.pdb) using the LIGPDB coordinates. If not defined, LIGPDB is set to the first structure specified in the list file. 
+				   In order to run an effector unbound simulation: 1) set the first entry in list the effector unbound PDB file, 2) set the second 
+				   entry in list the effector bound PDB file, 3) set LIGPDB to the effector bound PDB file. If omitting LIGPDB, the allosteric 
+				   site is defined after superimposing the effector unbound PDB file onto the effector bound PDB file. </ul>
+	     <br /> DEVIATION = X (optional) <ul> is the distance (in &Aring;ngstroms) that the atoms will be randomized when creating the 
+				   initial structure (default is 1.0 &Aring).</ul>
+	     <br /> MDTEMP = X (optional) <ul> is the temperature (in degrees Kelvin) for the simulation (default is 300 K).</ul>
       </p><br />
      
 
@@ -53,21 +73,22 @@ space relevant to the allosteric transition. See the paper for more details.
       <p>Name your job so you can refer to it later.
       </p></li>
 </ul>
-<a name="output"><h4>Output</h4></a>
+<a name="output"><h4>Server Output</h4></a>
 <p>
 	The output is a zip file containing the same directories that were uploaded and subdirectories for each simulation. Each subdirectory will contain 
-	a Modeller script (model_run.py), a unique starting structure (random.ini), a restraint file containing interactions that will define the energy landscape 
+	a MODELLER script (model_run.py), a unique starting structure (random.ini), a restraint file containing interactions that will define the energy landscape 
 	(converted.rsr), log files, and other output files.
 </p><br />
 
-<a name="run"><h4>To run the simulation</h4></a>
+<a name="run"><h4>***To run the simulation</h4></a>
 <p>
-	Three scripts within Modeller have been modified to run the the simulations: 1) automodel.py is the top level script 2) autosched.py sets up the initial 
-	structure and 3) refine.py runs the equilibration and simulation trajectories. Download these scripts 
-	(click <a href="http://modbase.compbio.ucsf.edu/allosmod/html/file/modeller_scripts.zip">here</a>) 
-	and move them to $MODELLER_HOME/modlib/modeller/automodel/. The scripts will not modify existing Modeller functionality. To modify the simulation 
-	time and/or the simulation temperature, edit the consttemp method in refine.py. To run, navigate to the output subdirectories, each contains 
-	a unique starting structure (random.ini) and a unique run script (model_run.py), and type: "$MODELLER_HOME/bin/modSVN model_run.py". 
+	To run, navigate to a run directory. Each run directory contains a unique starting structure (random.ini) and a unique run script (model_run.py), then 
+	type: "$MODELLER_HOME/bin/mod${MODELLER_VERSION} model_run.py". The process can use 2 GB of memory for a 500 residue protein so allocate your 
+	resources carefully! The script will output 2000 snapshots by default (numbered 1001 to 3000) as well other data files. AllosMod 
+	implements the Automodel class used in MODELLER for comparative modeling, 
+	however the optimization and refinement steps have been modified to allow for constant temperature molecular dynamics simulations. For 
+	each run directory, there is a file allosmod.py. This file contains the method consttemp that controls the simulation schedule and temperature (MDtemp). 
+	For help with script details, refer to the <a href="http://salilab.org/modeller/manual/"> MODELLER help pages</a>.
 </p><br />
 
 <a name="analysis"><h4>To analyze the simulation</h4></a>
@@ -75,5 +96,5 @@ space relevant to the allosteric transition. See the paper for more details.
 	Download the analysis script to run on any linux/unix based machine 
 	(click <a href="http://modbase.compbio.ucsf.edu/allosmod/html/file/analysis.zip">here</a>).  This script will check the simulations for possible 
 	errors as well as output several files including: 1) energies 2) Boltzmann weighted probabilities 3) local structural similarity metrics Qi.  
-	See README file for a full desciption.
+	See README file for a full description.
 </p><br />
