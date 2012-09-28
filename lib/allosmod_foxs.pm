@@ -99,38 +99,37 @@ sub get_all_advanced_options {
     return $self->get_advanced_modeling_options();
 }
 
-sub get_index_page {
-    my $self = shift;
+sub get_sequence_or_alignment {
+    my ($self, $alignment) = @_;
     my $q = $self->cgi;
-    if (defined($q->param('sequence'))) {
-      return $self->confirm_alignment();
+
+    if (defined($alignment)) {
+      return $q->p("Alignment:" . $q->br .
+                   $q->textarea({-name=>'alignment', -rows=>5, -cols=>80,
+                                 -value=>$alignment}));
     } else {
-      return $self->get_first_index_page();
+      return $q->p("Sequence used in experiment:" . $q->br .
+                   $q->textarea({-name=>'sequence', -rows=>5, -cols=>80}));
     }
 }
 
-sub confirm_alignment {
+sub get_alignment {
     my $self = shift;
     my $q = $self->cgi;
-    return "<div id=\"resulttable\">\n" .
-           $q->h2({-align=>"center"},
-                  "Confirm or modify alignment") .
-
-           $q->start_form({-name=>"allosmod-foxsform", -method=>"post",
-                           -action=>$self->submit_url}) .
-           $q->p("Alignment:" . $q->br .
-                 $q->textarea({-name=>'alignment', -rows=>5, -cols=>80})) .
-           $q->p("<center>" .
-                 $q->input({-type=>"submit", -value=>"Submit"}) .
-                 $q->input({-type=>"reset", -value=>"Reset"}) .
-                 "</center>") .
-           $q->end_form .
-           "</div>\n";
+    my $seq = $q->param('sequence');
+    if (defined($seq) and $seq ne "") {
+      return "to do";
+    } else {
+      return undef;
+    }
 }
 
-sub get_first_index_page {
+sub get_index_page {
     my $self = shift;
     my $q = $self->cgi;
+
+    my $alignment = $self->get_alignment();
+    my $action = (defined($alignment) ? $self->submit_url : $self->index_url);
 
     my $greeting = <<GREETING;
 <p>AllosMod-FoXS combines the <a href="http://modbase.compbio.ucsf.edu/allosmod/index.html"> AllosMod server</a> and 
@@ -147,13 +146,12 @@ GREETING
            $greeting .
 
            $q->start_form({-name=>"allosmod-foxsform", -method=>"post",
-                           -action=>$self->index_url}) .
+                           -action=>$action}) .
            $q->p("PDB code " . $q->textfield({-name=>'pdbcode',
                                               -size=>'5'}) .
                  " or upload file(s) " .
                  $q->filefield({-name=>'uploaded_file'})) .
-           $q->p("Sequence used in experiment:" . $q->br .
-                 $q->textarea({-name=>'sequence', -rows=>5, -cols=>80})) .
+           $self->get_sequence_or_alignment($alignment) .
            $q->table(
                $q->Tr($q->td("Experimental profile"),
                       $q->td($q->filefield({-name=>"saxs_profile",
