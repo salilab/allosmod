@@ -95,6 +95,37 @@ sub get_advanced_modeling_options {
                                      -size=>"3"})));
 }
 
+sub get_sampling_options {
+    my $self = shift;
+    my $q = $self->cgi;
+    return $self->make_dropdown("sampling", "Sampling Options", 0,
+      "<input type=\"radio\" name=\"sampletype\" value=\"multiconf\" " .
+      "checked=\"checked\" onclick=\"\$('#rareconf').slideUp('fast'); " .
+      "\$('#multiconf').slideDown('fast')\" />Sample most probable " .
+      "conformations consistent with input crystal structure(s)" . $q->br .
+      "<div class=\"sampopts\" id=\"multiconf\">\n" .
+      "Number of runs " . $q->textfield({-name=>'NRUNS', -size=>"3",
+                                         -value=>"30"}) .
+      "MD temperature " . $q->textfield({-name=>'md_temperature', -size=>"3",
+                                         -value=>"300"}) .
+      "</div>\n\n" .
+
+      "<input type=\"radio\" name=\"sampletype\" value=\"multiconf\" " .
+      "onclick=\"\$('#multiconf').slideUp('fast'); " .
+      "\$('#rareconf').slideDown('fast')\" />Sample low probability " .
+      "conformations consistent with input crystal structure(s)" . $q->br .
+      "<div class=\"sampopts\" id=\"rareconf\" style=\"display:none\">\n" .
+      "Number of runs " . $q->textfield({-name=>'NRUNS', -size=>"3",
+                                         -value=>"30"}) . $q->br .
+      "MD temperature scanned or fixed value" .
+                $q->textfield({-name=>'md_temperature', -size=>"3",
+                               -value=>"300"}) . $q->br .
+      "structural similarity % cut-off" .
+                $q->textfield({-name=>'similarity_percentile', -size=>"3",
+                               -value=>"10"}) .
+      "</div>\n");
+}
+
 sub get_saxs_options {
     my $self = shift;
     my $q = $self->cgi;
@@ -135,6 +166,7 @@ sub get_saxs_options {
 sub get_all_advanced_options {
     my $self = shift;
     return $self->get_advanced_modeling_options() .
+           $self->get_sampling_options() .
            $self->get_saxs_options();
 }
 
