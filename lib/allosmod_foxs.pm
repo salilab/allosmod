@@ -96,10 +96,10 @@ sub get_advanced_modeling_options {
                 $q->p("glycosylation sites" .
                       $q->filefield({-name=>"sugar_file"}) .
                       $q->checkbox({-name=>'flexible_glyc_sites',
-                                    -label=>'flexible', -value=>"checked"}) . $q->br .
+                                    -label=>'flexible', -value=>'checked'}) . $q->br .
                       "number of optimization steps" .
                       $q->textfield({-name=>'number_of_steps_glyc',
-                                     -size=>"3"})));
+                                     -size=>"3", -value=>"1"})));
 }
 
 sub get_sampling_options {
@@ -126,7 +126,7 @@ sub get_sampling_options {
                                          -value=>"30"}) . $q->br .
       "MD temperature scanned or fixed value" .
                 $q->textfield({-name=>'md_temperature', -size=>"3",
-                               -value=>"300"}) . $q->br .
+                               -value=>"scan"}) . $q->br .
       "structural similarity % cut-off" .
                 $q->textfield({-name=>'similarity_percentile', -size=>"3",
                                -value=>"10"}) .
