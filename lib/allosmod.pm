@@ -12,8 +12,8 @@ sub get_navigation_links {
     my $q = $self->cgi;
     return [
         $q->a({-href=>$self->index_url}, "AllosMod Home"),
-#        $q->a({-href=>$self->help_url}, "About AllosMod"),
-        $q->a({-href=>$self->cgiroot . "/help.cgi?type=help"},"About AllosMod"),
+        $q->a({-href=>$self->help_url}, "About AllosMod"),
+#        $q->a({-href=>$self->cgiroot . "/help.cgi?type=help"},"About AllosMod"),
         $q->a({-href=>$self->queue_url}, "AllosMod Queue"),
         $q->a({-href=>$self->contact_url}, "Contact Us"),
 	$q->a({-href=>$self->cgiroot . "/help.cgi?type=resources"},"Resources")

@@ -1,0 +1,82 @@
+<h1>AllosMod Help Page - Modeling Glycosylation </h1><br />
+<a><h4>Server Input</h4></a>
+<ul>
+  <li><a id="file"><h5>Directories zip file</h5></a>
+      <p>Upload a zip file containing a set of directories for each glycosylated protein that you want to model. For an example directory, 
+         click <a href="http://modbase.compbio.ucsf.edu/allosmod/html/file/input_glyc.zip"> here</a>. 
+         Each directory should contain the following files:
+      </p></li>
+
+      <p><br /><b>PDB file(s):</b> the template structures used to model the protein. <br />
+         <br /><b>Alignment file:</b> (align.ali) contains one entry for each PDB file. Another entry (named pm.pdb) pertains to the sequence to be modeled. 
+                  This alignment file should be generated after an alignment procedure, as this alignment will be used to generate restraints for modeling. 
+                  Multiple chains can be specified by using a "/" as a separator, the same specifications 
+		  used in MODELLER. There are many ways to create an alignment file including: 1) <a href="http://salilab.org/modeller/tutorial/basic.html">MODELLER</a>
+		  and 2) <a href="http://www.ebi.ac.uk/Tools/msa/clustalw2/">ClustalW</a>. <br />
+		  ***<a style="color:red">WARNING</a>*** Small errors in the alignment can cause big errors during a simulation due to energy conservation problems. 
+		  Make sure there are no misalignments in which adjacent residues are aligned far apart in sequence (alignment programs often do this at the beginning 	
+		  or end of chains). <br />
+	 <br /><b>Structure list:</b> (list) contains all PDB files used as template structures.<br />
+	 <br /><b>Input file:</b> (input.dat) contains one line per parameter as follows:
+	     <br /> NRUNS = X <ul> Number of models to generate. </ul> <br />
+	     <br /> ATTACH_GAPS = True/False (optional) <ul> Gaps will be inserted into the alignment file at the sugar attachment sites. This allows more flexibility 
+		    of the protein to accommodate the sugars (default is True) . </ul><br />
+	     <br /> SAMPLING = X (optional) 
+	     <ul> 
+			moderate_cm - <ul> (Default) Sampling is performed using simulated annealing at moderate temperatures. The energy function for the 
+			  protein is composed of restraints from MODELLER while the energy function for sugar molecules is a combination of dihedral terms from CHARMM and 
+			  harmonic restraints as described in Guttman et al. </ul><br />
+	     </ul>
+	     <br /> REPEAT_OPTIMIZATION = X (optional) 
+	     <ul>
+			is the number of optimization steps to be performed. Default is one.
+	     </ul> <br />
+	 <br /><b>Glycosylation file:</b> (glyc.dat) contains one line per sugar monomer grouped by chains of monomers. The line with the protein-bonded monomer 
+	          specifies the beginning of a chain and is followed by all monomers within the chain. Three or four columns define 
+		  the sugar types and connectivity: 1) monomer name, 2) O1 bond type, 3) O1 attachment residue index and, if O1 attaches to a protein side chain, 
+		  the protein chain should be the fourth column: <br />
+		  <ul>
+			<br /><b>monomer name:</b><br />
+			<ul>
+			    NAG - b-N-Acetyl-D-Glucosamine<br />
+			    NGA - b-N-Acetyl-D-Galactosamine<br />
+			    GLB - b-Galactose<br />
+			    FUC - a-Fucose<br />
+			    MAN - a-Mannose<br />
+			    BMA - b-Mannose<br />
+			    NAN - a-Neuraminic acid<br />
+			</ul>
+
+			<br /><b>O1 bond type:</b><br />
+			<ul>
+			    NGLA or NGLB - axial or equatorial bond to ASN*<br />
+			    SGPA or SGPB - bond between alpha or beta position and SER*<br />
+			    TGPA or TGPB - bond between alpha or beta position and THR*<br />
+			    16ab - (i) 1->6 (i-1) axial at C1 and equatorial at C6<br />
+			    16fu - (i) 1->6 (i-1) axial at C1 and equatorial at C6<br />
+			    14bb - (i) 1->4 (i-1) equatorial at C1 and equatorial at C4<br />
+			    13ab - (i) 1->3 (i-1) axial at C1 and equatorial at C3<br />
+			    13bb - (i) 1->4 (i-1) equatorial at C1 and equatorial at C3<br />
+			    12aa - (i) 1->2 (i-1) axial at C1 and axial at C2<br />
+			    12ba - (i) 1->2 (i-1) equatorial at C1 and axial at C2<br />
+			    sa23 - og sialic acid alpha 2->3 equatorial<br />
+			    sa26 - og sialic acid alpha 2->6 equatorial<br />
+			    <br /><br />
+			    *entry specifies the beginning of a new chain
+			</ul>
+
+			<br /><b>O1 attachment residue index and chain:</b><br />
+			<ul>
+			For every new sugar chain, specify the amino acid residue index and chain bound to the O1 atom.
+			For sugars within the chain, specify the index of the sugar monomer bound to the O1 atom defined as such: 
+			the first listed monomer in a chain has index 1, the second listed monomer in a chain has index 2,... <br />
+			</ul>
+		  </ul>
+		  
+      </p><br />
+     
+</ul>
+<a name="output"><h4>Output</h4></a>
+<p>
+	The output is a zip file containing the same directories that were uploaded with subdirectories containing glycosylated structures named pm.pdb.B99990001.pdb.<br />
+</p><br />
