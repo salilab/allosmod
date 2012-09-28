@@ -117,11 +117,33 @@ sub get_alignment {
     my $self = shift;
     my $q = $self->cgi;
     my $seq = $q->param('sequence');
-    if (defined($seq) and $seq ne "") {
-      return "to do";
-    } else {
+    if (!defined($seq)) {
       return undef;
     }
+    $seq =~ s/\s*//g;
+    if ($seq eq "") {
+      return undef;
+    }
+
+    my $nres = 0;
+    my $ichain = 0;
+    for (my $i = 0; $i < length($seq); $i++) {
+      my $s = substr($seq, $i, 1);
+      if ($s eq '/') {
+        $ichain++;
+      } else {
+        $nres++;
+      }
+    }
+    
+    my $end_chain = chr(ord('A') + $ichain);
+    my $aln = ">P1;pm.pdb\n" .
+              "structureX:pm.pdb:1:A:${nres}:${end_chain}:::-1.00:-1.00";
+    for (my $i = 0; $i < length($seq); $i += 75) {
+      $aln .= "\n" . substr($seq, $i, 75);
+    }
+    $aln .= "*\n";
+    return $aln;
 }
 
 sub get_index_page {
