@@ -65,12 +65,12 @@ MODELLER. AllosMod creates a model of a protein\'s energy landscape.
 Carefully designed energy landscapes allow efficient molecular 
 dynamics sampling at constant temperatures, thereby providing ergodic 
 sampling of conformational space. Use AllosMod to:<br />
-<br /><ul>
+<ul>
 - Model energy landscapes for a protein with known/modeled ligand bound and unbound structures <br />
-- Model energy landscapes for a protein with only one known/modeled structure to predict lowly populated ensembles <br />
-- Model energy landscapes for glycosylated proteins (Click <a href="http://modbase.compbio.ucsf.edu/allosmod/help.cgi?type=glyc"> here</a>) <br />
+- Model energy landscapes for a protein with one known/modeled structure to predict lowly populated ensembles <br />
+- Model energy landscapes for glycosylated proteins (For help, click <a href="http://modbase.compbio.ucsf.edu/allosmod/help.cgi?type=glyc"> here</a>) <br />
 - Fast sampling for any of the above landscapes <br />
-</ul><br />
+</ul>
 
 The AllosMod server allows batch jobs to set up many simulations at 
 once. Upload a zip file containing directories for each 

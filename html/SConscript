@@ -1,4 +1,4 @@
 Import('env')
 
-env.InstallHTML(['img/pdf.gif','img/am_logo.gif'],'img')
+env.InstallHTML(['img/pdf.gif','img/am_logo.gif','img/foxs.png'],'img')
 env.InstallHTML(['file/modeller_scripts.zip','file/Weinkam_PNAS_2012.pdf','file/Weinkam_PNAS_2012_si.pdf','file/input.zip','file/analysis.zip','file/files_glyc.zip','file/input_glyc.zip'],'file')

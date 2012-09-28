@@ -23,6 +23,7 @@ sub get_navigation_links {
     return [
         $q->a({-href=>$self->index_url}, "AllosMod-FoXS Home"),
         $q->a({-href=>$self->help_url}, "About AllosMod-FoXS"),
+#        $q->a(href="http://modbase.compbio.ucsf.edu/allosmod/help.cgi?type=help", "About AllosMod-FoXS"),
         $q->a({-href=>$self->queue_url}, "Queue"),
         $q->a({-href=>$self->contact_url}, "Contact Us"),
 	$q->a({-href=>$self->cgiroot . "/help.cgi?type=resources"},"Resources")
@@ -36,7 +37,12 @@ sub get_project_menu {
     return <<MENU;
 <div id="logo">
 <left>
-<a href="http://modbase.compbio.ucsf.edu/allosmod-foxs"><img src="$htmlroot/img/am_logo.gif" /></a>
+<a href="http://modbase.compbio.ucsf.edu/allosmod"><img src="http://modbase.compbio.ucsf.edu/allosmod/html/img/am_logo.gif" /></a>
+</left>
+<br />
+<br />
+<left>
+<a href="http://modbase.compbio.ucsf.edu/foxs"><img src="http://modbase.compbio.ucsf.edu/allosmod/html/img/foxs.png" /></a>
 </left>
 </div><br />
 <h4><small>Developers:</small></h4><p>Dina Schneidman <br />
@@ -59,8 +65,8 @@ sub get_footer {
 <div id="address">
 <center><a href="http://www.ncbi.nlm.nih.gov/pubmed/22403063">
 <b>P. Weinkam, J. Pons, and A. Sali, Proc Natl Acad Sci U S A., (2012) <i>109 (13),</i> 4875-4880</b></a>:
-<a href="$htmlroot/file/Weinkam_PNAS_2012.pdf"><img src="$htmlroot/img/pdf.gif" /></a>,
-S.I.:<a href="http://modbase.compbio.ucsf.edu/allosmod/html/file/Weinkam_PNAS_2012_si.pdf"><img src="$htmlroot/img/pdf.gif" /></a>
+<a href="http://modbase.compbio.ucsf.edu/allosmod/html/file/Weinkam_PNAS_2012.pdf"><img src="http://modbase.compbio.ucsf.edu/allosmod/html/img/pdf.gif" /></a>,
+S.I.:<a href="http://modbase.compbio.ucsf.edu/allosmod/html/file/Weinkam_PNAS_2012_si.pdf"><img src="http://modbase.compbio.ucsf.edu/allosmod/html/img/pdf.gif" /></a>
 </center>
 </div>
 FOOTER
@@ -90,7 +96,7 @@ sub get_advanced_modeling_options {
                 $q->p("glycosylation sites" .
                       $q->filefield({-name=>"sugar_file"}) .
                       $q->checkbox({-name=>'flexible_glyc_sites',
-                                    -label=>'flexible'}) . $q->br .
+                                    -label=>'flexible', -value=>"checked"}) . $q->br .
                       "number of optimization steps" .
                       $q->textfield({-name=>'number_of_steps_glyc',
                                      -size=>"3"})));
@@ -222,11 +228,7 @@ sub get_index_page {
 
     my $form;
     if (defined($alignment)) {
-      $form = $q->p("PDB code " . $q->textfield({-name=>'pdbcode',
-                                              -size=>'5'}) .
-                 " or upload file(s) " .
-                 $q->filefield({-name=>'uploaded_file'})) .
-           $q->p("Alignment:" . $q->br .
+      $form = $q->p("Alignment:" . $q->br .
                    $q->textarea({-name=>'alignment', -rows=>5, -cols=>80,
                                  -value=>$alignment})) .
            $q->table(
@@ -242,7 +244,11 @@ sub get_index_page {
                  "</center>") .
            $self->get_all_advanced_options();
     } else {
-      $form = $q->p("Sequence used in experiment:" . $q->br .
+      $form = $q->p("PDB code " . $q->textfield({-name=>'pdbcode',
+                                              -size=>'5'}) .
+                 " or upload file(s) " .
+                 $q->filefield({-name=>'uploaded_file'})) .
+          $q->p("Sequence used in experiment:" . $q->br .
                     $q->textarea({-name=>'sequence', -rows=>5, -cols=>80})) .
               $q->p("<center>" .
                     $q->input({-type=>"submit", -value=>"Submit"}) .
@@ -250,7 +256,7 @@ sub get_index_page {
     }
 
     my $greeting = <<GREETING;
-<p>AllosMod-FoXS combines the <a href="http://modbase.compbio.ucsf.edu/allosmod/index.html"> AllosMod server</a> and 
+<p>AllosMod-FoXS combines the <a href="http://modbase.compbio.ucsf.edu/allosmod/index.html"> AllosMod</a> and 
 <a href="http://modbase.compbio.ucsf.edu/foxs/index.html"> FoXS</a> web servers. Our combined server allows various 
 sampling algorithms from AllosMod to generate structures that are directly inputed into FoXS for small angle X-ray 
 scattering (SAXS) profile calculations.

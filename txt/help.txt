@@ -11,9 +11,9 @@ allosteric site. The blue probability density function translates to a double en
 the rest of the protein, i.e. the regulated region. Varying the radius of the allosteric site changes how the distance energy is distributed 
 across the structure, thereby driving the simulation to sample different regions of the conformational
 space relevant to the allosteric transition.<br />
-
-For help page to model glycosylated proteins, click <a href="http://modbase.compbio.ucsf.edu/allosmod/help.cgi?type=glyc"> here</a> <br />
-
+<br />
+For help page to model glycosylated proteins, click <a href="http://modbase.compbio.ucsf.edu/allosmod/help.cgi?type=glyc"> here</a>. <br />
+<br />
 </p>
 <a><h4>Server Input</h4></a>
 <ul>
