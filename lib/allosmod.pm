@@ -64,24 +64,27 @@ sub get_index_page {
 MODELLER. AllosMod creates a model of a protein\'s energy landscape. 
 Carefully designed energy landscapes allow efficient molecular 
 dynamics sampling at constant temperatures, thereby providing ergodic 
-sampling of conformational space. AllosMod is optimized to study 
-transitions in large allosteric proteins but a user can apply AllosMod to 
-study protein dynamics for any case in which the main states are 
-crystalized or can be modeled.<br />
-<br />
+sampling of conformational space. Use AllosMod to:<br />
+<br /><ul>
+- Model energy landscapes for a protein with known/modeled ligand bound and unbound structures <br />
+- Model energy landscapes for a protein with only one known/modeled structure to predict lowly populated ensembles <br />
+- Model energy landscapes for glycosylated proteins (Click <a href="http://modbase.compbio.ucsf.edu/allosmod/help.cgi?type=glyc"> here</a>) <br />
+- Fast sampling for any of the above landscapes <br />
+</ul><br />
+
 The AllosMod server allows batch jobs to set up many simulations at 
 once. Upload a zip file containing directories for each 
 type of landscape that you want to create. AllosMod will set up many short 
-simulations for each landscape. By default, each constant temperature simulation 
-is ran at 300K for 6 ns, which will be completed 
-overnight on a single processor. By starting each simulation 
-at different points in conformational space, sampling is acheived efficiently. <br />
+simulations for each landscape. There are two options for sampling: 1) constant temperature 
+simulation at 300 K for 6 ns, which will be completed overnight on a single processor on the 
+user\'s computer or 2) sampling is performed using a quick, unequilibrated simulation at 300 K.
+Sampling is acheived efficiently by starting each simulation at different points in conformational 
+space and by storing the energies in memory. <br />
 <br />
 AllosMod has several options for conformational sampling and contains tools for simulation analysis. 
-The AllosMod server is integrated with a server for modeling glycosylated proteins (in development) 
-and the <a href="http://modbase.compbio.ucsf.edu/foxs/index.html"> FoXS server</a>
-for structure-based calculation of small angle X-ray scattering 
-profiles. For more details click on the "About AllosMod" link above and read the paper listed below. <br />
+The AllosMod server is integrated with the <a href="http://modbase.compbio.ucsf.edu/foxs/index.html"> FoXS server</a>
+for structure-based calculation of small angle X-ray scattering profiles (in progress). For more 
+details click on the "About AllosMod" link above and read the paper listed below. <br />
 <br />
 ***<a style="color:red">NEW</a>*** AllosMod will run quick, constant temperature simulations of your 
                         modeled energy landscape on our servers, see "About AllosMod" for details.
