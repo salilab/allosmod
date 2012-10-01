@@ -36,14 +36,13 @@ sub get_project_menu {
     my $htmlroot = $self->htmlroot;
     return <<MENU;
 <div id="logo">
-<left>
+<center>
 <a href="http://modbase.compbio.ucsf.edu/allosmod"><img src="http://modbase.compbio.ucsf.edu/allosmod/html/img/am_logo.gif" /></a>
-</left>
+</center>
 <br />
-<br />
-<left>
+<center>
 <a href="http://modbase.compbio.ucsf.edu/foxs"><img src="http://modbase.compbio.ucsf.edu/allosmod/html/img/foxs.png" /></a>
-</left>
+</center>
 </div><br />
 <h4><small>Developers:</small></h4><p>Dina Schneidman <br />
 Ben Webb<br />
@@ -67,6 +66,10 @@ sub get_footer {
 <b>P. Weinkam, J. Pons, and A. Sali, Proc Natl Acad Sci U S A., (2012) <i>109 (13),</i> 4875-4880</b></a>:
 <a href="http://modbase.compbio.ucsf.edu/allosmod/html/file/Weinkam_PNAS_2012.pdf"><img src="http://modbase.compbio.ucsf.edu/allosmod/html/img/pdf.gif" /></a>,
 S.I.:<a href="http://modbase.compbio.ucsf.edu/allosmod/html/file/Weinkam_PNAS_2012_si.pdf"><img src="http://modbase.compbio.ucsf.edu/allosmod/html/img/pdf.gif" /></a>
+</center>
+<center><a href="http://www.ncbi.nlm.nih.gov/pubmed/20507903">
+<b>D. Schneidman-Duhovny, M. Hammel, A. Sali, Nucleic Acids Res., (2010) <i>38</i>(Web Server issue), W540-4</b></a>:
+<a href="http://modbase.compbio.ucsf.edu/allosmod/html/file/Schneidman-Duhovny_NucAcRes_2010.pdf"><img src="http://modbase.compbio.ucsf.edu/allosmod/html/img/pdf.gif" /></a>
 </center>
 </div>
 FOOTER
@@ -96,7 +99,7 @@ sub get_advanced_modeling_options {
                 $q->p("glycosylation sites" .
                       $q->filefield({-name=>"sugar_file"}) .
                       $q->checkbox({-name=>'flexible_glyc_sites',
-                                    -label=>'flexible', -value=>'checked'}) . $q->br .
+                                    -label=>'flexible', -checked=>"1"}) . $q->br .
                       "number of optimization steps" .
                       $q->textfield({-name=>'number_of_steps_glyc',
                                      -size=>"3", -value=>"1"})));
@@ -147,25 +150,25 @@ sub get_saxs_options {
                              $q->td('# of points in the computed profile')),
                       $q->Tr($q->td('Hydration Layer'),
                              $q->td('<input type="checkbox" name="hlayer" ' .
-                                    'value="checked" />'),
+                                    'checked="1" />'),
                              $q->td('use hydration layer to improve fitting')),
                       $q->Tr($q->td('Excluded Volume Adjustment'),
                              $q->td('<input type="checkbox" name="exvolume" ' .
-                                    'value="checked" />'),
+                                    'checked="1" />'),
                              $q->td('adjust the protein excluded volume ' .
                                     'to improve fitting')),
                       $q->Tr($q->td('Implicit Hydrogens'),
                              $q->td('<input type="checkbox" name="ihydrogens"' .
-                                    ' value="checked" />'),
+                                    'checked="1" />'),
                              $q->td('implicitly consider hydrogen atoms')),
                       $q->Tr($q->td('Background Adjustment'),
                              $q->td('<input type="checkbox" name="background"' .
-                                    ' value="checked" />'),
+                                    'checked="1" />'),
                              $q->td('adjust the background of the ' .
                                     'experimental profile')),
                       $q->Tr($q->td('Offset'),
                              $q->td('<input type="checkbox" name="offset"' .
-                                    ' value="checked" />'),
+                                    'checked="1" />'),
                              $q->td('use offset in profile fitting')),
                   ));
 }
