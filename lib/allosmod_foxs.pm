@@ -259,7 +259,7 @@ sub get_index_page {
     }
 
     my $greeting = <<GREETING;
-<p>AllosMod-FoXS combines the <a href="http://modbase.compbio.ucsf.edu/allosmod/index.html"> AllosMod</a> and 
+<p>AllosMod-FoXS combines the <a href="http://modbase.compbio.ucsf.edu/allosmod/"> AllosMod</a> and 
 <a href="http://modbase.compbio.ucsf.edu/foxs/index.html"> FoXS</a> web servers. Our combined server allows various 
 sampling algorithms from AllosMod to generate structures that are directly inputed into FoXS for small angle X-ray 
 scattering (SAXS) profile calculations.
