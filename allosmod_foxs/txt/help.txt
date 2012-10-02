@@ -1,0 +1,26 @@
+<h1>AllosMod-FoXS Help Pages</h1>
+<p>
+Test<br />
+<br />
+</p>
+<a><h4>Server Input</h4></a>
+<ul>
+  <li><a id="email"><h5>Email</h5></a>
+      <p>If set, a notification will be sent once the job is completed.
+      </p></li><br />
+  <li><a id="file"><h5>Directories zip file</h5></a>
+      <p>Upload a zip file containing a set of directories for each landscape that you want to model. To create such a file, put all the input files into one 
+         directory per landscape and type: zip -r input.zip dir1 dir2... For an example directory, 
+         click <a href="http://modbase.compbio.ucsf.edu/allosmod/html/file/input.zip"> here</a>. 
+         Each directory should contain the following files:
+      </p></li>
+
+      <p><br /><b>PDB file(s):</b> all structures used to create the energy landscape for the simulation. <br />
+      </p><br />
+     
+</ul>
+<a name="output"><h4>Server Output</h4></a>
+<p>
+	The output is 
+</p><br />
+

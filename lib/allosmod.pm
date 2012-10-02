@@ -67,7 +67,7 @@ dynamics sampling at constant temperatures, thereby providing ergodic
 sampling of conformational space. Use AllosMod to:<br />
 <ul>
 - Model energy landscapes for a protein with known/modeled ligand bound and unbound structures <br />
-- Model energy landscapes for a protein with one known/modeled structure to predict lowly populated ensembles <br />
+- Model energy landscapes for a protein with one known/modeled structure to predict rarely populated conformations <br />
 - Model energy landscapes for glycosylated proteins (For help, click <a href="http://modbase.compbio.ucsf.edu/allosmod/help.cgi?type=glyc"> here</a>) <br />
 - Fast sampling for any of the above landscapes <br />
 </ul>

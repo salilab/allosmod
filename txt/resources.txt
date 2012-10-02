@@ -1,0 +1,40 @@
+<h1>Links and Resources for Allostery</h1>
+<br />
+<h4>Other Relevant Databases and Servers</h4>
+<p>1. <a href="http://mdl.shsmu.edu.cn/ASD/">Allostery Database</a></p>
+<p>2. <a href="http://globin.cse.psu.edu/">Hemoglobin Database</a></p>
+<p>3. <a href="http://www.dynameomics.org/">Dynameomics Database</a></p>
+<p>4. <a href="http://molmovdb.mbb.yale.edu/molmovdb/">Database of Macromolecular Movements</a></p>
+<p>5. <a href="http://best.bio.jhu.edu/BEST/">Corex Server</a></p>
+<p>6. <a href="http://s12-ap550.bioch.ox.ac.uk:8078/dynamite_html/dynamite_splash_v1.5.html">Dynamite Server</a></p>
+<p>7. <a href="http://www3.mpibpc.mpg.de/groups/de_groot/concoord/">Concoord Server</a></p>
+<p>8. <a href="http://mmb.pcb.ub.es/FlexServ/">FlexServ Server</a></p>
+<br />
+<h4>References</h4>
+<p>1. <a href="http://modbase.compbio.ucsf.edu/allosmod/html//file/Weinkam_PNAS_2012.pdf">Weinkam, Pons, Sali. PNAS 2012: AllosMod Paper</a></p>
+<p>2. <a href="http://modbase.compbio.ucsf.edu/allosmod/html//file/Bakan_PNAS_2009.pdf">Bakan_PNAS_2009.pdf</a></p>
+<p>3. <a href="http://modbase.compbio.ucsf.edu/allosmod/html//file/ClarksonLee_Biochem_2006.pdf">ClarksonLee_Biochem_2006.pdf</a></p>
+<p>4. <a href="http://modbase.compbio.ucsf.edu/allosmod/html//file/CuiKarplus_ProtSci_2008.pdf">CuiKarplus_ProtSci_2008.pdf</a></p>
+<p>5. <a href="http://modbase.compbio.ucsf.edu/allosmod/html//file/FerreiroWolynes_PNAS_2011.pdf">FerreiroWolynes_PNAS_2011.pdf</a></p>
+<p>6. <a href="http://modbase.compbio.ucsf.edu/allosmod/html//file/FrauenfelderWolynes_Science_1991.pdf">FrauenfelderWolynes_Science_1991.pdf</a></p>
+<p>7. <a href="http://modbase.compbio.ucsf.edu/allosmod/html//file/Ghosh_PNAS_2007.pdf">Ghosh_PNAS_2007.pdf</a></p>
+<p>8. <a href="http://modbase.compbio.ucsf.edu/allosmod/html//file/HardyWells_JBiolChem_2009_casp7.pdf">HardyWells_JBiolChem_2009_casp7.pdf</a></p>
+<p>9. <a href="http://modbase.compbio.ucsf.edu/allosmod/html//file/HyeonThirumalai_PNAS_2006.pdf">HyeonThirumalai_PNAS_2006.pdf</a></p>
+<p>10. <a href="http://modbase.compbio.ucsf.edu/allosmod/html//file/KiddBakerThomas_Plos_2009.pdf">KiddBakerThomas_Plos_2009.pdf</a></p>
+<p>11. <a href="http://modbase.compbio.ucsf.edu/allosmod/html//file/LiTakada_PNAS_2011.pdf">LiTakada_PNAS_2011.pdf</a></p>
+<p>12. <a href="http://modbase.compbio.ucsf.edu/allosmod/html//file/McclendonJacobson_JChem_2009.pdf">McclendonJacobson_JChem_2009.pdf</a></p>
+<p>13. <a href="http://modbase.compbio.ucsf.edu/allosmod/html//file/PopovychKalodimos_NatStructMolBiol_2006.pdf">PopovychKalodimos_NatStructMolBiol_2006.pdf</a></p>
+<p>14. <a href="http://modbase.compbio.ucsf.edu/allosmod/html//file/SuelRanganathan_Nature_2003.pdf">SuelRanganathan_Nature_2003.pdf</a></p>
+<p>15. <a href="http://modbase.compbio.ucsf.edu/allosmod/html//file/WhitfordOnuchic_2008_JBiolChem.pdf">WhitfordOnuchic_2008_JBiolChem.pdf</a></p>
+<p>16. <a href="http://modbase.compbio.ucsf.edu/allosmod/html//file/XuBahar_JMB_2003_hb.pdf">XuBahar_JMB_2003_hb.pdf</a></p>
+<br />
+<h4>Reviews</h4>
+<p>1. <a href="http://modbase.compbio.ucsf.edu/allosmod/html//file/ChangeuxEdelstein_2005_Science_review.pdf">ChangeuxEdelstein_2005_Science_review.pdf</a></p>
+<p>2. <a href="http://modbase.compbio.ucsf.edu/allosmod/html//file/Goodey_NatChemBiol_2008_rev.pdf">Goodey_NatChemBiol_2008_rev.pdf</a></p>
+<p>3. <a href="http://modbase.compbio.ucsf.edu/allosmod/html//file/KuriyanEisenberg_Nature_2007_review.pdf">KuriyanEisenberg_Nature_2007_review.pdf</a></p>
+<p>4. <a href="http://modbase.compbio.ucsf.edu/allosmod/html//file/Nussinov_Proteins_2004_review.pdf">Nussinov_Proteins_2004_review.pdf</a></p>
+<p>5. <a href="http://modbase.compbio.ucsf.edu/allosmod/html//file/SwainGierasch_CurrOpStructBiol_2006_rev.pdf">SwainGierasch_CurrOpStructBiol_2006_rev.pdf</a></p>
+<p>6. <a href="http://modbase.compbio.ucsf.edu/allosmod/html//file/ZhuravlevPapoian_QRevBiophy_2010.pdf">ZhuravlevPapoian_QRevBiophy_2010.pdf</a></p>
+<p>7. <a href="http://modbase.compbio.ucsf.edu/allosmod/html//file/Elber_CurrOpStructBio_2011.pdf">Elber_CurrOpStructBio_2011.pdf</a></p>
+<p>8. <a href="http://modbase.compbio.ucsf.edu/allosmod/html//file/KernZuiderweg_CurrOpStructBiol_2003.pdf">KernZuiderweg_CurrOpStructBiol_2003.pdf</a></p>
+<br />
