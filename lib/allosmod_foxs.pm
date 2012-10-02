@@ -182,27 +182,47 @@ sub get_all_advanced_options {
            $self->get_saxs_options();
 }
 
-sub get_sequence_or_alignment {
-    my ($self, $alignment) = @_;
-    my $q = $self->cgi;
-
-    if (defined($alignment)) {
-    } else {
-    }
-}
-
 sub get_alignment {
     my $self = shift;
     my $q = $self->cgi;
     my $seq = $q->param('sequence');
     if (!defined($seq)) {
-      return undef;
+      return undef, undef;
     }
     $seq =~ s/\s*//g;
     if ($seq eq "") {
-      return undef;
+      return undef, undef;
     }
 
+    my $job = $self->make_job($q->param("name") || "job");
+    my @pdbcodes = $q->param("pdbcode");
+    my @uplfiles = $q->upload("uploaded_file");
+    my $aln;
+    # Handle PDB codes
+    foreach my $code (@pdbcodes) {
+      if (defined($code) and $code ne "") {
+        $aln .= ">P1;$code\n" .
+                "structureX:$code:.:.:.:.:::-1.00:-1.00\n*\n";
+      }
+    }
+    # Upload files into job directory
+    my $upl_num = 0;
+    foreach my $upl (@uplfiles) {
+      if (defined $upl) {
+        my $fname = "uplstruc$upl_num"; # todo: use untainted user's name
+        my $buffer;
+        my $fullpath = $job->directory . "/" . $fname;
+        open(OUTFILE, '>', $fullpath)
+         or throw saliweb::frontend::InternalError("Cannot open $fullpath: $!");
+        while (<$upl>) {
+          print OUTFILE $_;
+        }
+        close OUTFILE;
+        $aln .= ">P1;$fname\n" .
+                "structureX:$fname:.:.:.:.:::-1.00:-1.00\n*\n";
+        $upl_num++;
+      }
+    }
     my $nres = 0;
     my $ichain = 0;
     for (my $i = 0; $i < length($seq); $i++) {
@@ -215,20 +235,20 @@ sub get_alignment {
     }
     
     my $end_chain = chr(ord('A') + $ichain);
-    my $aln = ">P1;pm.pdb\n" .
-              "structureX:pm.pdb:1:A:${nres}:${end_chain}:::-1.00:-1.00";
+    $aln .= ">P1;pm.pdb\n" .
+            "structureX:pm.pdb:1:A:${nres}:${end_chain}:::-1.00:-1.00";
     for (my $i = 0; $i < length($seq); $i += 75) {
       $aln .= "\n" . substr($seq, $i, 75);
     }
     $aln .= "*\n";
-    return $aln;
+    return $aln, $job;
 }
 
 sub get_index_page {
     my $self = shift;
     my $q = $self->cgi;
 
-    my $alignment = $self->get_alignment();
+    my ($alignment, $job) = $self->get_alignment();
     my $action = (defined($alignment) ? $self->submit_url : $self->index_url);
 
     my $form;
@@ -236,6 +256,7 @@ sub get_index_page {
       $form = $q->p("Alignment:" . $q->br .
                    $q->textarea({-name=>'alignment', -rows=>5, -cols=>80,
                                  -value=>$alignment})) .
+              $q->hidden('jobname', $job->name) .
            $q->table(
                $q->Tr($q->td("Experimental profile"),
                       $q->td($q->filefield({-name=>"saxs_profile",
@@ -249,19 +270,21 @@ sub get_index_page {
                  "</center>") .
            $self->get_all_advanced_options();
     } else {
-      $form = $q->table({-id=>'structures'},
+      $form = $q->p("Job name: " . $q->textfield({-name=>"name",
+                                                  -size=>"25"})) .
+              $q->table({-id=>'structures'},
                          $q->Tr($q->td("PDB code " .
-                                       $q->textfield({-name=>'pdbcode0',
+                                       $q->textfield({-name=>'pdbcode',
                                                       -size=>'5'})) .
                                 $q->td("or upload file " .
-                                     $q->filefield({-name=>'uploaded_file0'})
+                                     $q->filefield({-name=>'uploaded_file'})
                                 ))) .
               $q->p($q->button(-value=>'add structure',
                                -onClick=>"add_structure()")) .
           $q->p("Sequence used in experiment:" . $q->br .
                     $q->textarea({-name=>'sequence', -rows=>5, -cols=>80})) .
               $q->p("<center>" .
-                    $q->input({-type=>"submit", -value=>"Submit"}) .
+                    $q->input({-type=>"submit", -value=>"Create alignment"}) .
                     "</center>");
     }
 
@@ -288,13 +311,11 @@ sub get_submit_page {
     my $self = shift;
     my $q = $self->cgi;
 
-    my $user_pdb      = $q->upload('uploaded_file');              # uploaded file handle
-    my $user_name     = $q->param('name')||"";          # user-provided job name
+    my $jobname = $q->param('jobname');
     my $user_saxs      = $q->upload('saxs_profile');              # uploaded file handle
-    my $user_pdbcode     = $q->param('PDB code')||"";          # user-provided job name
     my $email         = $q->param('email')||undef;      # user's e-mail
 
-    my $job = $self->make_job($user_name);
+    my $job = $self->resume_job($jobname);
     my $jobdir = $job->directory;
 
     #write uploaded files
