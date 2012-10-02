@@ -10,6 +10,7 @@ env.InstallCGIScripts()
 f = env.Frontend('allosmod_foxs')
 f.InstallCGIScripts()
 f.InstallHTML(['allosmod_foxs/html/jquery-1.8.1.min.js',
+               'allosmod_foxs/html/allosmod_foxs.js',
                'allosmod_foxs/html/allosmod_foxs.css'])
 f.InstallTXT(['allosmod_foxs/txt/help.txt', 'allosmod_foxs/txt/contact.txt'])
 

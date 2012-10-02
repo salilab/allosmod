@@ -13,6 +13,8 @@ sub get_start_html_parameters {
   my %param = $self->SUPER::get_start_html_parameters($style);
   push @{$param{-script}}, {-language => 'JavaScript',
                             -src => 'html/jquery-1.8.1.min.js' };
+  push @{$param{-script}}, {-language => 'JavaScript',
+                            -src => 'html/allosmod_foxs.js' };
   push @{$param{-style}->{'-src'}}, 'html/allosmod_foxs.css';
   return %param;
 }
@@ -247,10 +249,15 @@ sub get_index_page {
                  "</center>") .
            $self->get_all_advanced_options();
     } else {
-      $form = $q->p("PDB code " . $q->textfield({-name=>'pdbcode',
-                                              -size=>'5'}) .
-                 " or upload file(s) " .
-                 $q->filefield({-name=>'uploaded_file'})) .
+      $form = $q->table({-id=>'structures'},
+                         $q->Tr($q->td("PDB code " .
+                                       $q->textfield({-name=>'pdbcode0',
+                                                      -size=>'5'})) .
+                                $q->td("or upload file " .
+                                     $q->filefield({-name=>'uploaded_file0'})
+                                ))) .
+              $q->p($q->button(-value=>'add structure',
+                               -onClick=>"add_structure()")) .
           $q->p("Sequence used in experiment:" . $q->br .
                     $q->textarea({-name=>'sequence', -rows=>5, -cols=>80})) .
               $q->p("<center>" .
