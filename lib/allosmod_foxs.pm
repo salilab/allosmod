@@ -25,7 +25,6 @@ sub get_navigation_links {
     return [
         $q->a({-href=>$self->index_url}, "AllosMod-FoXS Home"),
         $q->a({-href=>$self->help_url}, "About AllosMod-FoXS"),
-#        $q->a(href="http://modbase.compbio.ucsf.edu/allosmod/help.cgi?type=help", "About AllosMod-FoXS"),
         $q->a({-href=>$self->queue_url}, "Queue"),
         $q->a({-href=>$self->contact_url}, "Contact Us"),
 	$q->a({-href=>$self->cgiroot . "/help.cgi?type=resources"},"Resources")
@@ -197,12 +196,12 @@ sub get_alignment {
     my $job = $self->make_job($q->param("name") || "job");
     my @pdbcodes = $q->param("pdbcode");
     my @uplfiles = $q->upload("uploaded_file");
-    my $aln;
+    my $list = $job->directory . "/" . "list";
     # Handle PDB codes
     foreach my $code (@pdbcodes) {
       if (defined($code) and $code ne "") {
-        $aln .= ">P1;$code\n" .
-                "structureX:$code:.:.:.:.:::-1.00:-1.00\n*\n";
+########## get from pdb??
+	  system("echo $code >>$list");
       }
     }
     # Upload files into job directory
@@ -211,36 +210,31 @@ sub get_alignment {
       if (defined $upl) {
         my $fname = "uplstruc$upl_num"; # todo: use untainted user's name
         my $buffer;
-        my $fullpath = $job->directory . "/" . $fname;
+        my $fullpath = $job->directory . "/" . $upl;
         open(OUTFILE, '>', $fullpath)
          or throw saliweb::frontend::InternalError("Cannot open $fullpath: $!");
         while (<$upl>) {
           print OUTFILE $_;
         }
         close OUTFILE;
-        $aln .= ">P1;$fname\n" .
-                "structureX:$fname:.:.:.:.:::-1.00:-1.00\n*\n";
+
+	system("echo $upl >>$list");
+
         $upl_num++;
       }
     }
-    my $nres = 0;
-    my $ichain = 0;
-    for (my $i = 0; $i < length($seq); $i++) {
-      my $s = substr($seq, $i, 1);
-      if ($s eq '/') {
-        $ichain++;
-      } else {
-        $nres++;
-      }
-    }
-    
-    my $end_chain = chr(ord('A') + $ichain);
-    $aln .= ">P1;pm.pdb\n" .
-            "structureX:pm.pdb:1:A:${nres}:${end_chain}:::-1.00:-1.00";
-    for (my $i = 0; $i < length($seq); $i += 75) {
-      $aln .= "\n" . substr($seq, $i, 75);
-    }
-    $aln .= "*\n";
+
+    my $inpseq = $job->directory . "/" . "inpseq";
+    system("echo $seq >> $inpseq");
+
+    my $dirout = $job->directory;
+    system("/netapp/sali/allosmod/get_MULTsi20b.sh inpseq $dirout");
+
+    my $aln = `cat $dirout/align.ali`;
+
+    my $testout = $job->directory . "/" . "test";
+    system("echo $dirout/align.ali >>$testout");
+
     return $aln, $job;
 }
 
@@ -284,7 +278,7 @@ sub get_index_page {
           $q->p("Sequence used in experiment:" . $q->br .
                     $q->textarea({-name=>'sequence', -rows=>7, -cols=>80})) .
               $q->p("<center>" .
-                    $q->input({-type=>"submit", -value=>"Create alignment"}) .
+                    $q->input({-type=>"submit", -value=>"Submit"}) .
                     "</center>");
     }
 
