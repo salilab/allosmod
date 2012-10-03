@@ -43,7 +43,7 @@ sub get_project_menu {
 </center>
 <br />
 <center>
-<a href="http://modbase.compbio.ucsf.edu/foxs"><img src="http://modbase.compbio.ucsf.edu/allosmod/html/img/foxs.png" /></a>
+<a href="http://modbase.compbio.ucsf.edu/foxs"><img src="http://modbase.compbio.ucsf.edu/allosmod/html/img/foxs.gif" /></a>
 </center>
 </div><br />
 <h4><small>Developers:</small></h4><p>Dina Schneidman <br />
@@ -271,18 +271,18 @@ sub get_index_page {
            $self->get_all_advanced_options();
     } else {
       $form = $q->p("Job name: " . $q->textfield({-name=>"name",
-                                                  -size=>"25"})) .
+                                                  -size=>"20"})) .
               $q->table({-id=>'structures'},
                          $q->Tr($q->td("PDB code " .
                                        $q->textfield({-name=>'pdbcode',
-                                                      -size=>'5'})) .
-                                $q->td("or upload file " .
-                                     $q->filefield({-name=>'uploaded_file'})
-                                ))) .
-              $q->p($q->button(-value=>'add structure',
+                                                      -size=>'4'})) .
+				$q->td("or upload PDB file " .
+				       $q->filefield({-name=>'uploaded_file'}))
+                                )) .
+              $q->p($q->button(-value=>'Add more structures',
                                -onClick=>"add_structure()")) .
           $q->p("Sequence used in experiment:" . $q->br .
-                    $q->textarea({-name=>'sequence', -rows=>5, -cols=>80})) .
+                    $q->textarea({-name=>'sequence', -rows=>7, -cols=>80})) .
               $q->p("<center>" .
                     $q->input({-type=>"submit", -value=>"Create alignment"}) .
                     "</center>");
