@@ -13,7 +13,7 @@ class Job(saliweb.backend.Job):
     def run(self):
         #preprocess job to keep track of iterations
         subprocess.call(["/netapp/sali/allosmod/preproccess.sh"])
-        CTRFILE = open("jobcounter","r") #jobcounter: -1 is all jobs complete, -99 is first pass, >0 indicates number of jobs submitted
+        CTRFILE = open("jobcounter","r") #jobcounter: -1 is all sims complete, -99 is first pass, >0 indicates number of jobs submitted
         jobcounter = int(CTRFILE.readline())
         os.system("echo run jobctr %i >>pwout" % jobcounter)
         #unzip input.zip, check inputs, make input scripts for subdirs
@@ -46,6 +46,7 @@ source ./%s/qsub.sh
 echo finished
 """
                 r = self.runnercls(script)
+                r.set_sge_options("-j y -l arch=lx24-amd64 -l netapp=0.1G,scratch=0.1G -l mem_free=0.1G -l h_rt=0:01:00 -t 1-1 -V")
             elif scan == -1:
                 #execute quick cooling on multiple nodes
                 script = """
@@ -99,14 +100,12 @@ echo fail
                 os.system("rm %s/numsim" % dir.replace('\n', ''))
                 os.system("rm %s/error" % dir.replace('\n', ''))
                 os.system("rm %s/qsub.sh" % dir.replace('\n', ''))
-                os.system("rm %s/scan" % dir.replace('\n', ''))
                 os.system("rm %s/coolist_*" % dir.replace('\n', ''))
 
                 os.system("mv %s output" % dir.replace('\n', ''))
 
-            os.system("zip -r output.zip output")
-#            os.system("rm -rf dirlist dirlist_all jobcounter input.zip output")
-            os.system("rm -rf dirlist dirlist_all jobcounter output")
+#            os.system("/netapp/sali/allosmod/zip_or_send_output.sh")
+            os.system("rm -rf dirlist dirlist_all jobcounter")
 
         #handle error
         if jobcounter >= MAXJOBS:
@@ -114,6 +113,10 @@ echo fail
             os.system("echo If less jobs were expected to run, this could be a user/server error >>error.log")
             os.system("mv %s output" % dir.replace('\n', ''))
 
+def complete(self):
+    os.chmod(".", 0775)
+    os.system("/netapp/sali/allosmod/zip_or_send_output.sh")
+    
 def get_web_service(config_file):
     db = saliweb.backend.Database(Job)
     config = saliweb.backend.Config(config_file)

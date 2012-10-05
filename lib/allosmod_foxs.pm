@@ -69,7 +69,7 @@ sub get_footer {
 S.I.:<a href="http://modbase.compbio.ucsf.edu/allosmod/html/file/Weinkam_PNAS_2012_si.pdf"><img src="http://modbase.compbio.ucsf.edu/allosmod/html/img/pdf.gif" /></a>
 </center>
 <center><a href="http://www.ncbi.nlm.nih.gov/pubmed/20507903">
-<b>D. Schneidman-Duhovny, M. Hammel, A. Sali, Nucleic Acids Res., (2010) <i>38</i>(Web Server issue), W540-4</b></a>:
+<b>D. Schneidman-Duhovny, M. Hammel, A. Sali, Nucleic Acids Res., (2010) <i>38</i>, W540-4</b></a>:
 <a href="http://modbase.compbio.ucsf.edu/allosmod/html/file/Schneidman-Duhovny_NucAcRes_2010.pdf"><img src="http://modbase.compbio.ucsf.edu/allosmod/html/img/pdf.gif" /></a>
 </center>
 </div>
@@ -94,15 +94,18 @@ sub get_advanced_modeling_options {
     my $self = shift;
     my $q = $self->cgi;
     return $self->make_dropdown("advmodel", "Advanced Modeling Options", 0,
-                $q->p("number of modeller models" .
-                      $q->textfield({-name=>'NUM_MODELS', -value=>"10",
+                $q->p("Number of comparitive models " .
+                      $q->textfield({-name=>'advanced_nruns', -value=>"10",
                                      -size=>"3"})) .
-                $q->p("glycosylation sites" .
-                      $q->filefield({-name=>"sugar_file"}) .
-                      $q->checkbox({-name=>'flexible_glyc_sites',
-                                    -label=>'flexible', -checked=>"1"}) . $q->br .
-                      "number of optimization steps" .
-                      $q->textfield({-name=>'number_of_steps_glyc',
+                $q->p("Glycosylation input file " .
+                      $q->filefield({-name=>"glyc_input"}) . $q->br .
+                      $q->Tr($q->td('Flexible residues at glycosylation sites '),
+                             $q->td('<input type="checkbox" name="glyc_flexible_sites"' .
+                                    'checked="1" />')) . $q->br .
+#                      $q->checkbox({-name=>'glyc_flexible_sites',
+#                                    -label=>' Flexible residue at glycosylation site', -checked=>"1"}) . $q->br .
+                      "Number of optimization steps " .
+                      $q->textfield({-name=>'glyc_num_opt_steps',
                                      -size=>"3", -value=>"1"})));
 }
 
@@ -110,29 +113,38 @@ sub get_sampling_options {
     my $self = shift;
     my $q = $self->cgi;
     return $self->make_dropdown("sampling", "Sampling Options", 0,
-      "<input type=\"radio\" name=\"sampletype\" value=\"multiconf\" " .
+      "<input type=\"radio\" name=\"sampletype\" value=\"comparativemod\" " .
       "checked=\"checked\" onclick=\"\$('#rareconf').slideUp('fast'); " .
-      "\$('#multiconf').slideDown('fast')\" />Sample most probable " .
+      "\$('#multiconf').slideUp('fast'); \$('#comparativemod').slideDown('fast')\" />Generate " .
+      "comparative models using MODELLER" . $q->br .
+      "<div class=\"sampopts\" id=\"comparativemod\">\n" .
+      "Number of comparitive models " . $q->textfield({-name=>'comparativemod_nruns', -size=>"3",
+                                         -value=>"10"}) .
+      "</div>\n\n" .
+
+      "<input type=\"radio\" name=\"sampletype\" value=\"multiconf\" " .
+      "onclick=\"\$('#rareconf').slideUp('fast'); " .
+      "\$('#comparativemod').slideUp('fast'); \$('#multiconf').slideDown('fast')\" />Sample most probable " .
       "conformations consistent with input crystal structure(s)" . $q->br .
-      "<div class=\"sampopts\" id=\"multiconf\">\n" .
-      "Number of runs " . $q->textfield({-name=>'NRUNS', -size=>"3",
-                                         -value=>"30"}) .
-      "MD temperature " . $q->textfield({-name=>'md_temperature', -size=>"3",
+      "<div class=\"sampopts\" id=\"multiconf\" style=\"display:none\">\n" .
+      "Number of runs " . $q->textfield({-name=>'multiconf_nruns', -size=>"3",
+                                         -value=>"30"}) . $q->br .
+      "MD temperature " . $q->textfield({-name=>'multiconf_mdtemp', -size=>"3",
                                          -value=>"300"}) .
       "</div>\n\n" .
 
       "<input type=\"radio\" name=\"sampletype\" value=\"rareconf\" " .
       "onclick=\"\$('#multiconf').slideUp('fast'); " .
-      "\$('#rareconf').slideDown('fast')\" />Sample low probability " .
+      "\$('#comparativemod').slideUp('fast'); \$('#rareconf').slideDown('fast')\" />Sample low probability " .
       "conformations consistent with input crystal structure(s)" . $q->br .
       "<div class=\"sampopts\" id=\"rareconf\" style=\"display:none\">\n" .
-      "Number of runs " . $q->textfield({-name=>'NRUNS', -size=>"3",
+      "Number of runs " . $q->textfield({-name=>'rareconf', -size=>"3",
                                          -value=>"30"}) . $q->br .
-      "MD temperature scanned or fixed value" .
-                $q->textfield({-name=>'md_temperature', -size=>"3",
+      "MD temperature scanned or fixed value " .
+                $q->textfield({-name=>'rareconf_mdtemp', -size=>"3",
                                -value=>"scan"}) . $q->br .
-      "structural similarity % cut-off" .
-                $q->textfield({-name=>'similarity_percentile', -size=>"3",
+      "structural similarity % cut-off " .
+                $q->textfield({-name=>'rareconf_simcutoff', -size=>"3",
                                -value=>"10"}) .
       "</div>\n");
 }
@@ -143,33 +155,38 @@ sub get_saxs_options {
     return $self->make_dropdown("saxs", "SAXS Options", 0,
                   $q->table(
                       $q->Tr($q->td('Maximal q Value'),
-                             $q->td($q->textfield({-name=>'q', -size=>"10",
+                             $q->td($q->textfield({-name=>'saxs_qmax', -size=>"10",
                                                    -value=>"0.5"}))),
                       $q->Tr($q->td('Profile Size'),
-                             $q->td($q->textfield({-name=>'psize', -size=>"10",
+                             $q->td($q->textfield({-name=>'saxs_psize', -size=>"10",
                                                    -value=>"500"})),
                              $q->td('# of points in the computed profile')),
                       $q->Tr($q->td('Hydration Layer'),
-                             $q->td('<input type="checkbox" name="hlayer" ' .
+                             $q->td('<input type="checkbox" name="saxs_hlayer" ' .
                                     'checked="1" />'),
                              $q->td('use hydration layer to improve fitting')),
                       $q->Tr($q->td('Excluded Volume Adjustment'),
-                             $q->td('<input type="checkbox" name="exvolume" ' .
+                             $q->td('<input type="checkbox" name="saxs_exvolume" ' .
                                     'checked="1" />'),
                              $q->td('adjust the protein excluded volume ' .
                                     'to improve fitting')),
                       $q->Tr($q->td('Implicit Hydrogens'),
-                             $q->td('<input type="checkbox" name="ihydrogens"' .
+                             $q->td('<input type="checkbox" name="saxs_ihydrogens"' .
                                     'checked="1" />'),
                              $q->td('implicitly consider hydrogen atoms')),
                       $q->Tr($q->td('Background Adjustment'),
-                             $q->td('<input type="checkbox" name="background"' .
-                                    'checked="1" />'),
+                             $q->td('<input type="checkbox" name="saxs_backadj"' .
+                                    'checked="0" />'),
                              $q->td('adjust the background of the ' .
                                     'experimental profile')),
+                      $q->Tr($q->td('Residue Level Computation'),
+                             $q->td('<input type="checkbox" name="saxs_coarse"' .
+                                    'checked="0" />'),
+                             $q->td('perform coarse grained profile ' .
+                                    'computation for Ca atoms only')),
                       $q->Tr($q->td('Offset'),
-                             $q->td('<input type="checkbox" name="offset"' .
-                                    'checked="1" />'),
+                             $q->td('<input type="checkbox" name="saxs_offset"' .
+                                    'checked="0" />'),
                              $q->td('use offset in profile fitting')),
                   ));
 }
@@ -196,6 +213,7 @@ sub get_alignment {
     my $job = $self->make_job($q->param("name") || "job");
     my @pdbcodes = $q->param("pdbcode");
     my @uplfiles = $q->upload("uploaded_file");
+    my $aln;
     my $list = $job->directory . "/" . "list";
     # Handle PDB codes
     foreach my $code (@pdbcodes) {
@@ -227,13 +245,11 @@ sub get_alignment {
     my $inpseq = $job->directory . "/" . "inpseq";
     system("echo $seq >> $inpseq");
 
-    my $dirout = $job->directory;
-    system("/netapp/sali/allosmod/get_MULTsi20b.sh inpseq $dirout");
+    my $jobdir = $job->directory;
+    open(FOO, "/netapp/sali/allosmod/get_MULTsi20b.sh inpseq $jobdir |") || die "dont let script output to std out";
+    close(FOO);
 
-    my $aln = `cat $dirout/align.ali`;
-
-    my $testout = $job->directory . "/" . "test";
-    system("echo $dirout/align.ali >>$testout");
+    $aln .= `cat $jobdir/align.ali`;
 
     return $aln, $job;
 }
@@ -248,7 +264,7 @@ sub get_index_page {
     my $form;
     if (defined($alignment)) {
       $form = $q->p("Alignment:" . $q->br .
-                   $q->textarea({-name=>'alignment', -rows=>5, -cols=>80,
+                   $q->textarea({-name=>'alignment', -rows=>10, -cols=>80,
                                  -value=>$alignment})) .
               $q->hidden('jobname', $job->name) .
            $q->table(
@@ -306,18 +322,111 @@ sub get_submit_page {
     my $q = $self->cgi;
 
     my $jobname = $q->param('jobname');
-    my $user_saxs      = $q->upload('saxs_profile');              # uploaded file handle
-    my $email         = $q->param('email')||undef;      # user's e-mail
-
+    my $email = $q->param('email')||"null"; # user's e-mail
     my $job = $self->resume_job($jobname);
     my $jobdir = $job->directory;
 
     #write uploaded files
+    my $file_contents;
+    my $user_saxs = $q->upload('saxs_profile');
+    my $saxsfile = "$jobdir/saxs.dat";
+    open(UPLOAD, "> $saxsfile")
+	or throw saliweb::frontend::InternalError("Cannot open $saxsfile: $!");
+    $file_contents = "";
+    while (<$user_saxs>) {
+        $file_contents .= $_;
+    }
+    print UPLOAD $file_contents;
+    close UPLOAD
+	or throw saliweb::frontend::InternalError("Cannot close $saxsfile: $!");
+    my $glyc_input = $q->upload('glyc_input');
+#    my $glycfile = "$jobdir/glyc.dat";
+#    open(UPLOAD, "> $glycfile")
+#	or throw saliweb::frontend::InternalError("Cannot open $glycfile: $!");
+#    $file_contents = "";
+#    while (<$glyc_input>) {
+#        $file_contents .= $_;
+#    }
+#    print UPLOAD $file_contents;
+#    close UPLOAD
+#	or throw saliweb::frontend::InternalError("Cannot close $glycfile: $!");
 
-    #submit job
+    # rewrite alignment to file
+    my $alignment = $q->param('alignment'); #alignment
+    my $filename = "$jobdir/align.ali";
+    open (FILE,">$filename") or die "I cannot open $filename\n";
+    print FILE $alignment;
+    close(FILE);
+
+    # handle advanced options
+    my $advanced_nruns = $q->param('advanced_nruns');
+    my $glyc_flexible_sites = $q->param('glyc_flexible_sites');
+    my $glyc_num_opt_steps = $q->param('glyc_num_opt_steps');
+
+    # handle sampling options
+    my $sampletype = $q->param('sampletype');    
+    my $comparativemod_nruns = $q->param('comparativemod_nruns');
+    my $multiconf_mdtemp = $q->param('multiconf_mdtemp');
+    my $multiconf_nruns = $q->param('multiconf_nruns');
+    my $rareconf_mdtemp = $q->param('rareconf_mdtemp');
+    my $rareconf_simcutoff = $q->param('rareconf_simcutoff');
+    my $rareconf_nruns = $q->param('rareconf_nruns');
+
+    # make input.dat for allosmod
+    if ($sampletype eq "multiconf") {
+	system("echo NRUNS=$multiconf_nruns >> $jobdir/input.dat");
+	system("echo MDTEMP=$multiconf_mdtemp >> $jobdir/input.dat");
+#	system("echo delEmax= >> $jobdir/input.dat");
+#	system("echo LIGPDB= >> $jobdir/input.dat");
+	system("echo rAS=1000 >> $jobdir/input.dat");
+	system("echo DEVIATION=1.0 >> $jobdir/input.dat");
+	system("echo SAMPLING=moderate_am >> $jobdir/input.dat");
+    } elsif ($sampletype eq "rareconf") {
+	system("echo NRUNS=$rareconf_nruns >> $jobdir/input.dat");
+	system("echo MDTEMP=$rareconf_mdtemp >> $jobdir/input.dat");
+#	system("echo delEmax= >> $jobdir/input.dat");
+#	system("echo LIGPDB= >> $jobdir/input.dat");
+	system("echo rAS=1000 >> $jobdir/input.dat");
+	system("echo DEVIATION=10.0 >> $jobdir/input.dat");
+	system("echo SAMPLING=moderate_am_scan >> $jobdir/input.dat");
+    } elsif ($sampletype eq "comparativemod") {
+	system("echo NRUNS=$comparativemod_nruns >> $jobdir/input.dat");
+#	system("echo delEmax= >> $jobdir/input.dat");
+#	system("echo LIGPDB= >> $jobdir/input.dat");
+	system("echo rAS=1000 >> $jobdir/input.dat");
+	system("echo DEVIATION=4.0 >> $jobdir/input.dat");
+	system("echo SAMPLING=fast_cm >> $jobdir/input.dat");
+    } else {
+	system("echo error sampletype >> $jobdir/input.dat");
+    }
+
+    # handle SAXS options
+    my $saxs_qmax = $q->param('saxs_qmax');
+    my $saxs_psize = $q->param('saxs_psize');
+    my $saxs_hlayer = $q->param('saxs_hlayer');
+    my $saxs_exvolume = $q->param('saxs_exvolume');
+    my $saxs_ihydrogens = $q->param('saxs_ihydrogens');
+    my $saxs_backadj = $q->param('saxs_backadj');
+    my $saxs_offset = $q->param('saxs_offset');
+    my $saxs_coarse = $q->param('saxs_coarse');
+    system("echo qmax $saxs_qmax >> $jobdir/foxs.in");
+    system("echo psize $saxs_psize >> $jobdir/foxs.in");
+    system("echo hlayer $saxs_hlayer >> $jobdir/foxs.in");
+    system("echo exvolume $saxs_exvolume >> $jobdir/foxs.in");
+    system("echo ihydrogens $saxs_ihydrogens >> $jobdir/foxs.in");
+    system("echo backadj $saxs_backadj >> $jobdir/foxs.in");
+    system("echo offset $saxs_offset >> $jobdir/foxs.in");
+    system("echo coarse $saxs_coarse >> $jobdir/foxs.in");
+    system("echo email $email >> $jobdir/foxs.in");
+
+    # zip all files
+#    open(FOO, "zip -r $jobdir/input.zip $jobdir/* |") || die "dont output to std out";
+#    close(FOO);
+
+    # submit job
     $job->submit($email);
 
-    ## write subject details into a file and pop up an exit page
+    # write subject details into a file and pop up an exit page
     my $return=
       $q->h1("Job Submitted") .
       $q->hr .
