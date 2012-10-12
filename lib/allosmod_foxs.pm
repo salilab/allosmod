@@ -49,8 +49,8 @@ sub get_project_menu {
 Ben Webb<br />
 Patrick Weinkam</p>
 <h4><small>Acknowledgements:</small></h4>
-<p>Elina Tjioe<br />
-Ursula Pieper<br />
+<p>Ursula Pieper<br />
+Elina Tjioe<br />
 <br />
 Andrej Sali</p>
 <p><i>Version $version</i></p>
@@ -94,19 +94,36 @@ sub get_advanced_modeling_options {
     my $self = shift;
     my $q = $self->cgi;
     return $self->make_dropdown("advmodel", "Advanced Modeling Options", 0,
-                $q->p("Number of comparitive models " .
-                      $q->textfield({-name=>'advanced_nruns', -value=>"10",
-                                     -size=>"3"})) .
-                $q->p("Glycosylation input file " .
-                      $q->filefield({-name=>"glyc_input"}) . $q->br .
-                      $q->Tr($q->td('Flexible residues at glycosylation sites '),
-                             $q->td('<input type="checkbox" name="glyc_flexible_sites"' .
-                                    'checked="1" />')) . $q->br .
-#                      $q->checkbox({-name=>'glyc_flexible_sites',
-#                                    -label=>' Flexible residue at glycosylation site', -checked=>"1"}) . $q->br .
-                      "Number of optimization steps " .
-                      $q->textfield({-name=>'glyc_num_opt_steps',
-                                     -size=>"3", -value=>"1"})));
+      "<input type=\"radio\" name=\"advancedopt\" value=\"ligandmod\" " .
+      "onclick=\"\$('#glycmod').slideUp('fast'); " .
+      "\$('#ligandmod').slideDown('fast')\"" .
+      "\>Model ligand binding site" . $q->br .
+      "<div class=\"advopts\" id=\"ligandmod\" style=\"display:none\">\n" .
+	     "Radius of ligand binding site (&Aring;ngstroms) " . $q->textfield({-name=>'ligandmod_rAS', -size=>"3",
+                                         -value=>"11"}) . $q->br .
+	     "Ligand PDB file " . $q->filefield({-name=>"ligandmod_ligfile"}) . $q->br .
+	     "PDB file from which ligand was extracted " . $q->textfield({-name=>'ligandmod_ligpdb', -size=>"25",
+                                         -value=>""}) .
+
+      "</div>\n\n" .
+
+      "<input type=\"radio\" name=\"advancedopt\" value=\"glycmod\" " .
+      "onclick=\"\$('#ligandmod').slideUp('fast'); " .
+      "\$('#glycmod').slideDown('fast')\"" .
+      "\>Model glycosylation" . $q->br .
+      "<div class=\"advopts\" id=\"glycmod\" style=\"display:none\">\n" .
+	    "Number of models " . $q->textfield({-name=>'glycmod_nruns', -size=>"3",
+						 -value=>"10"}) . $q->br .
+	    "Glycosylation input file " .
+	    $q->filefield({-name=>"glycmod_input"}) . $q->br .
+	    "Flexible residues at glycosylation sites " .
+	    '<input type="checkbox" name="glycmod_flexible_sites"' .
+				'checked="1" />' . $q->br .
+	    "Number of optimization steps " .
+	    $q->textfield({-name=>'glycmod_num_opt_steps',-size=>"3", -value=>"1"}) .
+
+      "</div>\n\n");
+
 }
 
 sub get_sampling_options {
@@ -138,7 +155,7 @@ sub get_sampling_options {
       "\$('#comparativemod').slideUp('fast'); \$('#rareconf').slideDown('fast')\" />Sample low probability " .
       "conformations consistent with input crystal structure(s)" . $q->br .
       "<div class=\"sampopts\" id=\"rareconf\" style=\"display:none\">\n" .
-      "Number of runs " . $q->textfield({-name=>'rareconf', -size=>"3",
+      "Number of runs " . $q->textfield({-name=>'rareconf_nruns', -size=>"3",
                                          -value=>"30"}) . $q->br .
       "MD temperature scanned or fixed value " .
                 $q->textfield({-name=>'rareconf_mdtemp', -size=>"3",
@@ -176,17 +193,17 @@ sub get_saxs_options {
                              $q->td('implicitly consider hydrogen atoms')),
                       $q->Tr($q->td('Background Adjustment'),
                              $q->td('<input type="checkbox" name="saxs_backadj"' .
-                                    'checked="0" />'),
+                                    ' />'),
                              $q->td('adjust the background of the ' .
                                     'experimental profile')),
                       $q->Tr($q->td('Residue Level Computation'),
                              $q->td('<input type="checkbox" name="saxs_coarse"' .
-                                    'checked="0" />'),
+                                    ' />'),
                              $q->td('perform coarse grained profile ' .
                                     'computation for Ca atoms only')),
                       $q->Tr($q->td('Offset'),
                              $q->td('<input type="checkbox" name="saxs_offset"' .
-                                    'checked="0" />'),
+                                    ' />'),
                              $q->td('use offset in profile fitting')),
                   ));
 }
@@ -218,8 +235,10 @@ sub get_alignment {
     # Handle PDB codes
     foreach my $code (@pdbcodes) {
       if (defined($code) and $code ne "") {
-########## get from pdb??
-	  system("echo $code >>$list");
+	  # TODO: replace with get_pdb_chains
+	  my $pdbfile = saliweb::frontend::get_pdb_code($code, $job->directory);
+	  $pdbfile =~ s/.*[\/\\](.*)/$1/;
+	  system("echo $pdbfile >>$list");
       }
     }
     # Upload files into job directory
@@ -271,7 +290,7 @@ sub get_index_page {
                $q->Tr($q->td("Experimental profile"),
                       $q->td($q->filefield({-name=>"saxs_profile",
                                             -size=>"25"}))) .
-               $q->Tr($q->td("Email address (optional)"),
+               $q->Tr($q->td("Email address"),
                       $q->td($q->textfield({-name=>"email",
                                             -value=>$self->email,
                                             -size=>"25"})))) .
@@ -339,17 +358,11 @@ sub get_submit_page {
     print UPLOAD $file_contents;
     close UPLOAD
 	or throw saliweb::frontend::InternalError("Cannot close $saxsfile: $!");
-    my $glyc_input = $q->upload('glyc_input');
-#    my $glycfile = "$jobdir/glyc.dat";
-#    open(UPLOAD, "> $glycfile")
-#	or throw saliweb::frontend::InternalError("Cannot open $glycfile: $!");
-#    $file_contents = "";
-#    while (<$glyc_input>) {
-#        $file_contents .= $_;
-#    }
-#    print UPLOAD $file_contents;
-#    close UPLOAD
-#	or throw saliweb::frontend::InternalError("Cannot close $glycfile: $!");
+    my $filesize = -s "$jobdir/saxs.dat";
+    if($filesize == 0) {
+	print "You have uploaded an empty profile file: $saxsfile";
+	exit;
+    }
 
     # rewrite alignment to file
     my $alignment = $q->param('alignment'); #alignment
@@ -359,10 +372,50 @@ sub get_submit_page {
     close(FILE);
 
     # handle advanced options
-    my $advanced_nruns = $q->param('advanced_nruns');
-    my $glyc_flexible_sites = $q->param('glyc_flexible_sites');
-    my $glyc_num_opt_steps = $q->param('glyc_num_opt_steps');
+    my $advancedopt = $q->param('advancedopt');
+    my $ligandmod_rAS = $q->param('ligandmod_rAS');
+    my $ligandmod_ligpdb = $q->param('ligandmod_ligpdb');
+    my $glycmod_nruns = $q->param('glycmod_nruns');
+    my $glycmod_flexible_sites = $q->param('glycmod_flexible_sites');
+    my $glycmod_num_opt_steps = $q->param('glycmod_num_opt_steps');
 
+    my $file_contents = "";
+    my $filesize2;
+    if ($advancedopt eq "ligandmod") {
+	my $ligand_input = $q->upload('ligandmod_ligfile');
+	my $ligandfile = "$jobdir/lig.pdb";
+	open(UPLOAD, "> $ligandfile")
+	    or throw saliweb::frontend::InternalError("Cannot open $ligandfile: $!");
+	$file_contents = "";
+	while (<$ligand_input>) {
+		$file_contents .= $_;
+	    }
+	print UPLOAD $file_contents;
+	close UPLOAD
+	    or throw saliweb::frontend::InternalError("Cannot close $ligandfile: $!");
+	$filesize2 = -s "$jobdir/saxs.dat";
+	if($filesize2 == 0) {
+	    system("rm $jobdir/lig.pdb");
+	    }
+    }
+    if ($advancedopt eq "glycmod") {
+	my $glyc_input = $q->upload('glycmod_input');
+	my $glycfile = "$jobdir/glyc.dat";
+	open(UPLOAD, "> $glycfile")
+	    or throw saliweb::frontend::InternalError("Cannot open $glycfile: $!");
+	$file_contents = "";
+	while (<$glyc_input>) {
+	    $file_contents .= $_;
+	}
+	print UPLOAD $file_contents;
+	close UPLOAD
+	    or throw saliweb::frontend::InternalError("Cannot close $glycfile: $!");
+	$filesize2 = -s "$jobdir/glyc.dat";
+	if($filesize2 == 0) {
+	    system("rm $jobdir/glyc.dat");
+	}
+    }
+    
     # handle sampling options
     my $sampletype = $q->param('sampletype');    
     my $comparativemod_nruns = $q->param('comparativemod_nruns');
@@ -384,15 +437,12 @@ sub get_submit_page {
     } elsif ($sampletype eq "rareconf") {
 	system("echo NRUNS=$rareconf_nruns >> $jobdir/input.dat");
 	system("echo MDTEMP=$rareconf_mdtemp >> $jobdir/input.dat");
-#	system("echo delEmax= >> $jobdir/input.dat");
-#	system("echo LIGPDB= >> $jobdir/input.dat");
 	system("echo rAS=1000 >> $jobdir/input.dat");
 	system("echo DEVIATION=10.0 >> $jobdir/input.dat");
 	system("echo SAMPLING=moderate_am_scan >> $jobdir/input.dat");
+	system("echo SCAN_CUTOFF=$rareconf_simcutoff >> $jobdir/input.dat");
     } elsif ($sampletype eq "comparativemod") {
 	system("echo NRUNS=$comparativemod_nruns >> $jobdir/input.dat");
-#	system("echo delEmax= >> $jobdir/input.dat");
-#	system("echo LIGPDB= >> $jobdir/input.dat");
 	system("echo rAS=1000 >> $jobdir/input.dat");
 	system("echo DEVIATION=4.0 >> $jobdir/input.dat");
 	system("echo SAMPLING=fast_cm >> $jobdir/input.dat");
@@ -402,13 +452,31 @@ sub get_submit_page {
 
     # handle SAXS options
     my $saxs_qmax = $q->param('saxs_qmax');
+    if(($saxs_qmax !~ /^\d[\.]\d+$/ and $saxs_qmax !~ /^\d$/) or
+       $saxs_qmax <= 0.0 or $saxs_qmax >= 1.0) {
+	print "Invalid q value $saxs_qmax. Q must be > 0 and < 1.0\n";
+	print end_html;
+	exit;
+    }
     my $saxs_psize = $q->param('saxs_psize');
+    if(($saxs_psize !~ /^\d+$/ and $saxs_psize !~ /^\d+[\.]\d+$/) or
+       $saxs_psize <= 20 or $saxs_psize >= 2000) {
+	print "Invalid profile size value $saxs_psize. Profile size must be > 20 and < 1000\n";
+	print end_html;
+	exit;
+    }
     my $saxs_hlayer = $q->param('saxs_hlayer');
+    if(!$saxs_hlayer) { $saxs_hlayer = 0; } else { $saxs_hlayer = 1; }
     my $saxs_exvolume = $q->param('saxs_exvolume');
+    if(!$saxs_exvolume) { $saxs_exvolume = 0; } else { $saxs_exvolume = 1; }
     my $saxs_ihydrogens = $q->param('saxs_ihydrogens');
+    if(!$saxs_ihydrogens) { $saxs_ihydrogens = 0; } else { $saxs_ihydrogens = 1; }
     my $saxs_backadj = $q->param('saxs_backadj');
+    if(!$saxs_backadj) { $saxs_backadj = 0; } else { $saxs_backadj = 1; }
     my $saxs_offset = $q->param('saxs_offset');
+    if(!$saxs_offset) { $saxs_offset = 0; } else { $saxs_offset = 1; }
     my $saxs_coarse = $q->param('saxs_coarse');
+    if(!$saxs_coarse) { $saxs_coarse = 0; } else { $saxs_coarse = 1; }
     system("echo qmax $saxs_qmax >> $jobdir/foxs.in");
     system("echo psize $saxs_psize >> $jobdir/foxs.in");
     system("echo hlayer $saxs_hlayer >> $jobdir/foxs.in");
@@ -418,10 +486,6 @@ sub get_submit_page {
     system("echo offset $saxs_offset >> $jobdir/foxs.in");
     system("echo coarse $saxs_coarse >> $jobdir/foxs.in");
     system("echo email $email >> $jobdir/foxs.in");
-
-    # zip all files
-#    open(FOO, "zip -r $jobdir/input.zip $jobdir/* |") || die "dont output to std out";
-#    close(FOO);
 
     # submit job
     $job->submit($email);
@@ -470,6 +534,10 @@ sub get_results_page {
 sub display_ok_job {
     my ($self, $q, $job) = @_;
     my $return= $q->p("Job '<b>" . $job->name . "</b>' has completed, thank you for using AllosMod-FoXS!");
+
+    $return.= $q->p("<a href=\"" . $job->get_results_file_url("output.zip") .
+                    "\">Download output zip file.</a>");
+    $return.=$q->p("<br />You will receive a separate email containing a link to visualize the SAXS profiles using FoXS.");
 
     $return .= $job->get_results_available_time();
     return $return;

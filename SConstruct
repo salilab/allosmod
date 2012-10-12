@@ -6,6 +6,9 @@ Help(vars.GenerateHelpText(env))
 
 env.InstallAdminTools()
 env.InstallCGIScripts()
+env.InstallHTML(['html/jquery-1.8.1.min.js',
+               'html/allosmod.js',
+               'html/allosmod.css'])
 
 f = env.Frontend('allosmod_foxs')
 f.InstallCGIScripts()

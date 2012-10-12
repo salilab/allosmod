@@ -7,6 +7,18 @@ sub new {
     return saliweb::frontend::new(@_, @CONFIG@);
 }
 
+# Add our own JavaScript and CSS to the page header
+sub get_start_html_parameters {
+  my ($self, $style) = @_;
+  my %param = $self->SUPER::get_start_html_parameters($style);
+  push @{$param{-script}}, {-language => 'JavaScript',
+                            -src => 'html/jquery-1.8.1.min.js' };
+  push @{$param{-script}}, {-language => 'JavaScript',
+                            -src => 'html/allosmod.js' };
+  push @{$param{-style}->{'-src'}}, 'html/allosmod.css';
+  return %param;
+}
+
 sub get_navigation_links {
     my $self = shift;
     my $q = $self->cgi;
@@ -14,7 +26,7 @@ sub get_navigation_links {
         $q->a({-href=>$self->index_url}, "AllosMod Home"),
         $q->a({-href=>$self->help_url}, "About AllosMod"),
 #        $q->a({-href=>$self->cgiroot . "/help.cgi?type=help"},"About AllosMod"),
-        $q->a({-href=>$self->queue_url}, "AllosMod Queue"),
+        $q->a({-href=>$self->queue_url}, "Queue"),
         $q->a({-href=>$self->contact_url}, "Contact Us"),
 	$q->a({-href=>$self->cgiroot . "/help.cgi?type=resources"},"Resources")
         ];
@@ -32,9 +44,9 @@ sub get_project_menu {
 </div><br />
 <h4><small>Developer:</small></h4><p>Patrick Weinkam</p>
 <h4><small>Acknowledgements:</small></h4>
-<p>Elina Tjioe<br />
+<p>Ursula Pieper<br />
+Elina Tjioe<br />
 Ben Webb<br />
-Ursula Pieper<br />
 <br />
 Andrej Sali</p>
 <p><i>Version $version</i></p>
@@ -56,107 +68,411 @@ S.I.:<a href="http://modbase.compbio.ucsf.edu/allosmod/html/file/Weinkam_PNAS_20
 FOOTER
 }
 
+sub make_dropdown {
+    my ($self, $id, $title, $initially_visible, $text) = @_;
+   
+    my $style = "";
+    if (!$initially_visible) {
+      $style = " style=\"display:none\"";
+    }
+    return "<div class=\"dropdown_container\">\n" .
+           "<a onclick=\"\$('#${id}').slideToggle('fast')\" " .
+           "href=\"#\">$title</a>\n" .
+           "<div class=\"dropdown\" id=\"${id}\"$style>\n" .
+           $text . "\n</div></div>\n";
+}
+
+sub get_all_options_prealign {
+    my $self = shift;
+    my $q = $self->cgi;
+    return "<div class=\"dropdown_container\">\n" .
+           "<a onclick=\"\$('#single').slideDown('fast'); \$('#batch').slideUp('fast')\" " .
+           "href=\"#\">Model Single Energy Landscape</a>\n" .
+           "<div class=\"dropdown\" id=\"single\">\n" .
+	   $q->p("Structures used to define landscape:" . $q->br .
+	          $q->table({-id=>'structures'},
+			   $q->Tr($q->td("PDB code " .
+				  $q->textfield({-name=>'pdbcode',
+						-size=>'4'})) .
+				  $q->td("or upload PDB file " .
+					 $q->filefield({-name=>'uploaded_file'})))) .
+		  $q->p($q->button(-value=>'Add more structures',
+				  -onClick=>"add_structure()"))) .
+                  $q->p("Sequence to be used in simulation:" . $q->br .
+		       $q->textarea({-name=>'sequence', -rows=>7, -cols=>77})) .
+           "\n</div></div>\n" .
+
+           "<div class=\"dropdown_container\">\n" .
+           "<a onclick=\"\$('#batch').slideDown('fast'); \$('#single').slideUp('fast')\" " .
+           "href=\"#\">Model Energy Landscapes in Batch Mode</a>\n" .
+           "<div class=\"dropdown\" id=\"batch\" style=\"display:none\">\n" .
+	         $q->p("Upload directories zip file:    " . 
+		       $q->td($q->filefield({-name=>"zip"}))) .
+           "\n</div></div>\n";
+
+}
+
+sub get_advanced_modeling_options {
+    my $self = shift;
+    my $q = $self->cgi;
+    return $self->make_dropdown("advmodel", "Advanced Modeling Options", 0,
+      "<input type=\"radio\" name=\"advancedopt\" value=\"ligandmod\" " .
+      "onclick=\"\$('#glycmod').slideUp('fast'); " .
+      "\$('#ligandmod').slideDown('fast')\"" .
+      "\>Model ligand binding site" . $q->br .
+      "<div class=\"advopts\" id=\"ligandmod\" style=\"display:none\">\n" .
+	     "Radius of ligand binding site (&Aring;ngstroms) " . $q->textfield({-name=>'ligandmod_rAS', -size=>"3",
+                                         -value=>"11"}) . $q->br .
+	     "Ligand PDB file " . $q->filefield({-name=>"ligandmod_ligfile"}) . $q->br .
+	     "PDB file from which ligand was extracted " . $q->textfield({-name=>'ligandmod_ligpdb', -size=>"25",
+                                         -value=>""}) .
+
+      "</div>\n\n" .
+
+      "<input type=\"radio\" name=\"advancedopt\" value=\"glycmod\" " .
+      "onclick=\"\$('#ligandmod').slideUp('fast'); " .
+      "\$('#glycmod').slideDown('fast')\"" .
+      "\>Model glycosylation" . $q->br .
+      "<div class=\"advopts\" id=\"glycmod\" style=\"display:none\">\n" .
+	    "Number of models " . $q->textfield({-name=>'glycmod_nruns', -size=>"3",
+						 -value=>"10"}) . $q->br .
+	    "Glycosylation input file " .
+	    $q->filefield({-name=>"glycmod_input"}) . $q->br .
+	    "Flexible residues at glycosylation sites " .
+	    '<input type="checkbox" name="glycmod_flexible_sites"' .
+				'checked="1" />' . $q->br .
+	    "Number of optimization steps " .
+	    $q->textfield({-name=>'glycmod_num_opt_steps',-size=>"3", -value=>"1"}) .
+
+      "</div>\n\n");
+
+}
+
+sub get_sampling_options {
+    my $self = shift;
+    my $q = $self->cgi;
+    return $self->make_dropdown("sampling", "Sampling Options", 0,
+      "<input type=\"radio\" name=\"sampletype\" value=\"thermodyn\" " .
+      "checked=\"checked\" onclick=\"\$('#rareconf').slideUp('fast'); " .
+      "\$('#multiconf').slideUp('fast'); \$('#thermodyn').slideDown('fast')\"" .
+      "\>Generate a landscape that will be thermodynamically well sampled on the user's computer (using MODELLER)" . $q->br .
+	    "<div class=\"sampopts\" id=\"thermodyn\">\n" .
+	    "Number of simulations " . $q->textfield({-name=>'thermodyn_nruns', -size=>"3",
+                                         -value=>"10"}) . $q->br .
+	    "MD temperature " . $q->textfield({-name=>'thermodyn_mdtemp', -size=>"3",
+                                         -value=>"300"}) .
+
+      "</div>\n\n" .
+
+      "<input type=\"radio\" name=\"sampletype\" value=\"multiconf\" " .
+      "onclick=\"\$('#rareconf').slideUp('fast'); " .
+      "\$('#thermodyn').slideUp('fast'); \$('#multiconf').slideDown('fast')\" />Sample most probable " .
+      "conformations consistent with input crystal structure(s)" . $q->br .
+      "<div class=\"sampopts\" id=\"multiconf\" style=\"display:none\">\n" .
+      "Number of simulations " . $q->textfield({-name=>'multiconf_nruns', -size=>"3",
+                                         -value=>"30"}) . $q->br .
+      "MD temperature " . $q->textfield({-name=>'multiconf_mdtemp', -size=>"3",
+                                         -value=>"300"}) .
+      "</div>\n\n" .
+
+      "<input type=\"radio\" name=\"sampletype\" value=\"rareconf\" " .
+      "onclick=\"\$('#multiconf').slideUp('fast'); " .
+      "\$('#thermodyn').slideUp('fast'); \$('#rareconf').slideDown('fast')\" />Sample low probability " .
+      "conformations consistent with input crystal structure(s)" . $q->br .
+      "<div class=\"sampopts\" id=\"rareconf\" style=\"display:none\">\n" .
+      "Number of simulations " . $q->textfield({-name=>'rareconf_nruns', -size=>"3",
+                                         -value=>"30"}) . $q->br .
+      "MD temperature scanned or fixed value " .
+                $q->textfield({-name=>'rareconf_mdtemp', -size=>"3",
+                               -value=>"scan"}) . $q->br .
+      "structural similarity % cut-off " .
+                $q->textfield({-name=>'rareconf_simcutoff', -size=>"3",
+                               -value=>"10"}) .
+      "</div>\n");
+}
+
+sub get_all_advanced_options {
+    my $self = shift;
+    return $self->get_advanced_modeling_options() .
+	   $self->get_sampling_options();
+}
+
+sub get_alignment {
+    my $self = shift;
+    my $q = $self->cgi;
+
+    my $eml = $q->param('jobemail');
+    if (!defined($eml)) {
+	return undef, undef;
+    }
+    
+    my $job = $self->make_job($q->param("name") || "job");
+    my @pdbcodes = $q->param("pdbcode");
+    my @uplfiles = $q->upload("uploaded_file");
+    my $aln;
+    my $list = $job->directory . "/" . "list";
+    # Handle PDB codes
+    foreach my $code (@pdbcodes) {
+      if (defined($code) and $code ne "") {
+	  # TODO: replace with get_pdb_chains
+	  my $pdbfile = saliweb::frontend::get_pdb_code($code, $job->directory);
+	  $pdbfile =~ s/.*[\/\\](.*)/$1/;
+	  system("echo $pdbfile >>$list");
+      }
+    }
+    # Upload files into job directory
+    my $upl_num = 0;
+    foreach my $upl (@uplfiles) {
+      if (defined $upl) {
+        my $fname = "uplstruc$upl_num"; # todo: use untainted user's name
+        my $buffer;
+        my $fullpath = $job->directory . "/" . $upl;
+        open(OUTFILE, '>', $fullpath)
+         or throw saliweb::frontend::InternalError("Cannot open $fullpath: $!");
+        while (<$upl>) {
+          print OUTFILE $_;
+        }
+        close OUTFILE;
+
+	system("echo $upl >>$list");
+
+        $upl_num++;
+      }
+    }
+
+    my $jobdir = $job->directory;
+
+    my $filesize = -s "$list";
+    if($filesize == 0) {
+	#batch job
+	my $user_zip = $q->upload('zip');
+	my $zipfile = $job->directory . "/input.zip";
+	open(OUTFILE, '>', $zipfile)
+	    or throw saliweb::frontend::InternalError("Cannot open $zipfile: $!");
+	while (<$user_zip>) {
+	    print OUTFILE $_;
+	}
+	close OUTFILE;
+
+	my $filesize2 = -s "$zipfile";
+	if($filesize2 == 0) {
+	    return undef, undef;
+	} else {
+	    $aln = "X";
+	    system("echo XX >>$list");
+	}
+
+    } else{
+	#single job
+	my $seq = $q->param('sequence');
+	$seq =~ s/\s*//g;
+	if ($seq eq "") {
+	    return undef, undef;
+	}
+
+	my $inpseq = $job->directory . "/" . "inpseq";
+	system("echo $seq >> $inpseq");
+
+	open(FOO, "/netapp/sali/allosmod/get_MULTsi20b.sh inpseq $jobdir |") || die "dont let script output to std out";
+	close(FOO);
+
+	$aln .= `cat $jobdir/align.ali`;
+    }
+
+    return $aln, $job;
+}
+
 sub get_index_page {
     my $self = shift;
     my $q = $self->cgi;
+
+    my ($alignment, $job) = $self->get_alignment();
+    my $action = (defined($alignment) ? $self->submit_url : $self->index_url);
+
+    my $form;
+    if (defined($alignment)) {
+	if($alignment eq "X") {
+	    #batch job
+	    $form = $q->br . $q->br . $q->br . $q->br . $q->br . $q->br . $q->br .
+		    $q->p("Click submit to run your batch job. Make sure all alignment files have") . 
+		    $q->p("been checked by eye for misalignments (especially near ends of chains)") . $q->br .
+			  $q->hidden('jobname', $job->name) .
+			  $q->hidden('jobemail') .
+			  $q->p("<center>" .
+				$q->input({-type=>"submit", -value=>"Submit"}) .
+				"</center>");
+	} else {
+	    #single job
+	    $form = $q->p("Verify Alignment:" . $q->br .
+			  $q->textarea({-name=>'alignment', -rows=>10, -cols=>77,
+					-value=>$alignment})) .
+			  $q->hidden('jobname', $job->name) .
+			  $q->hidden('jobemail') .
+			  $q->p("<center>" .
+				$q->input({-type=>"submit", -value=>"Submit"}) .
+				"</center>") .
+			  $self->get_all_advanced_options();
+	}
+    } else {
+      $form = $q->table(
+	      $q->Tr($q->td("Job name "), 
+		     $q->td($q->textfield({-name=>"name",
+					   -size=>"25"}))) .
+              $q->Tr($q->td("Email"),
+		     $q->td($q->textfield({-name=>"jobemail",
+					   -value=>$self->email,
+					   -size=>"25"})))) .
+	      $self->get_all_options_prealign() .
+              $q->p("<center>" .
+                    $q->input({-type=>"submit", -value=>"Submit"}) .
+                    "</center>");
+    }
+
     my $greeting = <<GREETING;
-<p>AllosMod is a web server to set up simulations that can be run in 
-MODELLER. AllosMod creates a model of a protein\'s energy landscape. 
-Carefully designed energy landscapes allow efficient molecular 
+<p>AllosMod is a web server to set up and run simulations based on a modeled energy 
+landscape that you create. Carefully designed energy landscapes allow efficient molecular 
 dynamics sampling at constant temperatures, thereby providing ergodic 
 sampling of conformational space. Use AllosMod to:<br />
 <ul>
-- Model energy landscapes for a protein with known/modeled ligand bound and unbound structures <br />
-- Model energy landscapes for a protein with one known/modeled structure to predict rarely populated conformations <br />
+- Model energy landscapes for a protein with either known or modeled structures <br />
+- Sample your energy landscapes to predict often and/or rarely populated conformations <br />
+- Model energy landscapes for ligand-induced structural and/or dynamic changes, i.e. allostery <br />
 - Model energy landscapes for glycosylated proteins (For help, click <a href="http://modbase.compbio.ucsf.edu/allosmod/help.cgi?type=glyc"> here</a>) <br />
-- Fast sampling for any of the above landscapes <br />
 </ul>
 
-The AllosMod server allows batch jobs to set up many simulations at 
-once. Upload a zip file containing directories for each 
-type of landscape that you want to create. AllosMod will set up many short 
+<p>The AllosMod server runs in two modes: 1) single landscape and 2) batch jobs to set up many 
+simulations at once. By creating a single landscape, the server will create input files that can 
+be used to submit batch jobs. AllosMod will set up many short 
 simulations for each landscape. There are two options for sampling: 1) constant temperature 
-simulation at 300 K for 6 ns, which will be completed overnight on a single processor on the 
-user\'s computer or 2) sampling is performed using a quick, unequilibrated simulation at 300 K.
-Sampling is acheived efficiently by starting each simulation at different points in conformational 
-space and by storing the energies in memory. <br />
+molecular dynamics, which will be completed overnight on a single processor on the 
+user\'s computer (using MODELLER) or 2) quick, unequilibrated simulation performed on our servers 
+within minutes to hours. Sampling is acheived efficiently by starting each simulation at different 
+points in conformational space and by storing the energies in memory. <br />
 <br />
 AllosMod has several options for conformational sampling and contains tools for simulation analysis. 
-The AllosMod server is integrated with the <a href="http://modbase.compbio.ucsf.edu/foxs/index.html"> FoXS server</a>
-for structure-based calculation of small angle X-ray scattering profiles (in progress). For more 
-details click on the "About AllosMod" link above and read the paper listed below. <br />
+For more details click on the "About AllosMod" link above and read the paper listed below. <br />
 <br />
-***<a style="color:red">NEW</a>*** AllosMod will run quick, constant temperature simulations of your 
-                        modeled energy landscape on our servers, see "About AllosMod" for details.
+***<a style="color:red">NEW</a>*** The AllosMod server is integrated with the 
+<a href="http://modbase.compbio.ucsf.edu/foxs/index.html"> FoXS server</a> for rigid body modeling of 
+small angle X-ray scattering profiles. Our combined server is 
+<a href="http://modbase.compbio.ucsf.edu/allosmod-foxs"> AllosMod-FoXS</a>.
 <br />&nbsp;</p>
 GREETING
-    return "<div id=\"resulttable\">\n" .
-           $q->h2({-align=>"center"},
+
+    return $q->h2({-align=>"center"},
                   "AllosMod: Modeling of Ligand-induced Protein Dynamics and Beyond") .
+           $greeting .
+
            $q->start_form({-name=>"allosmodform", -method=>"post",
-                           -action=>$self->submit_url}) .
-           $q->table(
-               $q->Tr($q->td({-colspan=>2}, $greeting)) .
-
-               $q->Tr($q->td($q->h3("AllosMod Inputs"))) .
-
-               $q->Tr($q->td("Email address (optional)",
-                             $self->help_link("general")),
-                      $q->td($q->textfield({-name=>"email",
-                                            -value=>$self->email,
-                                            -size=>"25"}))) .
-
-               $q->Tr($q->td("Upload directories zip file",
-                             $self->help_link("file"), $q->br),
-                      $q->td($q->filefield({-name=>"zip"}))) .
-
-               $q->Tr($q->td("Name your model",
-                                    $self->help_link("name")),
-                      $q->td($q->textfield({-name=>"name",
-                                            -value=>"hemoglobin", -size=>"25"}))) .
-
-               $q->Tr($q->td($q->h3("***Before running simulations, click here: ",
-                                    $self->help_link("run")))) .
-
-               $q->Tr($q->td($q->h3("To analyze simulations, click here: ",
-                                    $self->help_link("analysis")))) .
-
-               $q->Tr($q->td({-colspan=>"2"},
-                             "<center>" .
-                             $q->input({-type=>"submit", -value=>"RUN!"}) .
-                             $q->input({-type=>"reset", -value=>"Reset"}) .
-                             "</center><p>&nbsp;</p>"))) .
-           $q->end_form .
-           "</div>\n";
+                           -action=>$action}) .
+           $form .
+           $q->end_form;
 }
 
 sub get_submit_page {
     my $self = shift;
     my $q = $self->cgi;
 
-    my $user_zip      = $q->upload('zip');              # uploaded file handle
-    my $user_name     = $q->param('name')||"";          # user-provided job name
-    my $email         = $q->param('email')||undef;      # user's e-mail
-#    my $user_numrun   = $q->param('numrun');     # number of runs per dir
+    my $jobname = $q->param('jobname');
+    my $email = $q->param('jobemail')||undef;      # user's e-mail
 
-#    check_optional_email($email);
-    check_zip($user_zip);
-#    check_numrun($user_numrun);
-
-    my $job = $self->make_job($user_name);
+    my $job = $self->resume_job($jobname);
     my $jobdir = $job->directory;
 
-    #write uploaded files
-    my $zipfile = "$jobdir/input.zip";
-    open(UPLOAD, "> $zipfile")
-	or throw saliweb::frontend::InternalError("Cannot open $zipfile: $!");
-    my $file_contents = "";
-    while (<$user_zip>) {
-        $file_contents .= $_;
+    my $filesize = -s "$jobdir/input.zip";
+    if($filesize == 0) {
+	#single job
+
+	# rewrite alignment to file
+	my $alignment = $q->param('alignment'); #alignment
+	my $filename = "$jobdir/align.ali";
+	open (FILE,">$filename") or die "I cannot open $filename\n";
+	print FILE $alignment;
+	close(FILE);
+
+	# handle advanced options
+	my $advancedopt = $q->param('advancedopt');
+	my $ligandmod_rAS = $q->param('ligandmod_rAS');
+	my $ligandmod_ligpdb = $q->param('ligandmod_ligpdb');
+	my $glycmod_nruns = $q->param('glycmod_nruns');
+	my $glycmod_flexible_sites = $q->param('glycmod_flexible_sites');
+	my $glycmod_num_opt_steps = $q->param('glycmod_num_opt_steps');
+
+	my $file_contents = "";
+	my $filesize2;
+	if ($advancedopt eq "ligandmod") {
+	    my $ligand_input = $q->upload('ligandmod_ligfile');
+	    my $ligandfile = "$jobdir/lig.pdb";
+	    open(UPLOAD, "> $ligandfile")
+		or throw saliweb::frontend::InternalError("Cannot open $ligandfile: $!");
+	    $file_contents = "";
+	    while (<$ligand_input>) {
+		$file_contents .= $_;
+	    }
+	    print UPLOAD $file_contents;
+	    close UPLOAD
+		or throw saliweb::frontend::InternalError("Cannot close $ligandfile: $!");
+	    $filesize2 = -s "$jobdir/saxs.dat";
+	    if($filesize2 == 0) {
+		system("rm $jobdir/lig.pdb");
+	    }
+	}
+	if ($advancedopt eq "glycmod") {
+	    my $glyc_input = $q->upload('glycmod_input');
+	    my $glycfile = "$jobdir/glyc.dat";
+	    open(UPLOAD, "> $glycfile")
+		or throw saliweb::frontend::InternalError("Cannot open $glycfile: $!");
+	    $file_contents = "";
+	    while (<$glyc_input>) {
+		$file_contents .= $_;
+	    }
+	    print UPLOAD $file_contents;
+	    close UPLOAD
+		or throw saliweb::frontend::InternalError("Cannot close $glycfile: $!");
+	    $filesize2 = -s "$jobdir/glyc.dat";
+	    if($filesize2 == 0) {
+		system("rm $jobdir/glyc.dat");
+	    }
+	}
+
+	# handle sampling options
+	my $sampletype = $q->param('sampletype');    
+	my $thermodyn_nruns = $q->param('thermodyn_nruns');
+	my $multiconf_mdtemp = $q->param('multiconf_mdtemp');
+	my $multiconf_nruns = $q->param('multiconf_nruns');
+	my $rareconf_mdtemp = $q->param('rareconf_mdtemp');
+	my $rareconf_simcutoff = $q->param('rareconf_simcutoff');
+	my $rareconf_nruns = $q->param('rareconf_nruns');
+
+	# make input.dat for allosmod
+	if ($sampletype eq "multiconf") {
+	    system("echo NRUNS=$multiconf_nruns >> $jobdir/input.dat");
+	    system("echo MDTEMP=$multiconf_mdtemp >> $jobdir/input.dat");
+#	     system("echo delEmax= >> $jobdir/input.dat");
+#	     system("echo LIGPDB= >> $jobdir/input.dat");
+	    system("echo rAS=1000 >> $jobdir/input.dat");
+	    system("echo DEVIATION=1.0 >> $jobdir/input.dat");
+	    system("echo SAMPLING=moderate_am >> $jobdir/input.dat");
+	} elsif ($sampletype eq "rareconf") {
+	    system("echo NRUNS=$rareconf_nruns >> $jobdir/input.dat");
+	    system("echo MDTEMP=$rareconf_mdtemp >> $jobdir/input.dat");
+	    system("echo rAS=1000 >> $jobdir/input.dat");
+	    system("echo DEVIATION=10.0 >> $jobdir/input.dat");
+	    system("echo SAMPLING=moderate_am_scan >> $jobdir/input.dat");
+	    system("echo SCAN_CUTOFF=$rareconf_simcutoff >> $jobdir/input.dat");
+	} elsif ($sampletype eq "thermodyn") {
+	    system("echo NRUNS=$thermodyn_nruns >> $jobdir/input.dat");
+	    system("echo rAS=1000 >> $jobdir/input.dat");
+	    system("echo DEVIATION=1.0 >> $jobdir/input.dat");
+	    system("echo SAMPLING=simulation >> $jobdir/input.dat");
+	} else {
+	    system("echo error sampletype >> $jobdir/input.dat");
+	}
+
+    } else {
+	#batch job
+
     }
-    print UPLOAD $file_contents;
-    close UPLOAD
-	or throw saliweb::frontend::InternalError("Cannot close $zipfile: $!");
 
     #submit job
     $job->submit($email);
@@ -188,32 +504,6 @@ sub get_submit_page {
     return $return;
 }
 
-# Check if a PDB name was specified
-sub check_zip {
-    my ($zip) = @_;
-    if (!$zip) {
-        throw saliweb::frontend::InputValidationError(
-                       "No directories zip file has been submitted!");
-    }
-}
-
-#check if number of runs specified is appropriate
-sub check_numrun {
-    my ($self, $numrun) = @_;
-    if (!$numrun) {
-        throw saliweb::frontend::InputValidationError(
-                       "Numrun not specified!");
-    }
-    if ($numrun == 0) {
-        throw saliweb::frontend::InputValidationError(
-                       "Numrun must be greater than zero!");
-    }
-    if ($numrun > 100) {
-        throw saliweb::frontend::InputValidationError(
-                       "Numrun must be less than 100!");
-    }
-}
-
 sub allow_file_download {
     my ($self, $file) = @_;
     return $file eq 'output.zip';
@@ -236,8 +526,8 @@ sub display_ok_job {
     $return.= $q->p("<a href=\"" . $job->get_results_file_url("output.zip") .
                     "\">Download output zip file.</a>");
     $return.=$q->p("<br />It would be wise to double check your run directories: <br /> 1) check that " .
-		   "allostericsite.pdb correctly represents the allosteric site (if applicable) <br /> 2) if some" .
-		   "directories were not set up correctly, then read error.log. <br />");
+		   "allostericsite.pdb correctly represents the allosteric site (if applicable) <br /> 2) if some " .
+		   "runs were not completed, then read error.log. <br />");
     $return .= $job->get_results_available_time();
     return $return;
 }

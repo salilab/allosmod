@@ -1,5 +1,15 @@
 <h1>AllosMod Help Page - Modeling Glycosylation </h1><br />
-<a><h4>Server Input</h4></a>
+<p>
+Protein glycosylation can be modeled as explained in this help page and in Guttman et al. For help to model non-glycosylated proteins, click 
+<a href="http://modbase.compbio.ucsf.edu/allosmod/help.cgi?type=help"> here</a>. This tool is meant to sample the 
+range of conformations accessible to sugars with minimal structural changes in the protein. Protein motions will be limited 
+to loops and surface side chains. To model protein conformational change in addition to glycosylation, first run simulations 
+using AllosMod and then input the trajectory snapshots to model the sugars.  <br />
+<br />
+The following help page is organized to run batch jobs. Each input field in single landscape mode has a corresponding file/section below. <br />
+<br />
+</p>
+<a><h4>Server Input: Batch Mode</h4></a>
 <ul>
   <li><a id="file"><h5>Directories zip file</h5></a>
       <p>Upload a zip file containing a set of directories for each glycosylated protein that you want to model. For an example directory, 

@@ -1,26 +1,36 @@
 <h1>AllosMod-FoXS Help Pages</h1>
+<br />
 <p>
-Test<br />
+The AllosMod-FoXS server is a combination of <a href="http://modbase.compbio.ucsf.edu/foxs/index.html"> FoXS</a> and 
+<a href="http://modbase.compbio.ucsf.edu/allosmod/index.html"> AllosMod</a>. AllosMod is a server to sample protein conformations, which 
+was originally created to study allosteric proteins. FoXS is a server to do rigid body modeling of small angle X-ray scattering (SAXS) 
+profiles. The combined server is meant to create a user friendly way to generate structures to compare to experimental SAXS profiles. <br />
+<br />
+The structures that are generated are a result of an underlying energy landscape and sampling procedure. The energy landscapes are constructed 
+with the assumption/hypothesis that the most stable structure for a given sequence is the native crystal structure. In some instances, there 
+might be several stable structures, in which case the energy landscape should include multiple basins of attraction. AllosMod is a tool that 
+allows the user to specify what structures should define the energy landscape. Crystal structures or models may be used.  <br />
+<br />
+There are different sampling options that involve increasingly longer calculations and should be approached as follows. 
+First, generate comparative models of the sequence used in the experiment (i.e. using MODELLER). These 
+structures will be very similar to the crystal structure (or template) and should include any missing loops or residues. Second, 
+generate models consistent with the crystal structure (or template) to test if there are relevant structural changes in 
+solution (using fast constant temperature molecular dynamics). Third, generate models that deviate from the crystal structure (or template) 
+to test if there are significant structural changes. This procedure includes sampling at high temperatures followed by rapid cooling, which can quickly 
+capture rare conformational changes. Lastly, an energy landscape could be created that, when sampled using an AllosMod 
+equilibrated simulation, reproduces SAXS data. Potentially, this modeled landscape would allow the user access microscopic motions that 
+are relevant for the biological system of interest.  <br />
 <br />
 </p>
 <a><h4>Server Input</h4></a>
 <ul>
-  <li><a id="email"><h5>Email</h5></a>
-      <p>If set, a notification will be sent once the job is completed.
-      </p></li><br />
-  <li><a id="file"><h5>Directories zip file</h5></a>
-      <p>Upload a zip file containing a set of directories for each landscape that you want to model. To create such a file, put all the input files into one 
-         directory per landscape and type: zip -r input.zip dir1 dir2... For an example directory, 
-         click <a href="http://modbase.compbio.ucsf.edu/allosmod/html/file/input.zip"> here</a>. 
-         Each directory should contain the following files:
-      </p></li>
-
-      <p><br /><b>PDB file(s):</b> all structures used to create the energy landscape for the simulation. <br />
-      </p><br />
-     
+Input your sequence as a string of capital letters, the same specifications used in MODELLER. Multiple chains can be specified by using a "/" 
+as a separator. Support is also given for nucleic acids, cofactors, and small molecules (for more information, click 
+<a href="http://salilab.org/modeller/tutorial/basic.html">here</a>). <br />
+<br />
+For help regarding other input fields, refer to the AllosMod <a href="http://modbase.compbio.ucsf.edu/allosmod/help.cgi?type=help"> help page</a> 
+(for glycosylation, click <a href="http://modbase.compbio.ucsf.edu/allosmod/help.cgi?type=glyc"> here</a>) and the FoXS 
+<a href="http://modbase.compbio.ucsf.edu/foxs/about.html"> help page</a>.  <br />
 </ul>
-<a name="output"><h4>Server Output</h4></a>
-<p>
-	The output is 
-</p><br />
+<br />
 
