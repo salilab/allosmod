@@ -18,7 +18,7 @@ generate models consistent with the crystal structure (or template) to test if t
 solution (using fast constant temperature molecular dynamics). Third, generate models that deviate from the crystal structure (or template) 
 to test if there are significant structural changes. This procedure includes sampling at high temperatures followed by rapid cooling, which can quickly 
 capture rare conformational changes. Lastly, an energy landscape could be created that, when sampled using an AllosMod 
-equilibrated simulation, reproduces SAXS data. Potentially, this modeled landscape would allow the user access microscopic motions that 
+equilibrated simulation, reproduces SAXS data. Potentially, this modeled landscape would allow the user to access microscopic motions that 
 are relevant for the biological system of interest.  <br />
 <br />
 </p>
@@ -28,7 +28,7 @@ Input your sequence as a string of capital letters, the same specifications used
 as a separator. Support is also given for nucleic acids, cofactors, and small molecules (for more information, click 
 <a href="http://salilab.org/modeller/tutorial/basic.html">here</a>). <br />
 <br />
-For help regarding other input fields, refer to the AllosMod <a href="http://modbase.compbio.ucsf.edu/allosmod/help.cgi?type=help"> help page</a> 
+For help regarding specific input fields, refer to the AllosMod <a href="http://modbase.compbio.ucsf.edu/allosmod/help.cgi?type=help"> help page</a> 
 (for glycosylation, click <a href="http://modbase.compbio.ucsf.edu/allosmod/help.cgi?type=glyc"> here</a>) and the FoXS 
 <a href="http://modbase.compbio.ucsf.edu/foxs/about.html"> help page</a>.  <br />
 </ul>

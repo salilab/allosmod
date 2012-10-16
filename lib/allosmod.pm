@@ -121,7 +121,7 @@ sub get_advanced_modeling_options {
       "\$('#ligandmod').slideDown('fast')\"" .
       "\>Model ligand binding site" . $q->br .
       "<div class=\"advopts\" id=\"ligandmod\" style=\"display:none\">\n" .
-	     "Radius of ligand binding site (&Aring;ngstroms) " . $q->textfield({-name=>'ligandmod_rAS', -size=>"3",
+	     "Radius of ligand binding site (&Aring) " . $q->textfield({-name=>'ligandmod_rAS', -size=>"3",
                                          -value=>"11"}) . $q->br .
 	     "Ligand PDB file " . $q->filefield({-name=>"ligandmod_ligfile"}) . $q->br .
 	     "PDB file from which ligand was extracted " . $q->textfield({-name=>'ligandmod_ligpdb', -size=>"25",
@@ -185,7 +185,7 @@ sub get_sampling_options {
       "MD temperature scanned or fixed value " .
                 $q->textfield({-name=>'rareconf_mdtemp', -size=>"3",
                                -value=>"scan"}) . $q->br .
-      "structural similarity % cut-off " .
+      "% of trajectory snapshots to be analyzed " .
                 $q->textfield({-name=>'rareconf_simcutoff', -size=>"3",
                                -value=>"10"}) .
       "</div>\n");
@@ -201,17 +201,14 @@ sub get_alignment {
     my $self = shift;
     my $q = $self->cgi;
 
-    my $eml = $q->param('jobemail');
-    if (!defined($eml)) {
-	return undef, undef;
-    }
-    
     my $job = $self->make_job($q->param("name") || "job");
     my @pdbcodes = $q->param("pdbcode");
     my @uplfiles = $q->upload("uploaded_file");
+
+    # Handle PDB codes
     my $aln;
     my $list = $job->directory . "/" . "list";
-    # Handle PDB codes
+    # Upload PDBs
     foreach my $code (@pdbcodes) {
       if (defined($code) and $code ne "") {
 	  # TODO: replace with get_pdb_chains
@@ -255,8 +252,11 @@ sub get_alignment {
 	close OUTFILE;
 
 	my $filesize2 = -s "$zipfile";
+	my $email = $q->param('jobemail');
 	if($filesize2 == 0) {
 	    return undef, undef;
+#	} elsif(length $email <= 0) {
+#	    check_required_email($email);
 	} else {
 	    $aln = "X";
 	    system("echo XX >>$list");
@@ -269,6 +269,24 @@ sub get_alignment {
 	if ($seq eq "") {
 	    return undef, undef;
 	}
+
+	#check PDB codes
+	my $found = 0;
+	foreach my $code (@pdbcodes) {
+	    my $pdb = lc $code;
+	    if(length $pdb > 0 and $pdb =~ /^[0-9]\w{3}$/) { $found = 1; }
+	}
+	my $arraySize = scalar (@uplfiles);
+	
+	if($found != 1 and $arraySize <= 0) {
+	    throw saliweb::frontend::InputValidationError("Please provide PDB code or upload PDB file $!");
+	}
+	
+	# check email
+#	my $email = $q->param('jobemail');
+#	if(($found == 1 or $arraySize > 0) and length $email <= 0) {
+#	    check_required_email($email);
+#	}    
 
 	my $inpseq = $job->directory . "/" . "inpseq";
 	system("echo $seq >> $inpseq");
@@ -374,7 +392,7 @@ sub get_submit_page {
     my $q = $self->cgi;
 
     my $jobname = $q->param('jobname');
-    my $email = $q->param('jobemail')||undef;      # user's e-mail
+    my $email = $q->param('jobemail'); #||undef;      # user's e-mail
 
     my $job = $self->resume_job($jobname);
     my $jobdir = $job->directory;
@@ -397,7 +415,17 @@ sub get_submit_page {
 	my $glycmod_nruns = $q->param('glycmod_nruns');
 	my $glycmod_flexible_sites = $q->param('glycmod_flexible_sites');
 	my $glycmod_num_opt_steps = $q->param('glycmod_num_opt_steps');
-
+	if(($ligandmod_rAS !~ /^\d+$/ and $ligandmod_rAS !~ /^\d+[\.]\d+$/) or
+	   $ligandmod_rAS <= 0) {
+	    throw saliweb::frontend::InputValidationError("Please provide a sensible radius of the ligand binding site $!");
+	}
+	if(($glycmod_nruns !~ /^\d+$/) or $glycmod_nruns <= 0 or $glycmod_nruns > 100) {
+	    throw saliweb::frontend::InputValidationError("Please provide a sensible number of models for glycosylation $!");
+	}
+	if(($glycmod_num_opt_steps !~ /^\d+$/) or $glycmod_num_opt_steps <= 0 or $glycmod_num_opt_steps > 10) {
+	    throw saliweb::frontend::InputValidationError("Please provide a sensible number of models for glycosylation $!");
+	}
+	
 	my $file_contents = "";
 	my $filesize2;
 	if ($advancedopt eq "ligandmod") {
@@ -443,26 +471,54 @@ sub get_submit_page {
 	my $rareconf_mdtemp = $q->param('rareconf_mdtemp');
 	my $rareconf_simcutoff = $q->param('rareconf_simcutoff');
 	my $rareconf_nruns = $q->param('rareconf_nruns');
+	if(($thermodyn_nruns !~ /^\d+$/) or $thermodyn_nruns <= 0 or $thermodyn_nruns > 100) {
+	    throw saliweb::frontend::InputValidationError("Please provide a sensible number of runs for comparative modeling $!");
+	}
+	if(($multiconf_nruns !~ /^\d+$/) or $multiconf_nruns <= 0 or $multiconf_nruns > 100) {
+	    throw saliweb::frontend::InputValidationError("Please provide a sensible number of runs for probable conformations $!");
+	}
+	if(($rareconf_nruns !~ /^\d+$/) or $rareconf_nruns <= 0 or $rareconf_nruns > 100) {
+	    throw saliweb::frontend::InputValidationError("Please provide a sensible number of runs for low probability conformations $!");
+	}
+	if(($multiconf_mdtemp !~ /^\d+$/ and $multiconf_mdtemp !~ /^\d+[\.]\d+$/ and $multiconf_mdtemp ne "scan") or
+	   ($multiconf_mdtemp <= 0 and $multiconf_mdtemp ne "scan")) {
+	    throw saliweb::frontend::InputValidationError("Please provide a sensible MD temperature for probable conformations $!");
+	}
+	if(($rareconf_mdtemp !~ /^\d+$/ and $rareconf_mdtemp !~ /^\d+[\.]\d+$/ and $rareconf_mdtemp ne "scan") or
+	   ($rareconf_mdtemp <= 0 and $rareconf_mdtemp ne "scan")) {
+	    throw saliweb::frontend::InputValidationError("Please provide a sensible MD temperature for low probability conformations $!");
+	}
+	if(($rareconf_simcutoff !~ /^\d+$/ and $rareconf_simcutoff !~ /^\d+[\.]\d+$/) or
+	   $rareconf_simcutoff <= 0 or $rareconf_simcutoff > 100) {
+	    throw saliweb::frontend::InputValidationError("Please provide a sensible percent cut-off for str $!");
+	}
 
 	# make input.dat for allosmod
+	if ($advancedopt eq "glycmod") {
+	    $sampletype = "null";
+	    system("echo NRUNS=$glycmod_nruns >> $jobdir/input.dat");
+	    system("echo DEVIATION=4.0 >> $jobdir/input.dat");
+	    system("echo SAMPLING=moderate_cm >> $jobdir/input.dat");	
+	    system("echo ATTACH_GAPS=$glycmod_flexible_sites >> $jobdir/input.dat");
+	    system("echo REPEAT_OPTIMIZATION=$glycmod_num_opt_steps >> $jobdir/input.dat");
+	}
+	if ($advancedopt eq "ligandmod") {
+	    system("echo LIGPDB=$ligandmod_ligpdb >> $jobdir/input.dat");
+	    system("echo rAS=$ligandmod_rAS >> $jobdir/input.dat");
+	}
 	if ($sampletype eq "multiconf") {
 	    system("echo NRUNS=$multiconf_nruns >> $jobdir/input.dat");
 	    system("echo MDTEMP=$multiconf_mdtemp >> $jobdir/input.dat");
-#	     system("echo delEmax= >> $jobdir/input.dat");
-#	     system("echo LIGPDB= >> $jobdir/input.dat");
-	    system("echo rAS=1000 >> $jobdir/input.dat");
 	    system("echo DEVIATION=1.0 >> $jobdir/input.dat");
 	    system("echo SAMPLING=moderate_am >> $jobdir/input.dat");
 	} elsif ($sampletype eq "rareconf") {
 	    system("echo NRUNS=$rareconf_nruns >> $jobdir/input.dat");
 	    system("echo MDTEMP=$rareconf_mdtemp >> $jobdir/input.dat");
-	    system("echo rAS=1000 >> $jobdir/input.dat");
 	    system("echo DEVIATION=10.0 >> $jobdir/input.dat");
 	    system("echo SAMPLING=moderate_am_scan >> $jobdir/input.dat");
 	    system("echo SCAN_CUTOFF=$rareconf_simcutoff >> $jobdir/input.dat");
 	} elsif ($sampletype eq "thermodyn") {
 	    system("echo NRUNS=$thermodyn_nruns >> $jobdir/input.dat");
-	    system("echo rAS=1000 >> $jobdir/input.dat");
 	    system("echo DEVIATION=1.0 >> $jobdir/input.dat");
 	    system("echo SAMPLING=simulation >> $jobdir/input.dat");
 	} else {
@@ -559,6 +615,13 @@ sub get_help_page {
 	return $self->get_text_file("help_glyc.txt");
     } else {
 	return $self->SUPER::get_help_page($display_type);
+    }
+}
+
+sub check_required_email {
+    my ($email) = @_;
+    if($email !~ m/^[\w\.-]+@[\w-]+\.[\w-]+((\.[\w-]+)*)?$/ ) {
+	throw saliweb::frontend::InputValidationError("Please provide a valid return email address");
     }
 }
 

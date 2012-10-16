@@ -9,21 +9,11 @@ from operator import itemgetter
 
 class Job(saliweb.backend.Job):
     runnercls = saliweb.backend.SGERunner
-
-    def preprocess(self):
+    runnercls2 = saliweb.backend.LocalRunner
+    
+    def run(self):
         #preprocess job to keep track of iterations
         subprocess.call(["/netapp/sali/allosmod/preproccess.sh"])
-        CTRFILE = open("jobcounter","r")
-        jobcounter = int(CTRFILE.readline())
-
-        if jobcounter == -1:
-            SCANFILE = open("%s/scan" % dir.replace('\n', ''),"r")
-            scan = int(SCANFILE.readline())
-
-            if scan == 0:
-                self.skip_run()
-                
-    def run(self):
         CTRFILE = open("jobcounter","r") #jobcounter: -1 is all sims complete, -99 is first pass, >0 indicates number of jobs submitted
         jobcounter = int(CTRFILE.readline())
         os.system("echo run jobctr %i >>pwout" % jobcounter)
@@ -56,7 +46,7 @@ source ./%s/qsub.sh
                 script = """
 echo finished
 """
-                r = self.runnercls(script)
+                r = self.runnercls2("echo finished")
                 r.set_sge_options("-j y -l arch=lx24-amd64 -l netapp=0.5G,scratch=0.5G -l mem_free=0.5G -l h_rt=0:01:00 -t 1-1 -V")
             elif scan == -1:
                 #execute quick cooling on multiple nodes
