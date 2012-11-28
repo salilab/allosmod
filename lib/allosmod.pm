@@ -201,6 +201,14 @@ sub get_alignment {
     my $self = shift;
     my $q = $self->cgi;
 
+    my $seq = $q->param('sequence');
+    my $zip = $q->param('zip');
+    $seq =~ s/\s*//g;
+    $zip =~ s/\s*//g;
+    if ($seq eq "" and $zip eq "") {
+	return undef, undef;
+    }
+
     my $job = $self->make_job($q->param("name") || "job");
     my @pdbcodes = $q->param("pdbcode");
     my @uplfiles = $q->upload("uploaded_file");
@@ -211,8 +219,7 @@ sub get_alignment {
     # Upload PDBs
     foreach my $code (@pdbcodes) {
       if (defined($code) and $code ne "") {
-	  # TODO: replace with get_pdb_chains
-	  my $pdbfile = saliweb::frontend::get_pdb_code($code, $job->directory);
+	  my $pdbfile = saliweb::frontend::get_pdb_chains($code, $job->directory);
 	  $pdbfile =~ s/.*[\/\\](.*)/$1/;
 	  system("echo $pdbfile >>$list");
       }
@@ -251,8 +258,9 @@ sub get_alignment {
 	}
 	close OUTFILE;
 
-	my $filesize2 = -s "$zipfile";
-	my $email = $q->param('jobemail');
+	my $filesize2 = 0;
+	$filesize2 = -s "$zipfile";
+#	my $email = $q->param('jobemail');
 	if($filesize2 == 0) {
 	    return undef, undef;
 #	} elsif(length $email <= 0) {
@@ -264,12 +272,6 @@ sub get_alignment {
 
     } else{
 	#single job
-	my $seq = $q->param('sequence');
-	$seq =~ s/\s*//g;
-	if ($seq eq "") {
-	    return undef, undef;
-	}
-
 	#check PDB codes
 	my $found = 0;
 	foreach my $code (@pdbcodes) {
@@ -335,8 +337,8 @@ sub get_index_page {
       $form = $q->table(
 	      $q->Tr($q->td("Job name "), 
 		     $q->td($q->textfield({-name=>"name",
-					   -size=>"25"}))) .
-              $q->Tr($q->td("Email"),
+					   -size=>"25"}))) . 
+             $q->Tr($q->td("Email"),
 		     $q->td($q->textfield({-name=>"jobemail",
 					   -value=>$self->email,
 					   -size=>"25"})))) .
@@ -364,7 +366,7 @@ be used to submit batch jobs. AllosMod will set up many short
 simulations for each landscape. There are two options for sampling: 1) constant temperature 
 molecular dynamics, which will be completed overnight on a single processor on the 
 user\'s computer (using MODELLER) or 2) quick, unequilibrated simulation performed on our servers 
-within minutes to hours. Sampling is acheived efficiently by starting each simulation at different 
+within minutes to hours. Sampling is achieved efficiently by starting each simulation at different 
 points in conformational space and by storing the energies in memory. <br />
 <br />
 AllosMod has several options for conformational sampling and contains tools for simulation analysis. 
@@ -440,7 +442,7 @@ sub get_submit_page {
 	    print UPLOAD $file_contents;
 	    close UPLOAD
 		or throw saliweb::frontend::InternalError("Cannot close $ligandfile: $!");
-	    $filesize2 = -s "$jobdir/saxs.dat";
+	    $filesize2 = -s "$jobdir/lig.pdb";
 	    if($filesize2 == 0) {
 		system("rm $jobdir/lig.pdb");
 	    }
@@ -466,6 +468,7 @@ sub get_submit_page {
 	# handle sampling options
 	my $sampletype = $q->param('sampletype');    
 	my $thermodyn_nruns = $q->param('thermodyn_nruns');
+	my $thermodyn_mdtemp = $q->param('thermodyn_mdtemp');
 	my $multiconf_mdtemp = $q->param('multiconf_mdtemp');
 	my $multiconf_nruns = $q->param('multiconf_nruns');
 	my $rareconf_mdtemp = $q->param('rareconf_mdtemp');
@@ -473,6 +476,10 @@ sub get_submit_page {
 	my $rareconf_nruns = $q->param('rareconf_nruns');
 	if(($thermodyn_nruns !~ /^\d+$/) or $thermodyn_nruns <= 0 or $thermodyn_nruns > 100) {
 	    throw saliweb::frontend::InputValidationError("Please provide a sensible number of runs for comparative modeling $!");
+	}
+	if(($thermodyn_mdtemp !~ /^\d+$/ and $thermodyn_mdtemp !~ /^\d+[\.]\d+$/ and $thermodyn_mdtemp ne "scan") or
+	   ($thermodyn_mdtemp <= 0 and $thermodyn_mdtemp ne "scan")) {
+	    throw saliweb::frontend::InputValidationError("Please provide a sensible MD temperature for probable conformations $!");
 	}
 	if(($multiconf_nruns !~ /^\d+$/) or $multiconf_nruns <= 0 or $multiconf_nruns > 100) {
 	    throw saliweb::frontend::InputValidationError("Please provide a sensible number of runs for probable conformations $!");
@@ -509,7 +516,7 @@ sub get_submit_page {
 	if ($sampletype eq "multiconf") {
 	    system("echo NRUNS=$multiconf_nruns >> $jobdir/input.dat");
 	    system("echo MDTEMP=$multiconf_mdtemp >> $jobdir/input.dat");
-	    system("echo DEVIATION=1.0 >> $jobdir/input.dat");
+	    system("echo DEVIATION=5.0 >> $jobdir/input.dat");
 	    system("echo SAMPLING=moderate_am >> $jobdir/input.dat");
 	} elsif ($sampletype eq "rareconf") {
 	    system("echo NRUNS=$rareconf_nruns >> $jobdir/input.dat");
@@ -519,10 +526,14 @@ sub get_submit_page {
 	    system("echo SCAN_CUTOFF=$rareconf_simcutoff >> $jobdir/input.dat");
 	} elsif ($sampletype eq "thermodyn") {
 	    system("echo NRUNS=$thermodyn_nruns >> $jobdir/input.dat");
+	    system("echo MDTEMP=$thermodyn_mdtemp >> $jobdir/input.dat");
 	    system("echo DEVIATION=1.0 >> $jobdir/input.dat");
 	    system("echo SAMPLING=simulation >> $jobdir/input.dat");
 	} else {
 	    system("echo error sampletype >> $jobdir/input.dat");
+	}
+	if($email =~ "pweinkam" and $email =~ "gmail") {
+	    system("echo BREAK=True >> $jobdir/input.dat");
 	}
 
     } else {

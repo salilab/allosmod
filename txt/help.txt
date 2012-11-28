@@ -76,7 +76,7 @@ The following help page is organized to run batch jobs. Each input field in sing
 	     <br /> DEVIATION = X (optional) <ul> is the distance (in &Aring;ngstroms) that the atoms will be randomized when creating the 
 				   initial structure (default is 1.0 &Aring).</ul>
 	     <br /> MDTEMP = X (optional) <ul> is the temperature (in degrees Kelvin) for the simulation (default is 300 K). Set MDTEMP to "scan" and each simulation 
-			           will be set up with a different temperature, alternating between 300 K, 400 K, 500 K, 600 K, and 700 K.</ul>
+			           will be set up with a different temperature, alternating between 300 K, 350 K, 400 K, 450 K, and 500 K.</ul>
 	     <br /> SCAN_CUTOFF = X (optional) <ul> is the percent of trajectory snapshots outputted if sampling is moderate_am_scan (default is 10 percent).</ul>
       </p><br />
      

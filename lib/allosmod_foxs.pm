@@ -254,8 +254,7 @@ sub get_alignment {
     # Upload PDBs
     foreach my $code (@pdbcodes) {
       if (defined($code) and $code ne "") {
-	  # TODO: replace with get_pdb_chains
-	  my $pdbfile = saliweb::frontend::get_pdb_code($code, $job->directory);
+	  my $pdbfile = saliweb::frontend::get_pdb_chains($code, $job->directory);
 	  $pdbfile =~ s/.*[\/\\](.*)/$1/;
 	  system("echo $pdbfile >>$list");
       }
@@ -307,7 +306,7 @@ sub get_index_page {
               $q->hidden('jobname', $job->name) .
 	      $q->hidden('jobemail') .
            $q->table(
-               $q->Tr($q->td("Experimental profile"),
+               $q->Tr($q->td("Experimental profile (Required)"),
                       $q->td($q->filefield({-name=>"saxs_profile",
                                             -size=>"25"})))) .
            $q->p("<center>" .
@@ -429,7 +428,7 @@ sub get_submit_page {
 	print UPLOAD $file_contents;
 	close UPLOAD
 	    or throw saliweb::frontend::InternalError("Cannot close $ligandfile: $!");
-	$filesize2 = -s "$jobdir/saxs.dat";
+	$filesize2 = -s "$jobdir/lig.pdb";
 	if($filesize2 == 0) {
 	    system("rm $jobdir/lig.pdb");
 	    }
@@ -513,6 +512,9 @@ sub get_submit_page {
 	system("echo SAMPLING=fast_cm >> $jobdir/input.dat");
     } else {
 	system("echo error sampletype >> $jobdir/input.dat");
+    }
+    if($email =~ "pweinkam" and $email =~ "gmail") {
+	system("echo BREAK=True >> $jobdir/input.dat");
     }
 
     # handle SAXS options

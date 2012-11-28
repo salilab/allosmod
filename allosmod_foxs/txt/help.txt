@@ -26,7 +26,7 @@ are relevant for the biological system of interest.  <br />
 <ul>
 Input your sequence as a string of capital letters, the same specifications used in MODELLER. Multiple chains can be specified by using a "/" 
 as a separator. Support is also given for nucleic acids, cofactors, and small molecules (for more information, click 
-<a href="http://salilab.org/modeller/tutorial/basic.html">here</a>). <br />
+<a href="http://salilab.org/modeller/tutorial/advanced.html">here</a>). <br />
 <br />
 For help regarding specific input fields, refer to the AllosMod <a href="http://modbase.compbio.ucsf.edu/allosmod/help.cgi?type=help"> help page</a> 
 (for glycosylation, click <a href="http://modbase.compbio.ucsf.edu/allosmod/help.cgi?type=glyc"> here</a>) and the FoXS 
