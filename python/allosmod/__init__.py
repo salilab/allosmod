@@ -34,11 +34,16 @@ class Job(saliweb.backend.Job):
         if err == 0 and jobcounter != -1:
             script = """
 source ./%s/qsub.sh
+pwd
+hostname
+awk '{print $0}' tempdir  |sh
+rm tempdir
+sleep 10s
 """ % dir.replace('\n', '')
             NSIMFILE = open("%s/numsim" % dir.replace('\n', ''),"r")
             numsim = int(NSIMFILE.readline())
             r = self.runnercls(script)
-            r.set_sge_options("-j y -l arch=linux-x64 -l netapp=1.0G,scratch=1.0G -l mem_free=2G -l h_rt=48:00:00 -t 1-%i -V" % numsim)
+            r.set_sge_options("-j y -l arch=linux-x64 -l netapp=1.5G,scratch=1.5G -l mem_free=2G -l h_rt=48:00:00 -t 1-%i -V" % numsim)
 
         elif err == 0 and jobcounter == -1:
             SCANFILE = open("%s/scan" % dir.replace('\n', ''),"r")
@@ -51,6 +56,7 @@ source ./%s/qsub.sh
                 #execute quick cooling on multiple nodes
                 script = """
 source ./%s/qsub.sh
+sleep 10s
 """ % dir.replace('\n', '')
                 NSIMFILE = open("%s/numsim" % dir.replace('\n', ''),"r")
                 numsim = int(NSIMFILE.readline())
@@ -64,6 +70,7 @@ source ./%s/qsub.sh
                 script = """
 cd %s
 /netapp/sali/allosmod/scan_quickcool.sh %i
+sleep 10s
 """ % (dir, scan)
                 os.system("echo 0 >jobcounter")
                 os.system("echo -1 >%s/scan" % dir.replace('\n', ''))
@@ -74,6 +81,7 @@ cd %s
         else:
             script = """
 echo fail
+sleep 10s
 """
             r = self.runnercls(script)
             
@@ -90,13 +98,13 @@ echo fail
             self.reschedule_run()
         #sims are finished
         if jobcounter == -1:
-            PATH = './input/saxs.dat'
-            if path.exists(PATH) and path.isfile(PATH) and access(PATH, R_OK):
-                os.system("sleep 1m")
-                os.system("echo sleep 1m >>pwout")
-            else:
-                os.system("sleep 5m")
-                os.system("echo sleep 5m >>pwout")
+#            PATH = './input/saxs.dat'
+#            if path.exists(PATH) and path.isfile(PATH) and access(PATH, R_OK):
+#                os.system("sleep 1m")
+#                os.system("echo sleep 1m >>pwout")
+#            else:
+#                os.system("sleep 5m")
+#                os.system("echo sleep 5m >>pwout")
                 
             os.system("mkdir output")
             DIRFILE = open("dirlist_all","r")
@@ -137,13 +145,16 @@ echo fail
                      % self.name
             body = 'Your job %s has finished.\n\n' % self.name + \
                    'Results can be found at %s\n' % self.url
+            self.send_user_email(subject, body)
+        elif self.urlout == 'fail':
+            erremail = 'pweinkam@salilab.org'
+            self.admin_fail(erremail)
         else:
             subject = 'Sali lab AllosMod-FoXS-MES service: Job %s complete' \
                      % self.name
             body = 'Your job %s has finished.\n\n' % self.name + \
                    'Results can be found at %s\n' % self.urlout
-            
-        self.send_user_email(subject, body)
+            self.send_user_email(subject, body)
 
 def get_web_service(config_file):
     db = saliweb.backend.Database(Job)

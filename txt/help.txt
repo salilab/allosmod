@@ -6,7 +6,7 @@
 </div><br />
 <p>
 The AllosMod logo is comprised of two probability density functions that are used for the nonbonded distance 
-interaction. The green probability density function translates to a single energy minima for interactions in the 
+energy. The green probability density function translates to a single energy minima for interactions in the 
 allosteric site. The blue probability density function translates to a double energy minima for interactions in 
 the rest of the protein, i.e. the regulated region. Varying the radius of the allosteric site changes how the distance energy is distributed 
 across the structure, thereby driving the simulation to sample different regions of the conformational
@@ -14,13 +14,21 @@ space relevant to the allosteric transition.<br />
 <br />
 For help page to model glycosylated proteins, click <a href="http://modbase.compbio.ucsf.edu/allosmod/help.cgi?type=glyc"> here</a>. <br />
 <br />
-The following help page is organized to run batch jobs. Each input field in single landscape mode has a corresponding file/section below. <br />
+For instructions on how to input a sequence into the first page, refer to the AllosMod-FoXS 
+<a href="http://modbase.compbio.ucsf.edu/allosmod-foxs/help.cgi?type=help"> help page</a> <br />
+<br />
+The page below provides help to run batch jobs. Each input field in single landscape mode has a corresponding file/section below. 
+Single landscape runs will output the files described below corresponding to the options set by the user, i.e. the files from a single 
+landscape run can be uploaded as a batch run. <br />
 <br />
 </p>
 <a><h4>Server Input: Batch Mode</h4></a>
 <ul>
   <li><a id="email"><h5>Email</h5></a>
       <p>A notification will be sent once the job is completed.
+      </p></li><br />
+  <li><a id="name"><h5>Name your model</h5></a>
+      <p>Name your job so you can refer to it later.
       </p></li><br />
   <li><a id="file"><h5>Directories zip file</h5></a>
       <p>Upload a zip file containing a set of directories for each landscape that you want to model. To create such a file, put all the input files into one 
@@ -40,18 +48,16 @@ The following help page is organized to run batch jobs. Each input field in sing
 		  Make sure there are no misalignments in which adjacent residues are aligned far apart in sequence (alignment programs often do this at the beginning 	
 		  or end of chains). <br />
 	 <br /><b>Structure list:</b> (list) contains a list of all PDB files used to create the energy landscape for the simulation.  
-	          The first file is used to define interactions in the allosteric site and other regions of the protein. All remaining files are used 
-		  to define interactions in all regions of the protein except the allosteric site. Refer to the LIGPDB option in input.dat for control 
-		  on how to define the allosteric site. <br />
-	 <br /><b>Ligand File (optional):</b> (lig.pdb) contains the structure of the ligand taken from the ligand bound structure (this structure is defined 
+		  Refer to the LIGPDB and ASPDB options in input.dat to define interactions in the allosteric site. <br />
+	 <br /><b>Ligand File (optional):</b> (lig.pdb) contains the structure of the ligand extracted from a ligand bound PDB file (defined 
 	          by LIGPDB in input.dat). A radius (rAS) around the ligand is used to define the allosteric site. If lig.pdb is excluded, 
 		  AllosMod will set up a landscape with as many energy minima as are described by structures in the list file. <br />
 	 <br /><b>Input file:</b> (input.dat) contains one line per parameter as follows:
 	     <br /> NRUNS = X <ul> is the number of independent simulations to run. </ul>
 	     <br /> rAS = X (optional) <ul> 
 				 is the radius (in &Aring;ngstroms) around the coordinates of the ligand that will specify the allosteric site. If the file lig.pdb 
-				 is included, the radius will be calculated using coordinates in LIGPDB. Therefore, it is important that lig.pdb is extracted 
-				 from LIGPDB. </ul>
+				 is included, the allosteric site will be calculated using rAS and the coordinates in LIGPDB. Therefore, lig.pdb 
+				 must be extracted from LIGPDB. </ul>
 	     <br /> SAMPLING = X (optional) <ul> 
 			         simulation - <ul> (Default) A simulation is set up for the user to run on his/her computer. Due to the large number of files 
 				 generated, AllosMod cannot currently run full simulations without overwhelming our other severs. For help running the 
@@ -65,25 +71,47 @@ The following help page is organized to run batch jobs. Each input field in sing
 				 form etc. Rarely populated structures are defined by their dissimilarity to the first structure in the list file 
 				 (SCAN_CUTOFF percent of trajectory snapshots are outputted). </ul>
 				 </ul>
-	     <br /> delEmax = X (optional) <ul> is the value of the maximum energy per distance interaction, typically between 0.09 and 0.12 kcal/mol. If excluded, 
+	     <br /> delEmax = X (optional) <ul> is the maximum energy for each pairwise atomic distance contact, typically between 0.09 and 0.12 kcal/mol. If excluded, 
                                    the value will be assigned according to 3.6*(number of residues/number of distance interactions). See paper for more details. </ul>
 	     <br /> LIGPDB = X (optional) <ul> is the PDB file used to define the allosteric site. AllosMod defines the allosteric site using the distance (rAS) 
-				   from the effector (lig.pdb) with respect to the LIGPDB coordinates. If not defined, LIGPDB is set to the first structure 
-				   specified in the list file. For example, to run an effector unbound simulation: 
-				   1) set the first entry in list to the effector unbound PDB file, 2) set the second entry in list to the effector bound PDB file, 
-				   3) set LIGPDB to the effector bound PDB file. If omitting LIGPDB, the allosteric 
-				   site is defined after superimposing the effector unbound PDB file onto the effector bound PDB file. </ul>
+				   from the effector (lig.pdb) with respect to the LIGPDB coordinates. </ul>
+	     <br /> ASPDB = X (optional) <ul> is the PDB file used to define the contacts in the allosteric site, i.e. the pairwise atomic distances 
+			           in ASPDB are used to determine the nonbonded distance energy. As an example, to run an effector unbound simulation: 
+				   1) include the effector bound and unbound PDB files in align.ali and list, 2) set ASPDB to the effector unbound PDB file, and 
+				   3) set LIGPDB to the effector bound PDB file. </ul>
 	     <br /> DEVIATION = X (optional) <ul> is the distance (in &Aring;ngstroms) that the atoms will be randomized when creating the 
-				   initial structure (default is 1.0 &Aring).</ul>
+				   initial structure (default is 1-10 &Aring depending on simulation type).</ul>
 	     <br /> MDTEMP = X (optional) <ul> is the temperature (in degrees Kelvin) for the simulation (default is 300 K). Set MDTEMP to "scan" and each simulation 
 			           will be set up with a different temperature, alternating between 300 K, 350 K, 400 K, 450 K, and 500 K.</ul>
-	     <br /> SCAN_CUTOFF = X (optional) <ul> is the percent of trajectory snapshots outputted if sampling is moderate_am_scan (default is 10 percent).</ul>
+	     <br /> SCAN_CUTOFF = X (optional) <ul> is the percent of trajectory snapshots outputted if sampling is moderate_am_scan. The default is 10 percent, 
+				   i.e. 0.1*NRUNS structures will be outputted selected by differing the most from the inputted PDB structure.</ul>
+	     <br /> BREAK = True/False (optional) <ul> is an option to include chemical frustration (Weinkam et al. 2009 Biochemistry, p2394-2402). Chemical frustration 
+				   is modeled by breaking all interactions involving buried, charged residues. Regions with many buried, charged residues will 
+				   have high conformational variability. </ul>
+	     <br /> SCLBREAK = X (optional) <ul> If BREAK=True, this number is used to scale the contacts with residues that cause chemical frustration.  </ul>
+	     <br /> ZCUTOFF = X (optional) <ul>  If BREAK=True, this number is used to select which residues cause chemical frustration. ZCUTOFF is the z-score cut off
+				   of the distribution involving the number of charged contacts per residue; residues with a z-score above this threshold 
+				   are predicted to cause chemical frustration. </ul>
+	     <br /> LOCRIGID = True/False (optional) <ul> If set to True, secondary structure, corresponding to the input PDB files, will have increased stability 
+				   in the simulation. Increased stability is maintained by increasing the energy by a factor of 10 for all C alpha-C alpha 
+				   contacts between 2 and 5 residues apart. </ul>
+	     <br /> COARSE = True/False (optional) <ul> is an option to coarse grain the energy landscape by restricting the nonbonded distance energy to include 
+				   C alpha and C beta atoms only. This allows very large proteins to be simulated without overwhelming the computer's memory. This 
+				   option is automatically set to True for proteins over 1500 residues. </ul>
+             <br /> {ADDITIONAL_RESTRAINT} {DISTANCE} {STANDARD_DEVIATION} {INDICES} (optional) <ul> is used to add additional restraints between residues. 
+				   ADDITIONAL_RESTRAINT can be HARM or UPBD corresponding to a harmonic distance restraint or an upper bound distance restraint, 
+				   respectively. The DISTANCE and STANDARD_DEVIATION corresponds to the distance between Calpha atoms (in &Aring;ngstroms). 
+				   INDICES is a list of residue indices (corresponding to simulated sequence) separated by commas. Restraints are added 
+				   between each successive pair of indices, i.e. between i1 and i2, between i3 and i4, ...  </ul>  <br />
+
+	 <br /><b> Destabilize residues (optional):</b> break.dat contains a list of residues whose contacts will be scaled by a specifed value. 
+			    Each line contains one residue index (corresponding to simulated sequence) in the first column and one scaling 
+			    factor in the second column. For example, to reduce all contacts for residue 30 by 90 %, break.dat would have one 
+			    line "30 0.1". break.dat is created automatically by setting BREAK=True, however, the user may specify 
+			    any desired residues and scaling factors by including break.dat in a batch run. <br /> 
       </p><br />
      
 
-  <li><a id="name"><h5>Name your model</h5></a>
-      <p>Name your job so you can refer to it later.
-      </p></li>
 </ul>
 <a name="output"><h4>Server Output</h4></a>
 <p>
@@ -95,9 +123,8 @@ The following help page is organized to run batch jobs. Each input field in sing
 <a name="run"><h4>***To run the simulation</h4></a>
 <p>
 	To run, navigate to a run directory. Each run directory contains a unique starting structure (random.ini) and a unique run script (model_run.py), then 
-	type: "$MODELLER_HOME/bin/mod${MODELLER_VERSION} model_run.py". The process can use 2 GB of memory for a 500 residue protein so allocate your 
-	resources carefully! The script will output 2000 snapshots by default (numbered 1001 to 3000) as well other data files. AllosMod 
-	implements the Automodel class used in MODELLER for comparative modeling, 
+	type: "$MODELLER_HOME/bin/mod${MODELLER_VERSION} model_run.py". The script will output 2000 snapshots by default (numbered 1001 to 3000) as 
+	well other data files. AllosMod implements the Automodel class used in MODELLER for comparative modeling, 
 	however the optimization and refinement steps have been modified to allow for constant temperature molecular dynamics simulations. For 
 	each run directory, there is a file allosmod.py. This file contains the method consttemp that controls the simulation schedule and temperature (MDtemp). 
 	For help with script details, refer to the <a href="http://salilab.org/modeller/manual/"> MODELLER help pages</a>.

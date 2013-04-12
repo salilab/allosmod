@@ -9,28 +9,57 @@ profiles. The combined server is meant to create a user friendly way to generate
 The structures that are generated are a result of an underlying energy landscape and sampling procedure. The energy landscapes are constructed 
 with the assumption/hypothesis that the most stable structure for a given sequence is the native crystal structure. In some instances, there 
 might be several stable structures, in which case the energy landscape should include multiple basins of attraction. AllosMod is a tool that 
-allows the user to specify what structures should define the energy landscape. Crystal structures or models may be used.  <br />
+allows the user to specify what structures should define the energy landscape. Crystal structures or models of protein, DNA, RNA, and sugars may be used.  <br />
 <br />
-There are different sampling options that involve increasingly longer calculations and should be approached as follows. 
-First, generate comparative models of the sequence used in the experiment (i.e. using MODELLER). These 
-structures will be very similar to the crystal structure (or template) and should include any missing loops or residues. Second, 
-generate models consistent with the crystal structure (or template) to test if there are relevant structural changes in 
-solution (using fast constant temperature molecular dynamics). Third, generate models that deviate from the crystal structure (or template) 
-to test if there are significant structural changes. This procedure includes sampling at high temperatures followed by rapid cooling, which can quickly 
-capture rare conformational changes. Lastly, an energy landscape could be created that, when sampled using an AllosMod 
-equilibrated simulation, reproduces SAXS data. Potentially, this modeled landscape would allow the user to access microscopic motions that 
-are relevant for the biological system of interest.  <br />
+There are different sampling options listed from least diverse sampling to most diverse sampling. As you go down the list, sampled structures will increasingly deviate 
+from the inputted PDB files: <br />
+<ul>
+1) Generate static structures, using MODELLER, which are similar to the input structure <br />
+<br />
+2) Generate models using fast AllosMod simulations at 300 K <br />
+<br />
+3) Generate models using fast AllosMod simulations at temperatures between 300 and 500 K and with increased stability of secondary structure. <br />
+<br />
+4) Generate models that strongly deviate from the crystal structure by sampling at high temperature and with chemical frustation 
+(Weinkam et al. 2009 Biochemistry, 2394-2402). Chemical frustration allows for high conformational variability in regions of the structure with buried charges.<br />
+</ul>
+<br />
+<p>
+These default settings can be adjusted with more flexibility by using <a href="http://modbase.compbio.ucsf.edu/allosmod/index.html"> AllosMod</a>, which 
+allows the user to download the scripts and log files. These scripts can be ran on the user's computer using MODELLER. For help, 
+click <a href="http://salilab.org/modeller/tutorial/advanced.html"> here</a>. With AllosMod, you will also be able to generate 
+models based on a thermodynamically well sampled energy landscape. If this energy landscape produces models that reproduce 
+SAXS data, then perhaps the user can learn how the microscopic motions are relevant to the biological function of the protein.  <br />
+
 <br />
 </p>
 <a><h4>Server Input</h4></a>
 <ul>
 Input your sequence as a string of capital letters, the same specifications used in MODELLER. Multiple chains can be specified by using a "/" 
-as a separator. Support is also given for nucleic acids, cofactors, and small molecules (for more information, click 
-<a href="http://salilab.org/modeller/tutorial/advanced.html">here</a>). <br />
-<br />
-For help regarding specific input fields, refer to the AllosMod <a href="http://modbase.compbio.ucsf.edu/allosmod/help.cgi?type=help"> help page</a> 
+as a separator. Support is also given for nucleic acids, cofactors, and small molecules (for more information, refer to the MODELLER 
+<a href="http://modbase.compbio.ucsf.edu/allosmod/html/file/restyp.lib"> library file</a> or 
+<a href="http://salilab.org/modeller/tutorial/advanced.html"> help pages</a>). For help regarding specific input fields, refer 
+to the AllosMod <a href="http://modbase.compbio.ucsf.edu/allosmod/help.cgi?type=help"> help page</a> 
 (for glycosylation, click <a href="http://modbase.compbio.ucsf.edu/allosmod/help.cgi?type=glyc"> here</a>) and the FoXS 
 <a href="http://modbase.compbio.ucsf.edu/foxs/about.html"> help page</a>.  <br />
+<br />
+An example input sequence is shown below. PDB code 3L2P contains one protein chain, three DNA chains, and one ligand (represented by a "."):<br />
+<br />
+<ul>
+<p> 
+<font face="Monospace">
+HMRHKDCLLREFRKLCAMVADNPSYNTKTQIIQDFLRKGGDVYLTVKLLLPGVIKTVYNLNDKQI<br />
+VKLFSRIFNCNPDDMARDLEQGDVSETIRVFFEQSKSFPPAAKSLLTIQEVDEFLLRLSKLTKED<br />
+EQQQALQDIASRCTANDLKCIIRLIKHDLKMNSGAKHVLDALDPNAYEAFKASRNLQDVVERVLH<br />
+NAQEVELSVQASLMTPVQPMLAEACKSVEYAMKKCPNGMFSEIKYDGERVQVHKNGDHFSYFSRS<br />
+LKPVLPHKVAHFKDYIPQAFPGGHSMILDSEVLLIDNKTGKPLPFGTLGVHKKAAFQDANVCLFV<br />
+FDCIYFNDVSLMDRPLCERRKFLHDNMVEIPNRIMFSEMKRVTKALDLADMITRVIQEGLEGLVL<br />
+KDVKGTYEPGKRHWLKVKKDYLNMADTADLVVLGAFYGQGSKGGMMSIFLMGCYDPGSQKWCTVT<br />
+KCAGGHDDATLARLQNELDMVKISKAAVWEITGAEFSKSEAHTADGISIRFPRCTRIRDDKDWKS<br />
+ATNLPQLKELYQLSK/jllletljltj/ltjllejtl/ljjeltjjlejlejljetjjjl/.<br />
+</p>
+</ul>
+<br />
 </ul>
 <br />
 

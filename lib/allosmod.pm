@@ -98,7 +98,7 @@ sub get_all_options_prealign {
 					 $q->filefield({-name=>'uploaded_file'})))) .
 		  $q->p($q->button(-value=>'Add more structures',
 				  -onClick=>"add_structure()"))) .
-                  $q->p("Sequence to be used in simulation:" . $q->br .
+                  $q->p("Sequence to be used in simulation (specify protein and DNA/RNA, input sugar in adv. opt.)" . $q->br .
 		       $q->textarea({-name=>'sequence', -rows=>7, -cols=>77})) .
            "\n</div></div>\n" .
 
@@ -115,24 +115,27 @@ sub get_all_options_prealign {
 sub get_advanced_modeling_options {
     my $self = shift;
     my $q = $self->cgi;
+
     return $self->make_dropdown("advmodel", "Advanced Modeling Options", 0,
       "<input type=\"radio\" name=\"advancedopt\" value=\"ligandmod\" " .
       "onclick=\"\$('#glycmod').slideUp('fast'); " .
       "\$('#ligandmod').slideDown('fast')\"" .
       "\>Model ligand binding site" . $q->br .
-      "<div class=\"advopts\" id=\"ligandmod\" style=\"display:none\">\n" .
+	     "<div class=\"advopts\" id=\"ligandmod\" style=\"display:none\">\n" .
 	     "Radius of ligand binding site (&Aring) " . $q->textfield({-name=>'ligandmod_rAS', -size=>"3",
                                          -value=>"11"}) . $q->br .
 	     "Ligand PDB file " . $q->filefield({-name=>"ligandmod_ligfile"}) . $q->br .
 	     "PDB file from which ligand was extracted " . $q->textfield({-name=>'ligandmod_ligpdb', -size=>"25",
+                                         -value=>""}) . $q->br .
+	     "PDB file to define allosteric site contacts " . $q->textfield({-name=>'ligandmod_aspdb', -size=>"25",
                                          -value=>""}) .
 
       "</div>\n\n" .
 
       "<input type=\"radio\" name=\"advancedopt\" value=\"glycmod\" " .
       "onclick=\"\$('#ligandmod').slideUp('fast'); " .
-      "\$('#glycmod').slideDown('fast')\"" .
-      "\>Model glycosylation" . $q->br .
+      "\$('#glycmod').slideDown('fast')\" />Model " .
+      "glycosylation " . $q->br .
       "<div class=\"advopts\" id=\"glycmod\" style=\"display:none\">\n" .
 	    "Number of models " . $q->textfield({-name=>'glycmod_nruns', -size=>"3",
 						 -value=>"10"}) . $q->br .
@@ -144,6 +147,60 @@ sub get_advanced_modeling_options {
 	    "Number of optimization steps " .
 	    $q->textfield({-name=>'glycmod_num_opt_steps',-size=>"3", -value=>"1"}) .
 
+      "</div>\n\n" .
+
+      "<input type=\"radio\" name=\"advancedopt\" value=\"addrestr\" " .
+      "onclick=\"\$('#addrestr').slideDown('fast')\" />Add restraints " .
+      "between specific atoms " . $q->br .
+      "<div class=\"advopts\" id=\"addrestr\" style=\"display:none\">\n" .
+	          "<input type=\"radio\" name=\"addrestropt\" value=\"addbond\" " .
+		  "onclick=\"\$('#addbond').slideDown('fast')\"" .
+		  "\>Add bond between two residues using a harmonic restraint" . $q->br .
+		  "<div class=\"addrestropt\" id=\"addbond\" style=\"display:none\">\n" .
+
+		  "Calpha-Calpha distance (&Aring) " . $q->textfield({-name=>'addbond_dist', -size=>"3",
+                                         -value=>"3.8"}) . $q->br .
+	          "Standard deviation of restraint " . $q->textfield({-name=>'addbond_stdev', -size=>"3",
+                                         -value=>"3.0"}) . $q->br .
+	          "Residue indices (for simulated sequence) separated by commas, one pair per line. " .
+				"(for example, click <a href=\"http://modbase.compbio.ucsf.edu/allosmod/html/file/bonds.dat\"> here</a>)" . 
+				$q->textarea({-name=>'addbond_indices', -rows=>5, -cols=>10,
+                                         -value=>""}) . $q->br .
+
+                  "</div>\n\n" .
+
+	          "<input type=\"radio\" name=\"addrestropt\" value=\"addupper\" " .
+		  "onclick=\"\$('#addupper').slideDown('fast')\"" .
+		  "\>Add upper bound distance restraint between two residues " . $q->br .
+		  "<div class=\"addrestropt\" id=\"addupper\" style=\"display:none\">\n" .
+
+		  "Calpha-Calpha upper bound distance (&Aring) " . $q->textfield({-name=>'addupper_dist', -size=>"3",
+                                         -value=>"5.0"}) . $q->br .
+	          "Standard deviation of restraint " . $q->textfield({-name=>'addupper_stdev', -size=>"3",
+                                         -value=>"2.0"}) . $q->br .
+	          "Residue indices (for simulated sequence) separated by commas, one pair per line. " .
+				"(for example, click <a href=\"http://modbase.compbio.ucsf.edu/allosmod/html/file/bonds.dat\"> here</a>)" . 
+				$q->textarea({-name=>'addupper_indices', -rows=>5, -cols=>10,
+                                         -value=>""}) . $q->br .
+
+                  "</div>\n\n" .
+
+	          "<input type=\"radio\" name=\"addrestropt\" value=\"addlower\" " .
+		  "onclick=\"\$('#addlower').slideDown('fast')\"" .
+		  "\>Add lower bound distance restraint between two residues " . $q->br .
+		  "<div class=\"addrestropt\" id=\"addlower\" style=\"display:none\">\n" .
+
+		  "Calpha-Calpha lower bound distance (&Aring) " . $q->textfield({-name=>'addlower_dist', -size=>"3",
+                                         -value=>"10.0"}) . $q->br .
+	          "Standard deviation of restraint " . $q->textfield({-name=>'addlower_stdev', -size=>"3",
+                                         -value=>"1.0"}) . $q->br .
+	          "Residue indices (for simulated sequence) separated by commas, one pair per line. " .
+				"(for example, click <a href=\"http://modbase.compbio.ucsf.edu/allosmod/html/file/bonds.dat\"> here</a>)" . 
+				$q->textarea({-name=>'addlower_indices', -rows=>5, -cols=>10,
+                                         -value=>""}) . $q->br .
+
+                  "</div>\n\n" .
+
       "</div>\n\n");
 
 }
@@ -151,12 +208,13 @@ sub get_advanced_modeling_options {
 sub get_sampling_options {
     my $self = shift;
     my $q = $self->cgi;
+
     return $self->make_dropdown("sampling", "Sampling Options", 0,
       "<input type=\"radio\" name=\"sampletype\" value=\"thermodyn\" " .
       "checked=\"checked\" onclick=\"\$('#rareconf').slideUp('fast'); " .
-      "\$('#multiconf').slideUp('fast'); \$('#thermodyn').slideDown('fast')\"" .
+      "\$('#multiconf').slideUp('fast'); \$('#interconf').slideUp('fast'); \$('#thermodyn').slideDown('fast')\"" .
       "\>Generate a landscape that will be thermodynamically well sampled on the user's computer (using MODELLER)" . $q->br .
-	    "<div class=\"sampopts\" id=\"thermodyn\">\n" .
+ 	    "<div class=\"sampopts\" id=\"thermodyn\">\n" .
 	    "Number of simulations " . $q->textfield({-name=>'thermodyn_nruns', -size=>"3",
                                          -value=>"10"}) . $q->br .
 	    "MD temperature " . $q->textfield({-name=>'thermodyn_mdtemp', -size=>"3",
@@ -166,35 +224,58 @@ sub get_sampling_options {
 
       "<input type=\"radio\" name=\"sampletype\" value=\"multiconf\" " .
       "onclick=\"\$('#rareconf').slideUp('fast'); " .
-      "\$('#thermodyn').slideUp('fast'); \$('#multiconf').slideDown('fast')\" />Sample most probable " .
+      "\$('#thermodyn').slideUp('fast'); \$('#interconf').slideUp('fast'); \$('#multiconf').slideDown('fast')\" />Sample most probable " .
       "conformations consistent with input crystal structure(s)" . $q->br .
-      "<div class=\"sampopts\" id=\"multiconf\" style=\"display:none\">\n" .
-      "Number of simulations " . $q->textfield({-name=>'multiconf_nruns', -size=>"3",
-                                         -value=>"30"}) . $q->br .
-      "MD temperature " . $q->textfield({-name=>'multiconf_mdtemp', -size=>"3",
+	    "<div class=\"sampopts\" id=\"multiconf\" style=\"display:none\">\n" .
+            "Number of simulations " . $q->textfield({-name=>'multiconf_nruns', -size=>"3",
+                                         -value=>"10"}) . $q->br .
+            "MD temperature " . $q->textfield({-name=>'multiconf_mdtemp', -size=>"3",
                                          -value=>"300"}) .
+      "</div>\n\n" .
+
+      "<input type=\"radio\" name=\"sampletype\" value=\"interconf\" " .
+      "onclick=\"\$('#rareconf').slideUp('fast'); " .
+      "\$('#thermodyn').slideUp('fast'); \$('#multiconf').slideUp('fast'); \$('#interconf').slideDown('fast')\" />Sample intermediate probablity " .
+      "conformations consistent with input crystal structure(s)" . $q->br .
+      "<div class=\"sampopts\" id=\"interconf\" style=\"display:none\">\n" .
+            "Number of simulations " . $q->textfield({-name=>'interconf_nruns', -size=>"3",
+                                         -value=>"30"}) . $q->br .
+            "MD temperature " . $q->textfield({-name=>'interconf_mdtemp', -size=>"3",
+                                         -value=>"scan"}) . $q->br .
+            "Increase chain rigidity to maintain secondary structure at high temperature " .
+				'<input type="checkbox" name="interconf_locrig"' .
+				'checked="1" />' . $q->br .
       "</div>\n\n" .
 
       "<input type=\"radio\" name=\"sampletype\" value=\"rareconf\" " .
       "onclick=\"\$('#multiconf').slideUp('fast'); " .
-      "\$('#thermodyn').slideUp('fast'); \$('#rareconf').slideDown('fast')\" />Sample low probability " .
+      "\$('#thermodyn').slideUp('fast'); \$('#interconf').slideUp('fast'); \$('#rareconf').slideDown('fast')\" />Sample low probability " .
       "conformations consistent with input crystal structure(s)" . $q->br .
       "<div class=\"sampopts\" id=\"rareconf\" style=\"display:none\">\n" .
-      "Number of simulations " . $q->textfield({-name=>'rareconf_nruns', -size=>"3",
+             "Number of simulations " . $q->textfield({-name=>'rareconf_nruns', -size=>"3",
                                          -value=>"30"}) . $q->br .
-      "MD temperature scanned or fixed value " .
+             "MD temperature scanned or fixed value " .
                 $q->textfield({-name=>'rareconf_mdtemp', -size=>"3",
                                -value=>"scan"}) . $q->br .
-      "% of trajectory snapshots to be analyzed " .
-                $q->textfield({-name=>'rareconf_simcutoff', -size=>"3",
-                               -value=>"10"}) .
+             "Increase chain rigidity to maintain secondary structure at high temperature " .
+				'<input type="checkbox" name="rareconf_locrig"' .
+				'checked="1" />' . $q->br .
+             "Include chemical frustration (destabilize buried charged residues) " .
+				'<input type="checkbox" name="rareconf_break"' .
+				'checked="1" />' . $q->br .
+             "Z-score of the residue charge density, residues above this value cause chem. frust." .
+                $q->textfield({-name=>'rareconf_cdencutoff', -size=>"3",
+                               -value=>"3.5"}) . $q->br .
+             "Quickly cool each structure to increase secondary structure (takes a long time, use sparingly) " .
+				'<input type="checkbox" name="rareconf_quickcool"' .
+				' />' . $q->br .
       "</div>\n");
 }
 
 sub get_all_advanced_options {
     my $self = shift;
     return $self->get_advanced_modeling_options() .
-	   $self->get_sampling_options();
+	$self->get_sampling_options();
 }
 
 sub get_alignment {
@@ -228,7 +309,9 @@ sub get_alignment {
     my $upl_num = 0;
     foreach my $upl (@uplfiles) {
       if (defined $upl) {
-        my $fname = "uplstruc$upl_num"; # todo: use untainted user's name
+        if(length $upl > 40) { 
+	    throw saliweb::frontend::InputValidationError("Please limit the file name length to a maximum of 40 characters");
+	}
         my $buffer;
         my $fullpath = $job->directory . "/" . $upl;
         open(OUTFILE, '>', $fullpath)
@@ -250,6 +333,9 @@ sub get_alignment {
     if($filesize == 0) {
 	#batch job
 	my $user_zip = $q->upload('zip');
+	if($user_zip =~ ".gz" or $user_zip =~ ".tar") {
+	    throw saliweb::frontend::InputValidationError("Please upload a zip file instead of a tar or gzip file");
+	}
 	my $zipfile = $job->directory . "/input.zip";
 	open(OUTFILE, '>', $zipfile)
 	    or throw saliweb::frontend::InternalError("Cannot open $zipfile: $!");
@@ -293,8 +379,22 @@ sub get_alignment {
 	my $inpseq = $job->directory . "/" . "inpseq";
 	system("echo $seq >> $inpseq");
 
+	#preprocess PDB files and get sequence alignment
 	open(FOO, "/netapp/sali/allosmod/get_MULTsi20b.sh inpseq $jobdir |") || die "dont let script output to std out";
 	close(FOO);
+
+	#check if alignment fails
+	my $tempfile = $job->directory . "/" . "align.ali";
+	my $tempread = do {
+	    local $/ = undef;
+	    open my $fh, "<", $tempfile
+		or die "could not open $tempfile: $!";
+	    <$fh>;
+	};
+	if($tempread =~ "Dynamically" and $tempread =~ "allocated" and $tempread =~ "memory") {
+	    system("echo ERROR PW >> $jobdir/align.ali");
+	    throw saliweb::frontend::InputValidationError("Please check that your input sequence contains appropriate number of upper and lower case letters.");
+        }
 
 	$aln .= `cat $jobdir/align.ali`;
     }
@@ -354,7 +454,7 @@ landscape that you create. Carefully designed energy landscapes allow efficient 
 dynamics sampling at constant temperatures, thereby providing ergodic 
 sampling of conformational space. Use AllosMod to:<br />
 <ul>
-- Model energy landscapes for a protein with either known or modeled structures <br />
+- Model energy landscapes for protein, DNA, RNA, and/or sugar with either known or modeled structures <br />
 - Sample your energy landscapes to predict often and/or rarely populated conformations <br />
 - Model energy landscapes for ligand-induced structural and/or dynamic changes, i.e. allostery <br />
 - Model energy landscapes for glycosylated proteins (For help, click <a href="http://modbase.compbio.ucsf.edu/allosmod/help.cgi?type=glyc"> here</a>) <br />
@@ -363,9 +463,9 @@ sampling of conformational space. Use AllosMod to:<br />
 <p>The AllosMod server runs in two modes: 1) single landscape and 2) batch jobs to set up many 
 simulations at once. By creating a single landscape, the server will create input files that can 
 be used to submit batch jobs. AllosMod will set up many short 
-simulations for each landscape. There are two options for sampling: 1) constant temperature 
+simulations for each landscape. There are two types of sampling: 1) constant temperature 
 molecular dynamics, which will be completed overnight on a single processor on the 
-user\'s computer (using MODELLER) or 2) quick, unequilibrated simulation performed on our servers 
+user\'s computer (using MODELLER) or 2) quick, unequilibrated simulations performed on our servers 
 within minutes to hours. Sampling is achieved efficiently by starting each simulation at different 
 points in conformational space and by storing the energies in memory. <br />
 <br />
@@ -414,6 +514,7 @@ sub get_submit_page {
 	my $advancedopt = $q->param('advancedopt');
 	my $ligandmod_rAS = $q->param('ligandmod_rAS');
 	my $ligandmod_ligpdb = $q->param('ligandmod_ligpdb');
+	my $ligandmod_aspdb = $q->param('ligandmod_aspdb');
 	my $glycmod_nruns = $q->param('glycmod_nruns');
 	my $glycmod_flexible_sites = $q->param('glycmod_flexible_sites');
 	my $glycmod_num_opt_steps = $q->param('glycmod_num_opt_steps');
@@ -471,9 +572,15 @@ sub get_submit_page {
 	my $thermodyn_mdtemp = $q->param('thermodyn_mdtemp');
 	my $multiconf_mdtemp = $q->param('multiconf_mdtemp');
 	my $multiconf_nruns = $q->param('multiconf_nruns');
+	my $interconf_mdtemp = $q->param('interconf_mdtemp');
+	my $interconf_nruns = $q->param('interconf_nruns');
+	my $interconf_locrig = $q->param('interconf_locrig');
 	my $rareconf_mdtemp = $q->param('rareconf_mdtemp');
-	my $rareconf_simcutoff = $q->param('rareconf_simcutoff');
+	my $rareconf_cdencutoff = $q->param('rareconf_cdencutoff');
 	my $rareconf_nruns = $q->param('rareconf_nruns');
+	my $rareconf_locrig = $q->param('rareconf_locrig');
+	my $rareconf_break = $q->param('rareconf_break');
+	my $rareconf_quickcool = $q->param('rareconf_quickcool');
 	if(($thermodyn_nruns !~ /^\d+$/) or $thermodyn_nruns <= 0 or $thermodyn_nruns > 100) {
 	    throw saliweb::frontend::InputValidationError("Please provide a sensible number of runs for comparative modeling $!");
 	}
@@ -495,10 +602,25 @@ sub get_submit_page {
 	   ($rareconf_mdtemp <= 0 and $rareconf_mdtemp ne "scan")) {
 	    throw saliweb::frontend::InputValidationError("Please provide a sensible MD temperature for low probability conformations $!");
 	}
-	if(($rareconf_simcutoff !~ /^\d+$/ and $rareconf_simcutoff !~ /^\d+[\.]\d+$/) or
-	   $rareconf_simcutoff <= 0 or $rareconf_simcutoff > 100) {
-	    throw saliweb::frontend::InputValidationError("Please provide a sensible percent cut-off for str $!");
+	if(($rareconf_cdencutoff !~ /^\d+$/ and $rareconf_cdencutoff !~ /^\d+[\.]\d+$/) or
+	   $rareconf_cdencutoff <= 0 or $rareconf_cdencutoff > 5) {
+	    throw saliweb::frontend::InputValidationError("Please provide a sensible charge density Z-score $!");
 	}
+
+	# handle additional restraint options
+	my $addrestropt = $q->param('addrestropt');
+	my $addbond_dist = $q->param('addbond_dist');
+	my $addbond_stdev = $q->param('addbond_stdev');
+	my $addbond_indices = $q->param('addbond_indices');
+	$addbond_indices =~ s/\n+/,/g;
+	my $addupper_dist = $q->param('addupper_dist');
+	my $addupper_stdev = $q->param('addupper_stdev');
+	my $addupper_indices = $q->param('addupper_indices');
+	$addupper_indices =~ s/\n+/,/g;
+	my $addlower_dist = $q->param('addlower_dist');
+	my $addlower_stdev = $q->param('addlower_stdev');
+	my $addlower_indices = $q->param('addlower_indices');
+	$addlower_indices =~ s/\n+/,/g;
 
 	# make input.dat for allosmod
 	if ($advancedopt eq "glycmod") {
@@ -506,11 +628,12 @@ sub get_submit_page {
 	    system("echo NRUNS=$glycmod_nruns >> $jobdir/input.dat");
 	    system("echo DEVIATION=4.0 >> $jobdir/input.dat");
 	    system("echo SAMPLING=moderate_cm >> $jobdir/input.dat");	
-	    system("echo ATTACH_GAPS=$glycmod_flexible_sites >> $jobdir/input.dat");
+	    if ($glycmod_flexible_sites eq "on") { system("echo ATTACH_GAPS=True >> $jobdir/input.dat"); }
 	    system("echo REPEAT_OPTIMIZATION=$glycmod_num_opt_steps >> $jobdir/input.dat");
 	}
 	if ($advancedopt eq "ligandmod") {
 	    system("echo LIGPDB=$ligandmod_ligpdb >> $jobdir/input.dat");
+	    system("echo ASPDB=$ligandmod_aspdb >> $jobdir/input.dat");
 	    system("echo rAS=$ligandmod_rAS >> $jobdir/input.dat");
 	}
 	if ($sampletype eq "multiconf") {
@@ -522,19 +645,38 @@ sub get_submit_page {
 	    system("echo NRUNS=$rareconf_nruns >> $jobdir/input.dat");
 	    system("echo MDTEMP=$rareconf_mdtemp >> $jobdir/input.dat");
 	    system("echo DEVIATION=10.0 >> $jobdir/input.dat");
-	    system("echo SAMPLING=moderate_am_scan >> $jobdir/input.dat");
-	    system("echo SCAN_CUTOFF=$rareconf_simcutoff >> $jobdir/input.dat");
+	    if ($rareconf_quickcool eq "on") { system("echo SAMPLING=moderate_am_scan >> $jobdir/input.dat"); 
+					   } else { system("echo SAMPLING=moderate_am >> $jobdir/input.dat");}
+	    system("echo ZCUTOFF=$rareconf_cdencutoff >> $jobdir/input.dat");
+	    if ($rareconf_locrig eq "on") { system("echo LOCALRIGID=True >> $jobdir/input.dat"); }
+	    if ($rareconf_break eq "on") { system("echo BREAK=True >> $jobdir/input.dat"); }
+	} elsif ($sampletype eq "interconf") {
+	    system("echo NRUNS=$interconf_nruns >> $jobdir/input.dat");
+	    system("echo MDTEMP=$interconf_mdtemp >> $jobdir/input.dat");
+	    system("echo DEVIATION=10.0 >> $jobdir/input.dat");
+	    system("echo SAMPLING=moderate_am >> $jobdir/input.dat");
+	    if ($interconf_locrig eq "on") {	system("echo LOCALRIGID=True >> $jobdir/input.dat"); }
 	} elsif ($sampletype eq "thermodyn") {
 	    system("echo NRUNS=$thermodyn_nruns >> $jobdir/input.dat");
 	    system("echo MDTEMP=$thermodyn_mdtemp >> $jobdir/input.dat");
 	    system("echo DEVIATION=1.0 >> $jobdir/input.dat");
 	    system("echo SAMPLING=simulation >> $jobdir/input.dat");
+	} elsif ($sampletype eq "null") {
 	} else {
 	    system("echo error sampletype >> $jobdir/input.dat");
 	}
-	if($email =~ "pweinkam" and $email =~ "gmail") {
-	    system("echo BREAK=True >> $jobdir/input.dat");
+	if ($addrestropt eq "addbond" and $addbond_indices ne "") {
+	    system("echo HARM $addbond_dist $addbond_stdev $addbond_indices >> $jobdir/input.dat");
 	}
+	if ($addrestropt eq "addupper") {
+	    system("echo UPBD $addupper_dist $addupper_stdev $addupper_indices >> $jobdir/input.dat");
+	}
+	if ($addrestropt eq "addlower") {
+	    system("echo LOBD $addlower_dist $addlower_stdev $addlower_indices >> $jobdir/input.dat");
+	}
+#	if($email =~ "pweinkam" and $email =~ "gmail") {
+#	    system("echo LOCALRIGID=True >> $jobdir/input.dat");
+#	}
 
     } else {
 	#batch job

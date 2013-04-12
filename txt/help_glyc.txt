@@ -1,6 +1,6 @@
 <h1>AllosMod Help Page - Modeling Glycosylation </h1><br />
 <p>
-Protein glycosylation can be modeled as explained in this help page and in Guttman et al. For help to model non-glycosylated proteins, click 
+Protein glycosylation can be modeled as explained in this help page and in a published paper (Guttman et al. 2013 Structure). For help to model non-glycosylated proteins, click 
 <a href="http://modbase.compbio.ucsf.edu/allosmod/help.cgi?type=help"> here</a>. This tool is meant to sample the 
 range of conformations accessible to sugars with minimal structural changes in the protein. Protein motions will be limited 
 to loops and surface side chains. To model protein conformational change in addition to glycosylation, first run simulations 
@@ -35,16 +35,16 @@ The following help page is organized to run batch jobs. Each input field in sing
 	     <ul> 
 			moderate_cm - <ul> (Default) Sampling is performed using simulated annealing at moderate temperatures. The energy function for the 
 			  protein is composed of restraints from MODELLER while the energy function for sugar molecules is a combination of dihedral terms from CHARMM and 
-			  harmonic restraints as described in Guttman et al. </ul><br />
+			  harmonic restraints as described in the published paper (Guttman et al. 2013 Structure). </ul><br />
 	     </ul>
 	     <br /> REPEAT_OPTIMIZATION = X (optional) 
 	     <ul>
 			is the number of optimization steps to be performed. Default is one.
 	     </ul> <br />
-	 <br /><b>Glycosylation file:</b> (glyc.dat) contains one line per sugar monomer grouped by chains of monomers. The line with the protein-bonded monomer 
-	          specifies the beginning of a chain and is followed by all monomers within the chain. Three or four columns define 
-		  the sugar types and connectivity: 1) monomer name, 2) O1 bond type, 3) O1 attachment residue index and, if O1 attaches to a protein side chain, 
-		  the protein chain should be the fourth column: <br />
+	 <br /><b>Glycosylation file:</b> (glyc.dat, for an example click <a href="http://modbase.compbio.ucsf.edu/allosmod/html/file/glyc.dat"> here</a> ) 
+	          contains one line per sugar monomer grouped by chains of monomers. The line with the protein-bonded monomer 
+	          specifies the beginning of a chain and is followed by all monomers within the chain. Three columns define 
+		  the sugar types and connectivity: 1) monomer name, 2) O1 bond type, and 3) O1 attachment residue index: <br />
 		  <ul>
 			<br /><b>monomer name:</b><br />
 			<ul>
@@ -75,9 +75,10 @@ The following help page is organized to run batch jobs. Each input field in sing
 			    *entry specifies the beginning of a new chain
 			</ul>
 
-			<br /><b>O1 attachment residue index and chain:</b><br />
+			<br /><b>O1 attachment residue index:</b><br />
 			<ul>
-			For every new sugar chain, specify the amino acid residue index and chain bound to the O1 atom.
+			For every new sugar chain, specify the amino acid index of the residue bound to the first O1 atom in the sugar. The amino 
+			acid index must correspond to the input sequence in the alignment, i.e. the first residue in the input sequence is 1 and the Nth is N.
 			For sugars within the chain, specify the index of the sugar monomer bound to the O1 atom defined as such: 
 			the first listed monomer in a chain has index 1, the second listed monomer in a chain has index 2,... <br />
 			</ul>
