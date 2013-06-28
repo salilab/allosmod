@@ -137,15 +137,34 @@ sub get_advanced_modeling_options {
       "\$('#glycmod').slideDown('fast')\" />Model " .
       "glycosylation " . $q->br .
       "<div class=\"advopts\" id=\"glycmod\" style=\"display:none\">\n" .
-	    "Number of models " . $q->textfield({-name=>'glycmod_nruns', -size=>"3",
-						 -value=>"10"}) . $q->br .
-	    "Glycosylation input file " .
-	    $q->filefield({-name=>"glycmod_input"}) . $q->br .
-	    "Flexible residues at glycosylation sites " .
-	    '<input type="checkbox" name="glycmod_flexible_sites"' .
+	          "<input type=\"radio\" name=\"glycmodopt\" value=\"option1\" " .
+		  "onclick=\"\$('#option1').slideDown('fast');\$('#option2').slideUp('fast')\"" .
+		  "\>Option 1: Add flexible sugars to a semi-rigid protein that lacks glycosylation" . $q->br .
+		  "<div class=\"glycmodopt\" id=\"option1\" style=\"display:none\">\n" .
+
+       		  "Number of models " . $q->textfield({-name=>'glycmod_nruns', -size=>"3",
+						     -value=>"10"}) . $q->br .
+	       	  "Glycosylation input file " .
+				$q->filefield({-name=>"glycmod_input"}) . $q->br .
+		  "Flexible residues at glycosylation sites " .
+				'<input type="checkbox" name="glycmod_flexible_sites"' .
 				'checked="1" />' . $q->br .
-	    "Number of optimization steps " .
-	    $q->textfield({-name=>'glycmod_num_opt_steps',-size=>"3", -value=>"1"}) .
+		  "Number of optimization steps " .
+				$q->textfield({-name=>'glycmod_num_opt_steps',-size=>"3", -value=>"1"}) .
+
+                  "</div>\n\n" .
+
+	          "<input type=\"radio\" name=\"glycmodopt\" value=\"option2\" " .
+		  "onclick=\"\$('#option1').slideUp('fast');\$('#option2').slideDown('fast')\"" .
+		  "\>Option 2: Sample multiple protein conformations with rigid sugars (see Sampling Options below)" . $q->br .
+		  "<div class=\"glycmodopt\" id=\"option2\" style=\"display:none\">\n" .
+
+		  "WARNING: Rigid bodies can cause problems during simulations, care should be given here" . $q->br .
+		  "See the <a href=\"http://modbase.compbio.ucsf.edu/allosmod/help.cgi?type=glyc\"> glycosylation help page</a> for more information" . $q->br .
+	       	  "Upload the allosmod.py file generated for this protein using Option 1 on the <a href=\"http://modbase.compbio.ucsf.edu/allosmod\"> AllosMod server</a>" .
+				$q->filefield({-name=>"glycmod_python"}) . $q->br .
+
+                  "</div>\n\n" .
 
       "</div>\n\n" .
 
@@ -393,7 +412,7 @@ sub get_alignment {
 	};
 	if($tempread =~ "Dynamically" and $tempread =~ "allocated" and $tempread =~ "memory") {
 	    system("echo ERROR PW >> $jobdir/align.ali");
-	    throw saliweb::frontend::InputValidationError("Please check that your input sequence contains appropriate number of upper and lower case letters.");
+	    throw saliweb::frontend::InputValidationError("Please check that you have uploaded a PDB file and that your input sequence is appropriate");
         }
 
 	$aln .= `cat $jobdir/align.ali`;
@@ -510,6 +529,29 @@ sub get_submit_page {
 	print FILE $alignment;
 	close(FILE);
 
+	#check alignment is valid
+	open(FOO, "/netapp/sali/allosmod/check_align.sh $jobdir |") || die "dont let script output to std out";
+	close(FOO);
+	my $tempfile = "$jobdir/align.ali";
+	my $tempread = do {
+	    local $/ = undef;
+	    open my $fh, "<", $tempfile
+		or die "could not open $tempfile: $!";
+	    <$fh>;
+	};
+	if($tempread =~ "errorfil") {
+	    throw saliweb::frontend::InputValidationError("Please check that your alignment contains the filenames for all uploaded pdb files.");
+        }
+	if($tempread =~ "errorseq") {
+	    throw saliweb::frontend::InputValidationError("Please check that your alignment contains entries with the same sequence as the uploaded pdb files.");
+        }
+	if($tempread =~ "errorlength") {
+	    throw saliweb::frontend::InputValidationError("Please check that your alignment entries all have the same length.");
+        }
+	if($tempread =~ "errorblock") {
+	    throw saliweb::frontend::InputValidationError("Please check that all block residues, i.e. \".\", are aligned to a residue or hetero atoms.");
+        }
+
 	# handle advanced options
 	my $advancedopt = $q->param('advancedopt');
 	my $ligandmod_rAS = $q->param('ligandmod_rAS');
@@ -518,6 +560,8 @@ sub get_submit_page {
 	my $glycmod_nruns = $q->param('glycmod_nruns');
 	my $glycmod_flexible_sites = $q->param('glycmod_flexible_sites');
 	my $glycmod_num_opt_steps = $q->param('glycmod_num_opt_steps');
+	my $glycmodopt = $q->param('glycmodopt');
+	my $glycmod_python = $q->param('glycmod_python');
 	if(($ligandmod_rAS !~ /^\d+$/ and $ligandmod_rAS !~ /^\d+[\.]\d+$/) or
 	   $ligandmod_rAS <= 0) {
 	    throw saliweb::frontend::InputValidationError("Please provide a sensible radius of the ligand binding site $!");
@@ -549,20 +593,39 @@ sub get_submit_page {
 	    }
 	}
 	if ($advancedopt eq "glycmod") {
-	    my $glyc_input = $q->upload('glycmod_input');
-	    my $glycfile = "$jobdir/glyc.dat";
-	    open(UPLOAD, "> $glycfile")
-		or throw saliweb::frontend::InternalError("Cannot open $glycfile: $!");
-	    $file_contents = "";
-	    while (<$glyc_input>) {
-		$file_contents .= $_;
+	    if ($glycmodopt eq "option1") {
+		my $glyc_input = $q->upload('glycmod_input');
+		my $glycfile = "$jobdir/glyc.dat";
+		open(UPLOAD, "> $glycfile")
+		    or throw saliweb::frontend::InternalError("Cannot open $glycfile: $!");
+		$file_contents = "";
+		while (<$glyc_input>) {
+		    $file_contents .= $_;
+		}
+		print UPLOAD $file_contents;
+		close UPLOAD
+		    or throw saliweb::frontend::InternalError("Cannot close $glycfile: $!");
+		$filesize2 = -s "$jobdir/glyc.dat";
+		if($filesize2 == 0) {
+		    system("rm $jobdir/glyc.dat");
+		}
 	    }
-	    print UPLOAD $file_contents;
-	    close UPLOAD
-		or throw saliweb::frontend::InternalError("Cannot close $glycfile: $!");
-	    $filesize2 = -s "$jobdir/glyc.dat";
-	    if($filesize2 == 0) {
-		system("rm $jobdir/glyc.dat");
+	    if ($glycmodopt eq "option2") {
+		my $glyc_python = $q->upload('glycmod_python');
+		my $glycpython = "$jobdir/allosmod.py";
+		open(UPLOAD, "> $glycpython")
+		    or throw saliweb::frontend::InternalError("Cannot open $glycpython: $!");
+		$file_contents = "";
+		while (<$glyc_python>) {
+		    $file_contents .= $_;
+		}
+		print UPLOAD $file_contents;
+		close UPLOAD
+		    or throw saliweb::frontend::InternalError("Cannot close $glycpython: $!");
+		$filesize2 = -s "$jobdir/allosmod.py";
+		if($filesize2 == 0) {
+		    system("rm $jobdir/allosmod.py");
+		}
 	    }
 	}
 
@@ -582,7 +645,7 @@ sub get_submit_page {
 	my $rareconf_break = $q->param('rareconf_break');
 	my $rareconf_quickcool = $q->param('rareconf_quickcool');
 	if(($thermodyn_nruns !~ /^\d+$/) or $thermodyn_nruns <= 0 or $thermodyn_nruns > 100) {
-	    throw saliweb::frontend::InputValidationError("Please provide a sensible number of runs for comparative modeling $!");
+	    throw saliweb::frontend::InputValidationError("Please provide a sensible number of runs $!");
 	}
 	if(($thermodyn_mdtemp !~ /^\d+$/ and $thermodyn_mdtemp !~ /^\d+[\.]\d+$/ and $thermodyn_mdtemp ne "scan") or
 	   ($thermodyn_mdtemp <= 0 and $thermodyn_mdtemp ne "scan")) {
@@ -624,12 +687,14 @@ sub get_submit_page {
 
 	# make input.dat for allosmod
 	if ($advancedopt eq "glycmod") {
-	    $sampletype = "null";
-	    system("echo NRUNS=$glycmod_nruns >> $jobdir/input.dat");
-	    system("echo DEVIATION=4.0 >> $jobdir/input.dat");
-	    system("echo SAMPLING=moderate_cm >> $jobdir/input.dat");	
-	    if ($glycmod_flexible_sites eq "on") { system("echo ATTACH_GAPS=True >> $jobdir/input.dat"); }
-	    system("echo REPEAT_OPTIMIZATION=$glycmod_num_opt_steps >> $jobdir/input.dat");
+	    if ($glycmodopt eq "option1") {
+		$sampletype = "null";
+		system("echo NRUNS=$glycmod_nruns >> $jobdir/input.dat");
+		system("echo DEVIATION=4.0 >> $jobdir/input.dat");
+		system("echo SAMPLING=moderate_cm >> $jobdir/input.dat");	
+		if ($glycmod_flexible_sites eq "on") { system("echo ATTACH_GAPS=True >> $jobdir/input.dat"); }
+		system("echo REPEAT_OPTIMIZATION=$glycmod_num_opt_steps >> $jobdir/input.dat");
+	    }
 	}
 	if ($advancedopt eq "ligandmod") {
 	    system("echo LIGPDB=$ligandmod_ligpdb >> $jobdir/input.dat");
@@ -665,13 +730,13 @@ sub get_submit_page {
 	} else {
 	    system("echo error sampletype >> $jobdir/input.dat");
 	}
-	if ($addrestropt eq "addbond" and $addbond_indices ne "") {
+	if ($addbond_indices ne "") {
 	    system("echo HARM $addbond_dist $addbond_stdev $addbond_indices >> $jobdir/input.dat");
 	}
-	if ($addrestropt eq "addupper") {
+	if ($addupper_indices ne "") {
 	    system("echo UPBD $addupper_dist $addupper_stdev $addupper_indices >> $jobdir/input.dat");
 	}
-	if ($addrestropt eq "addlower") {
+	if ($addlower_indices ne "") {
 	    system("echo LOBD $addlower_dist $addlower_stdev $addlower_indices >> $jobdir/input.dat");
 	}
 #	if($email =~ "pweinkam" and $email =~ "gmail") {

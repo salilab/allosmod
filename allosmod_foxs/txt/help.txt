@@ -43,6 +43,10 @@ to the AllosMod <a href="http://modbase.compbio.ucsf.edu/allosmod/help.cgi?type=
 (for glycosylation, click <a href="http://modbase.compbio.ucsf.edu/allosmod/help.cgi?type=glyc"> here</a>) and the FoXS 
 <a href="http://modbase.compbio.ucsf.edu/foxs/about.html"> help page</a>.  <br />
 <br />
+HINT: Input your PDB structure into the first page and hit submit. Then copy the sequence for that file and
+hit the back button and paste the new sequence into the input field.  Then you just need to make sure to add any HIS tags or other residues 
+missing from the PDB structure. This procedure allows you to submit a job with minimal manual work. <br />
+<br />
 An example input sequence is shown below. PDB code 3L2P contains one protein chain, three DNA chains, and one ligand (represented by a "."):<br />
 <br />
 <ul>

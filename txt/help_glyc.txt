@@ -1,11 +1,36 @@
 <h1>AllosMod Help Page - Modeling Glycosylation </h1><br />
 <p>
-Protein glycosylation can be modeled as explained in this help page and in a published paper (Guttman et al. 2013 Structure). For help to model non-glycosylated proteins, click 
-<a href="http://modbase.compbio.ucsf.edu/allosmod/help.cgi?type=help"> here</a>. This tool is meant to sample the 
-range of conformations accessible to sugars with minimal structural changes in the protein. Protein motions will be limited 
-to loops and surface side chains. To model protein conformational change in addition to glycosylation, first run simulations 
-using AllosMod and then input the trajectory snapshots to model the sugars.  <br />
+Protein glycosylation can be modeled as explained in this help page and in our paper 
+(<a href="http://www.ncbi.nlm.nih.gov/pubmed/23473666">Guttman et al. 2013 Structure</a>).
+For help to model non-glycosylated proteins, click <a href="http://modbase.compbio.ucsf.edu/allosmod/help.cgi?type=help"> here</a>. 
+This tool is meant to sample the range of conformations accessible to sugars. There are a few ways to run the server 
+depending on the desired conformational flexibility of the protein and/or sugars:<br />
 <br />
+1) Input: a protein without sugars. Output: a semi-rigid protein (motions will be limited to loops and surface side chains) with flexible sugars. <br />
+<br />
+2) Input: a protein with sugars. Output: a flexible protein with rigid sugars. <br />
+<br />
+3) Input: a protein without sugars. Output: a flexible protein with flexible sugars.<br />
+<br />
+For option 1, input the protein sequence only and a file describing sugar connectivity (glyc.dat).  See below for more information and for an example 
+click <a href="http://modbase.compbio.ucsf.edu/allosmod/html/file/input_glyc.zip"> here</a>. For option 2, run option 1 and then use a single 
+structure from the output as input for another run.  In the input sequence, specify the protein sequence and a "." for each sugar.  The "." 
+specifies a block residue in MODELLER and will remain rigid.  Such rigid bodies can cause problems during dynamics so care should be given here.  
+You will also need to upload a file allosmod.py that was generated in option 1. For option 3, first run 
+simulations of the protein only using <a href="http://modbase.compbio.ucsf.edu/allosmod"> AllosMod</a>. Then 
+take the resulting structures and do option 1 (one for each structure) using AllosMod.  This can be best achieved using the batch mode (see below). 
+Take all the glycosylated protein structures as input into the <a href="http://modbase.compbio.ucsf.edu/foxs"> FoXS server</a>, if desired. <br />
+<br />
+HINTS:
+</p>
+	<ul> 1) Input your structure from option 1 into the first page and hit submit. Then copy the sequence for that file and
+	    hit the back button and paste the new sequence into the input field.  Then you just need to make sure to add any HIS tags or other residues 
+	    missing from the PDB structure. This procedure allows you to submit a job with minimal manual work. </ul>
+	<ul> 2) For help making the glyc.dat file from a PDB file that includes sugars, see the GlycoSciences <a href="http://www.glycosciences.de/tools/pdbcare/"> webpage</a>
+	    and set the "Assign connections by atom distances" to "HETATOM only."  This tool will also assess the structural quality of the sugars. </ul>
+
+<br />
+<p>
 The following help page is organized to run batch jobs. Each input field in single landscape mode has a corresponding file/section below. <br />
 <br />
 </p>
