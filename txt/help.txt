@@ -99,10 +99,15 @@ landscape run can be uploaded as a batch run. <br />
 				   C alpha and C beta atoms only. This allows very large proteins to be simulated without overwhelming the computer's memory. This 
 				   option is automatically set to True for proteins over 1500 residues. </ul>
              <br /> {ADDITIONAL_RESTRAINT} {DISTANCE} {STANDARD_DEVIATION} {INDICES} (optional) <ul> is used to add additional restraints between residues. 
-				   ADDITIONAL_RESTRAINT can be HARM or UPBD corresponding to a harmonic distance restraint or an upper bound distance restraint, 
-				   respectively. The DISTANCE and STANDARD_DEVIATION corresponds to the distance between Calpha atoms (in &Aring;ngstroms). 
-				   INDICES is a list of residue indices (corresponding to simulated sequence) separated by commas. Restraints are added 
-				   between each successive pair of indices, i.e. between i1 and i2, between i3 and i4, ...  </ul>  <br />
+				   ADDITIONAL_RESTRAINT can be HARM, LOBD, or UPBD corresponding to a distance restraints that are harmonic, lower bounded only, 
+				   or upper bounded only, respectively. DISTANCE and STANDARD_DEVIATION corresponds to the distance (in &Aring;ngstroms) 
+				   between two atoms in the residues specified in INDICES. If residue index is an amino acid, atom type will be CA, otherwise atom type will 
+				   be the first present: N, P, C, or O. INDICES is a list of residue indices separated by commas. 
+				   Restraints are added between each successive pair of indices, i.e. between i1 and i2, between i3 and i4, ...  
+				   The residue index corresponds to the position in the input alignment file. Therefore, if there are multiple chains, the index for the 
+				   first residue in the second chain will be one more than the index for the last residue in the first chain 
+				   (refer to any output PDB for simplicity).
+				   (for example, click <a href=\"http://modbase.compbio.ucsf.edu/allosmod/html/file/bonds.dat\"> here</a>) </ul>  <br />
 
 	 <br /><b> Destabilize residues (optional):</b> break.dat contains a list of residues whose contacts will be scaled by a specifed value. 
 			    Each line contains one residue index (corresponding to simulated sequence) in the first column and one scaling 

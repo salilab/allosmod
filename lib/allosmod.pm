@@ -514,8 +514,18 @@ sub get_submit_page {
 
     my $jobname = $q->param('jobname');
     my $email = $q->param('jobemail'); #||undef;      # user's e-mail
+    my $zip = $q->param('zip');
+    my $aln;
+    my $job;
 
-    my $job = $self->resume_job($jobname);
+    #skip second page if zip file 
+    if (defined($zip)) {
+	($aln, $job) = $self->get_alignment();
+    } else {
+	$job = $self->resume_job($jobname);
+    }
+
+###    my $job = $self->resume_job($jobname);
     my $jobdir = $job->directory;
 
     my $filesize = -s "$jobdir/input.zip";
@@ -834,6 +844,14 @@ sub get_help_page {
     } else {
 	return $self->SUPER::get_help_page($display_type);
     }
+}
+
+sub get_submit_parameter_help {
+    my $self = shift;
+    return [
+        $self->parameter("name", "Job name", 1),
+        $self->file_parameter("zip", "All input files in a single zip"),
+	    ];
 }
 
 sub check_required_email {
