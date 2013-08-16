@@ -17,3 +17,11 @@ my $t = new saliweb::Test('allosmod');
     like($links->[0], qr#<a href="http://modbase/top/">AllosMod Home</a>#,
          'Index link');
 }
+
+# Test get_index_page
+{
+    my $self = $t->make_frontend();
+    my $txt = $self->get_index_page();
+    like($txt, qr/AllosMod server/ms,
+         'get_index_page');
+}
