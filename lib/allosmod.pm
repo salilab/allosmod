@@ -550,7 +550,7 @@ sub get_submit_page {
 	    <$fh>;
 	};
 	if($tempread =~ "errorfil") {
-	    throw saliweb::frontend::InputValidationError("Please check that your alignment contains the filenames for all uploaded pdb files.");
+	    throw saliweb::frontend::InputValidationError("Please check that your alignment contains the filenames for all uploaded pdb files and has an entry for the simulated sequence (pm.pdb).");
         }
 	if($tempread =~ "errorseq") {
 	    throw saliweb::frontend::InputValidationError("Please check that your alignment contains entries with the same sequence as the uploaded pdb files.");
@@ -750,7 +750,7 @@ sub get_submit_page {
 	    system("echo LOBD $addlower_dist $addlower_stdev $addlower_indices >> $jobdir/input.dat");
 	}
 #	if($email =~ "pweinkam" and $email =~ "gmail") {
-#	    system("echo LOCALRIGID=True >> $jobdir/input.dat");
+#	    system("echo LOCALBETA=True >> $jobdir/input.dat");
 #	}
 
     } else {

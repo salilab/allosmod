@@ -122,14 +122,15 @@ landscape run can be uploaded as a batch run. <br />
 <p>
 	The output is a zip file containing the same directories that were uploaded and subdirectories for each simulation. Each subdirectory will contain 
 	a MODELLER script (model_run.py), a unique starting structure (random.ini), a restraint file containing interactions that will define the energy landscape 
-	(converted.rsr), log files, and other output files.
+	(converted.rsr), log files, and other output files.  If you opted to run short, unequilibrated simulations via the server then each subdirectory will 
+	contain pdb files named pm.pdb.B1*.  If you opted to set up a longer simulation to be run locally, then see the following section.
 </p><br />
 
 <a name="run"><h4>***To run the simulation</h4></a>
 <p>
 	To run, navigate to a run directory. Each run directory contains a unique starting structure (random.ini) and a unique run script (model_run.py), then 
-	type: "$MODELLER_HOME/bin/mod${MODELLER_VERSION} model_run.py". The script will output 2000 snapshots by default (numbered 1001 to 3000) as 
-	well other data files. AllosMod implements the Automodel class used in MODELLER for comparative modeling, 
+	type: "$MODELLER_HOME/bin/mod${MODELLER_VERSION} model_run.py". The script will output 2000 snapshots by default (pm.pdb.B10010001.pdb to 
+	pm.pdb.B30000001.pdb) as well other data files. AllosMod implements the Automodel class used in MODELLER for comparative modeling, 
 	however the optimization and refinement steps have been modified to allow for constant temperature molecular dynamics simulations. For 
 	each run directory, there is a file allosmod.py. This file contains the method consttemp that controls the simulation schedule and temperature (MDtemp). 
 	For help with script details, refer to the <a href="http://salilab.org/modeller/manual/"> MODELLER help pages</a>.
@@ -137,8 +138,8 @@ landscape run can be uploaded as a batch run. <br />
 
 <a name="analysis"><h4>To analyze the simulation</h4></a>
 <p>
-	Download the analysis script to run on any linux/unix based machine 
-	(click <a href="http://modbase.compbio.ucsf.edu/allosmod/html/file/analysis.zip">here</a>).  This script will check the simulations for possible 
+	Download a zip file containing example directories and analysis scripts to run on any linux/unix based machine 
+	(click <a href="http://modbase.compbio.ucsf.edu/allosmod/html/file/analysis.zip">here</a>).  The allosmod_analysis.sh script will check the simulations for possible 
 	errors as well as output several files including: 1) energies 2) Boltzmann weighted probabilities 3) local structural similarity metrics Qi.  
 	See README file for a full description.
 </p><br />

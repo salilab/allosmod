@@ -402,7 +402,7 @@ sub get_alignment {
 	throw saliweb::frontend::InputValidationError("Please check that you have uploaded a PDB file and that your input sequence is appropriate");
     }
     if($tempread =~ "errorfil") {
-	throw saliweb::frontend::InputValidationError("Please check that your alignment contains all uploaded pdb files.");
+	throw saliweb::frontend::InputValidationError("Please check that your alignment contains the filenames for all uploaded pdb files and has an entry for the simulated sequence (pm.pdb).");
     }
     if($tempread =~ "errorlength") {
 	throw saliweb::frontend::InputValidationError("Please check that your alignment entries all have the same length.");
