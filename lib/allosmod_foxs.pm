@@ -98,7 +98,7 @@ sub get_advanced_modeling_options {
       "<input type=\"radio\" name=\"advancedopt\" value=\"ligandmod\" " .
       "onclick=\"\$('#glycmod').slideUp('fast'); " .
       "\$('#ligandmod').slideDown('fast')\"" .
-      "\>Model ligand binding site" . $q->br .
+      "\>Model implicit ligand binding" . $q->br .
 	     "<div class=\"advopts\" id=\"ligandmod\" style=\"display:none\">\n" .
 	     "Radius of ligand binding site (&Aring) " . $q->textfield({-name=>'ligandmod_rAS', -size=>"3",
                                          -value=>"11"}) . $q->br .
@@ -198,6 +198,14 @@ sub get_advanced_modeling_options {
 
                   "</div>\n\n" .
 
+      "</div>\n\n" .
+
+      "<input type=\"radio\" name=\"advancedopt\" value=\"break\" " .
+      "onclick=\"\$('#break').slideDown('fast')\" />Alter " .
+      "residue contact energies " . $q->br .
+      "<div class=\"advopts\" id=\"break\" style=\"display:none\">\n" .
+		  "break.dat file " . $q->filefield({-name=>"break_input"}) . $q->br .
+
       "</div>\n\n");
 }
 
@@ -232,7 +240,7 @@ sub get_sampling_options {
       "<div class=\"sampopts\" id=\"interconf\" style=\"display:none\">\n" .
             "Number of simulations " . $q->textfield({-name=>'interconf_nruns', -size=>"3",
                                          -value=>"30"}) . $q->br .
-            "MD temperature " . $q->textfield({-name=>'interconf_mdtemp', -size=>"3",
+            "MD temperature scanned or fixed value " . $q->textfield({-name=>'interconf_mdtemp', -size=>"3",
                                          -value=>"scan"}) . $q->br .
             "Increase chain rigidity to maintain secondary structure at high temperature " .
 				'<input type="checkbox" name="interconf_locrig"' .
@@ -260,9 +268,9 @@ sub get_sampling_options {
              "Z-score of the residue charge density, residues above this value cause chem. frust." .
                 $q->textfield({-name=>'rareconf_cdencutoff', -size=>"3",
                                -value=>"3.5"}) . $q->br .
-             "Quickly cool each structure to increase secondary structure (takes a long time, use sparingly) " .
-				'<input type="checkbox" name="rareconf_quickcool"' .
-				' />' . $q->br .
+#             "Quickly cool each structure to increase secondary structure (takes a long time, use sparingly) " .
+#				'<input type="checkbox" name="rareconf_quickcool"' .
+#				' />' . $q->br .
       "</div>\n");
 }
 
@@ -271,40 +279,40 @@ sub get_saxs_options {
     my $q = $self->cgi;
     return $self->make_dropdown("saxs", "SAXS Options", 0,
                   $q->table(
-                      $q->Tr($q->td('Maximal q Value'),
+                      $q->Tr($q->td('Maximal q value'),
                              $q->td($q->textfield({-name=>'saxs_qmax', -size=>"10",
                                                    -value=>"0.5"}))),
-                      $q->Tr($q->td('Profile Size'),
+                      $q->Tr($q->td('Profile size'),
                              $q->td($q->textfield({-name=>'saxs_psize', -size=>"10",
                                                    -value=>"500"})),
-                             $q->td('# of points in the computed profile')),
-                      $q->Tr($q->td('Hydration Layer'),
-                             $q->td('<input type="checkbox" name="saxs_hlayer" ' .
-                                    'checked="1" />'),
-                             $q->td('use hydration layer to improve fitting')),
-                      $q->Tr($q->td('Excluded Volume Adjustment'),
-                             $q->td('<input type="checkbox" name="saxs_exvolume" ' .
-                                    'checked="1" />'),
-                             $q->td('adjust the protein excluded volume ' .
-                                    'to improve fitting')),
-                      $q->Tr($q->td('Implicit Hydrogens'),
-                             $q->td('<input type="checkbox" name="saxs_ihydrogens"' .
-                                    'checked="1" />'),
-                             $q->td('implicitly consider hydrogen atoms')),
-                      $q->Tr($q->td('Background Adjustment'),
+                             $q->td('Number of points in the computed profile')),
+#                      $q->Tr($q->td('Hydration Layer'),
+#                             $q->td('<input type="checkbox" name="saxs_hlayer" ' .
+#                                    'checked="1" />'),
+#                             $q->td('use hydration layer to improve fitting')),
+#                      $q->Tr($q->td('Excluded Volume Adjustment'),
+#                             $q->td('<input type="checkbox" name="saxs_exvolume" ' .
+#                                    'checked="1" />'),
+#                             $q->td('adjust the protein excluded volume ' .
+#                                    'to improve fitting')),
+#                      $q->Tr($q->td('Implicit Hydrogens'),
+#                             $q->td('<input type="checkbox" name="saxs_ihydrogens"' .
+#                                    'checked="1" />'),
+#                             $q->td('implicitly consider hydrogen atoms')),
+                      $q->Tr($q->td('Background adjustment'),
                              $q->td('<input type="checkbox" name="saxs_backadj"' .
                                     ' />'),
-                             $q->td('adjust the background of the ' .
+                             $q->td('Adjust the background of the ' .
                                     'experimental profile')),
-                      $q->Tr($q->td('Residue Level Computation'),
+                      $q->Tr($q->td('Residue-based computation'),
                              $q->td('<input type="checkbox" name="saxs_coarse"' .
                                     ' />'),
-                             $q->td('perform coarse grained profile ' .
-                                    'computation for Ca atoms only')),
-                      $q->Tr($q->td('Offset'),
-                             $q->td('<input type="checkbox" name="saxs_offset"' .
-                                    ' />'),
-                             $q->td('use offset in profile fitting')),
+                             $q->td('Perform coarse grained profile ' .
+                                    'computation using only the Ca atoms')),
+#                      $q->Tr($q->td('Offset'),
+#                             $q->td('<input type="checkbox" name="saxs_offset"' .
+#                                    ' />'),
+#                             $q->td('use offset in profile fitting')),
                   ));
 }
 
@@ -401,18 +409,6 @@ sub get_alignment {
 	system("echo ERROR PW >> $jobdir/align.ali");
 	throw saliweb::frontend::InputValidationError("Please check that you have uploaded a PDB file and that your input sequence is appropriate");
     }
-    if($tempread =~ "errorfil") {
-	throw saliweb::frontend::InputValidationError("Please check that your alignment contains the filenames for all uploaded pdb files and has an entry for the simulated sequence (pm.pdb).");
-    }
-    if($tempread =~ "errorlength") {
-	throw saliweb::frontend::InputValidationError("Please check that your alignment entries all have the same length.");
-    }
-    if($tempread =~ "errorblock") {
-	throw saliweb::frontend::InputValidationError("Please check that all block residues, i.e. \".\", are aligned to a residue or hetero atoms.");
-    }
-    if($tempread =~ "errorseq") {
-	throw saliweb::frontend::InputValidationError("Please check that your alignment contains entries with the same sequence as the uploaded pdb files.");
-    }
     
     $aln .= `cat $jobdir/align.ali`;
 
@@ -459,7 +455,8 @@ sub get_index_page {
                                 )) .
               $q->p($q->button(-value=>'Add more structures',
                                -onClick=>"add_structure()")) .
-          $q->p("Sequence used in experiment (specify protein and DNA/RNA, input sugar in adv. opt.)" . $q->br .
+                  $q->p("Sequence to be used in simulation (specify protein and DNA/RNA, input sugar in adv. opt., " . 
+			"see <a href=\"http://modbase.compbio.ucsf.edu/allosmod-foxs/help.cgi?type=help\"> help page</a>)" . $q->br .
                     $q->textarea({-name=>'sequence', -rows=>7, -cols=>80})) .
               $q->p("<center>" .
                     $q->input({-type=>"submit", -value=>"Submit"}) .
@@ -514,8 +511,7 @@ sub get_submit_page {
 	or throw saliweb::frontend::InputValidationError("Cannot close $saxsfile: $!");
     my $filesize = -s "$jobdir/saxs.dat";
     if($filesize == 0) {
-	print "You have uploaded an empty profile file: $saxsfile";
-	exit;
+	throw saliweb::frontend::InputValidationError("You have uploaded an empty SAXS profile.");
     }
 
     # rewrite alignment to file
@@ -535,7 +531,19 @@ sub get_submit_page {
 	    or die "could not open $tempfile: $!";
 	<$fh>;
     };
-
+    if($tempread =~ "errorfil") {
+	throw saliweb::frontend::InputValidationError("Please check that your alignment contains the filenames for all uploaded pdb files and has an entry for the simulated sequence (pm.pdb).");
+    }
+    if($tempread =~ "errorseq") {
+	throw saliweb::frontend::InputValidationError("Please check that your alignment contains entries with the same sequence as the uploaded pdb files.");
+    }
+    if($tempread =~ "errorlength") {
+	throw saliweb::frontend::InputValidationError("Please check that your alignment entries all have the same length.");
+    }
+    if($tempread =~ "errorblock") {
+	throw saliweb::frontend::InputValidationError("Please check that all block residues, i.e. \".\", are aligned to a residue or hetero atom.");
+    }
+    
     # handle advanced options
     my $advancedopt = $q->param('advancedopt');
     my $ligandmod_rAS = $q->param('ligandmod_rAS');
@@ -611,6 +619,24 @@ sub get_submit_page {
 		system("rm $jobdir/allosmod.py");
 	    }
 	}
+	if ($advancedopt eq "break") {
+	    my $break_file = $q->upload('break_input');
+	    my $breakfile = "$jobdir/break.dat";
+	    open(UPLOAD, "> $breakfile")
+		or throw saliweb::frontend::InternalError("Cannot open $breakfile: $!");
+	    $file_contents = "";
+	    while (<$break_file>) {
+		$file_contents .= $_;
+	    }
+	    print UPLOAD $file_contents;
+	    close UPLOAD
+		or throw saliweb::frontend::InternalError("Cannot close $breakfile: $!");
+	    $filesize2 = -s "$jobdir/break.dat";
+	    if($filesize2 == 0) {
+		system("rm $jobdir/break.dat");
+	    }
+	}
+
     }
     
     # handle sampling options
@@ -720,9 +746,9 @@ sub get_submit_page {
     if ($addlower_indices ne "") {
 	system("echo LOBD $addlower_dist $addlower_stdev $addlower_indices >> $jobdir/input.dat");
     }
-#    if($email =~ "pweinkam" and $email =~ "gmail") {
-#	system("echo COARSE=True >> $jobdir/input.dat");
-#    }
+    if($email =~ "pweinkam" and $email =~ "gmail") {
+	system("echo PW=True >> $jobdir/input.dat");
+    }
 
     # handle SAXS options
     my $saxs_qmax = $q->param('saxs_qmax');
@@ -842,6 +868,22 @@ sub check_required_email {
     if($email !~ m/^[\w\.-]+@[\w-]+\.[\w-]+((\.[\w-]+)*)?$/ ) {
 	throw saliweb::frontend::InputValidationError("Please provide a valid return email address");
     }
+}
+
+sub format_user_error {
+    my ($self, $exc) = @_;
+    my $q = $self->{'CGI'};
+    my $msg = $exc->text;
+    my $ret = $q->h2("Invalid input") .
+              $q->p("&nbsp;") .
+              $q->p($q->b("An error occurred during your request:")) .
+              "<div class=\"standout\"><p>$msg</p></div>";
+    if ($exc->isa('saliweb::frontend::InputValidationError')) {
+	$ret .= $q->p("&nbsp;");
+	$ret .= $q->p($q->b("WARNING: If you hit the back button in your web browser, your job may not submit properly."));
+        $ret .= $q->p($q->b("Please click <a href=\"http://modbase.compbio.ucsf.edu/allosmod-foxs\"> HERE</a> to reset the page."));
+    }
+    return $ret;
 }
 
 1;

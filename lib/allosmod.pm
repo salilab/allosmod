@@ -98,7 +98,8 @@ sub get_all_options_prealign {
 					 $q->filefield({-name=>'uploaded_file'})))) .
 		  $q->p($q->button(-value=>'Add more structures',
 				  -onClick=>"add_structure()"))) .
-                  $q->p("Sequence to be used in simulation (specify protein and DNA/RNA, input sugar in adv. opt.)" . $q->br .
+                  $q->p("Sequence to be used in simulation (specify protein and DNA/RNA, input sugar in adv. opt., " . 
+			"see <a href=\"http://modbase.compbio.ucsf.edu/allosmod-foxs/help.cgi?type=help\"> help page</a>)" . $q->br .
 		       $q->textarea({-name=>'sequence', -rows=>7, -cols=>77})) .
            "\n</div></div>\n" .
 
@@ -120,7 +121,7 @@ sub get_advanced_modeling_options {
       "<input type=\"radio\" name=\"advancedopt\" value=\"ligandmod\" " .
       "onclick=\"\$('#glycmod').slideUp('fast'); " .
       "\$('#ligandmod').slideDown('fast')\"" .
-      "\>Model ligand binding site" . $q->br .
+      "\>Model implicit ligand binding" . $q->br .
 	     "<div class=\"advopts\" id=\"ligandmod\" style=\"display:none\">\n" .
 	     "Radius of ligand binding site (&Aring) " . $q->textfield({-name=>'ligandmod_rAS', -size=>"3",
                                          -value=>"11"}) . $q->br .
@@ -205,7 +206,7 @@ sub get_advanced_modeling_options {
                   "</div>\n\n" .
 
 	          "<input type=\"radio\" name=\"addrestropt\" value=\"addlower\" " .
-		  "onclick=\"\$('#addlower').slideDown('fast')\"" .
+				"onclick=\"\$('#addlower').slideDown('fast')\"" .
 		  "\>Add lower bound distance restraint between two residues " . $q->br .
 		  "<div class=\"addrestropt\" id=\"addlower\" style=\"display:none\">\n" .
 
@@ -219,6 +220,14 @@ sub get_advanced_modeling_options {
                                          -value=>""}) . $q->br .
 
                   "</div>\n\n" .
+
+      "</div>\n\n" .
+
+      "<input type=\"radio\" name=\"advancedopt\" value=\"break\" " .
+      "onclick=\"\$('#break').slideDown('fast')\" />Alter " .
+      "residue contact energies " . $q->br .
+      "<div class=\"advopts\" id=\"break\" style=\"display:none\">\n" .
+		  "break.dat file " . $q->filefield({-name=>"break_input"}) . $q->br .
 
       "</div>\n\n");
 
@@ -259,7 +268,7 @@ sub get_sampling_options {
       "<div class=\"sampopts\" id=\"interconf\" style=\"display:none\">\n" .
             "Number of simulations " . $q->textfield({-name=>'interconf_nruns', -size=>"3",
                                          -value=>"30"}) . $q->br .
-            "MD temperature " . $q->textfield({-name=>'interconf_mdtemp', -size=>"3",
+            "MD temperature scanned or fixed value " . $q->textfield({-name=>'interconf_mdtemp', -size=>"3",
                                          -value=>"scan"}) . $q->br .
             "Increase chain rigidity to maintain secondary structure at high temperature " .
 				'<input type="checkbox" name="interconf_locrig"' .
@@ -285,9 +294,9 @@ sub get_sampling_options {
              "Z-score of the residue charge density, residues above this value cause chem. frust." .
                 $q->textfield({-name=>'rareconf_cdencutoff', -size=>"3",
                                -value=>"3.5"}) . $q->br .
-             "Quickly cool each structure to increase secondary structure (takes a long time, use sparingly) " .
-				'<input type="checkbox" name="rareconf_quickcool"' .
-				' />' . $q->br .
+#             "Quickly cool each structure to increase secondary structure (takes a long time, use sparingly) " .
+#				'<input type="checkbox" name="rareconf_quickcool"' .
+#				' />' . $q->br .
       "</div>\n");
 }
 
@@ -518,14 +527,13 @@ sub get_submit_page {
     my $aln;
     my $job;
 
-    #skip second page if zip file 
+    #skip second page if automated upload of a zip file, e.g. for CrytoSite
     if (defined($zip)) {
 	($aln, $job) = $self->get_alignment();
     } else {
 	$job = $self->resume_job($jobname);
     }
 
-###    my $job = $self->resume_job($jobname);
     my $jobdir = $job->directory;
 
     my $filesize = -s "$jobdir/input.zip";
@@ -559,7 +567,7 @@ sub get_submit_page {
 	    throw saliweb::frontend::InputValidationError("Please check that your alignment entries all have the same length.");
         }
 	if($tempread =~ "errorblock") {
-	    throw saliweb::frontend::InputValidationError("Please check that all block residues, i.e. \".\", are aligned to a residue or hetero atoms.");
+	    throw saliweb::frontend::InputValidationError("Please check that all block residues, i.e. \".\", are aligned to a residue or hetero atom.");
         }
 
 	# handle advanced options
@@ -637,6 +645,24 @@ sub get_submit_page {
 		    system("rm $jobdir/allosmod.py");
 		}
 	    }
+	    if ($advancedopt eq "break") {
+		my $break_file = $q->upload('break_input');
+		my $breakfile = "$jobdir/break.dat";
+		open(UPLOAD, "> $breakfile")
+		    or throw saliweb::frontend::InternalError("Cannot open $breakfile: $!");
+		$file_contents = "";
+		while (<$break_file>) {
+		    $file_contents .= $_;
+		}
+		print UPLOAD $file_contents;
+		close UPLOAD
+		    or throw saliweb::frontend::InternalError("Cannot close $breakfile: $!");
+		$filesize2 = -s "$jobdir/break.dat";
+		if($filesize2 == 0) {
+		    system("rm $jobdir/break.dat");
+		}
+	    }
+
 	}
 
 	# handle sampling options
@@ -809,9 +835,9 @@ sub display_ok_job {
 
     $return.= $q->p("<a href=\"" . $job->get_results_file_url("output.zip") .
                     "\">Download output zip file.</a>");
-    $return.=$q->p("<br />It would be wise to double check your run directories: <br /> 1) check that " .
-		   "allostericsite.pdb correctly represents the allosteric site (if applicable) <br /> 2) if some " .
-		   "runs were not completed, then read error.log. <br />");
+#    $return.=$q->p("<br />It would be wise to double check your run directories: <br /> 1) check that " .
+#		   "allostericsite.pdb correctly represents the allosteric site (if applicable) <br /> 2) if some " .
+#		   "runs were not completed, then read error.log. <br />");
     $return .= $job->get_results_available_time();
     return $return;
 }
@@ -859,6 +885,22 @@ sub check_required_email {
     if($email !~ m/^[\w\.-]+@[\w-]+\.[\w-]+((\.[\w-]+)*)?$/ ) {
 	throw saliweb::frontend::InputValidationError("Please provide a valid return email address");
     }
+}
+
+sub format_user_error {
+    my ($self, $exc) = @_;
+    my $q = $self->{'CGI'};
+    my $msg = $exc->text;
+    my $ret = $q->h2("Invalid input") .
+              $q->p("&nbsp;") .
+              $q->p($q->b("An error occurred during your request:")) .
+              "<div class=\"standout\"><p>$msg</p></div>";
+    if ($exc->isa('saliweb::frontend::InputValidationError')) {
+	$ret .= $q->p("&nbsp;");
+	$ret .= $q->p($q->b("WARNING: If you hit the back button in your web browser, your job may not submit properly."));
+        $ret .= $q->p($q->b("Please click <a href=\"http://modbase.compbio.ucsf.edu/allosmod\"> HERE</a> to reset the page."));
+    }
+    return $ret;
 }
 
 1;

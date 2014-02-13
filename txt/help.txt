@@ -81,8 +81,10 @@ landscape run can be uploaded as a batch run. <br />
 				   3) set LIGPDB to the effector bound PDB file. </ul>
 	     <br /> DEVIATION = X (optional) <ul> is the distance (in &Aring;ngstroms) that the atoms will be randomized when creating the 
 				   initial structure (default is 1-10 &Aring depending on simulation type).</ul>
-	     <br /> MDTEMP = X (optional) <ul> is the temperature (in degrees Kelvin) for the simulation (default is 300 K). Set MDTEMP to "scan" and each simulation 
-			           will be set up with a different temperature, alternating between 300 K, 350 K, 400 K, 450 K, and 500 K.</ul>
+	     <br /> MDTEMP = X (optional) <ul> is the temperature (in degrees Kelvin) for the simulation (default is 300 K). Set MDTEMP to "scan" and the simulation 
+			           temperature will alternate between 300 K, 350 K, 400 K, 450 K, and 500 K. Therefore, directory 0 will have 
+				   a 300 K simulation, directory 1 will have a 350 K simulation, and so on until directory 5 that will restart the 
+				   sequence with a 300 K simulation.</ul>
 	     <br /> SCAN_CUTOFF = X (optional) <ul> is the percent of trajectory snapshots outputted if sampling is moderate_am_scan. The default is 10 percent, 
 				   i.e. 0.1*NRUNS structures will be outputted selected by differing the most from the inputted PDB structure.</ul>
 	     <br /> BREAK = True/False (optional) <ul> is an option to include chemical frustration (Weinkam et al. 2009 Biochemistry, p2394-2402). Chemical frustration 
@@ -109,10 +111,10 @@ landscape run can be uploaded as a batch run. <br />
 				   (refer to any output PDB for simplicity).
 				   (for example, click <a href=\"http://modbase.compbio.ucsf.edu/allosmod/html/file/bonds.dat\"> here</a>) </ul>  <br />
 
-	 <br /><b> Destabilize residues (optional):</b> break.dat contains a list of residues whose contacts will be scaled by a specifed value. 
-			    Each line contains one residue index (corresponding to simulated sequence) in the first column and one scaling 
-			    factor in the second column. For example, to reduce all contacts for residue 30 by 90 %, break.dat would have one 
-			    line "30 0.1". break.dat is created automatically by setting BREAK=True, however, the user may specify 
+	 <br /><b> Alter residue contact energies (optional):</b> break.dat contains a list of residues whose pairwise contact energies (delEmax) 
+			    will be scaled by a specifed value. Each line contains one residue index (corresponding to simulated sequence) in the first 
+			    column and one scaling factor in the second column. For example, to reduce all contact energies for residue 30 by 90 %, 
+			    break.dat would have one line with "30 0.1". break.dat is created automatically by setting BREAK=True, however, the user may specify 
 			    any desired residues and scaling factors by including break.dat in a batch run. <br /> 
       </p><br />
      
