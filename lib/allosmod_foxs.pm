@@ -33,7 +33,7 @@ sub get_navigation_links {
 
 sub get_project_menu {
     my $self = shift;
-    my $version = $self->version;
+    my $version = $self->version_link;
     my $htmlroot = $self->htmlroot;
     return <<MENU;
 <div id="logo">
