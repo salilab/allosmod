@@ -1,0 +1,8 @@
+Import('env')
+
+files = Glob("*")
+
+files = [f for f in files if 'SConscript' not in str(f)]
+
+i = env.Install(env['config'].script_directory, files)
+env.Alias('install', i)
