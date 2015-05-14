@@ -1,0 +1,25 @@
+#!/bin/bash
+#compares two lists and prints out intersection of lists and all lines of F2
+
+
+F1=$1 #reference
+C1=$2
+F2=$3 #file to print
+C2=$4
+
+
+
+#get rows to print
+ctr=-1
+for s in `awk '{print $"'${C1}'"}' $F1`; do
+    ctr=$((${ctr} + 1))
+#    R_NR[$ctr]=`awk '("'${C2}'"=='$s'){print NR}' $F2` #compares numbers
+    R_NR[$ctr]=`awk '($"'${C2}'"=="'$s'"){print NR}' $F2` #compares strings
+done
+
+#print file 2
+echo ${R_NR[@]} >tempci93633
+cat $F2 >>tempci93633
+awk '(NR==1){for(a=1;a<=NF;a++){nn[a]=$a;len=a}}{for(a=1;a<=len;a++){if(NR>1&&NR==nn[a]+1){print $0}}}' tempci93633
+
+rm tempci9363[0-9]

@@ -1,0 +1,9 @@
+#!/bin/bash
+#prints subset of file based on NR
+#list, length of subset, index of subset
+
+LIST=$1
+L_SUB=$2
+N_SUB=$3
+
+awk '(NR>('${N_SUB}'-1)*'${L_SUB}'&&NR<='${N_SUB}'*'${L_SUB}'){print $0}' $LIST

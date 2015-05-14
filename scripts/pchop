@@ -1,0 +1,13 @@
+#!/bin/bash
+#chops rows of a file into pieces of size CSIZE, and outputs the NCHOP'th piece
+
+FIL=$1
+CSIZE=$2
+NCHOP=$3
+
+lb=`echo "(${NCHOP}-1)*${CSIZE}+1" | bc -l`
+ub=`echo "${NCHOP}*${CSIZE}" | bc -l`
+
+awk '(NR>='${lb}'&&NR<='${ub}'){print $0}' $FIL
+
+
