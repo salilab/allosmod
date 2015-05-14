@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Absolute path containing this and other scripts
+SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
+
 ################### 
 #name of directories to include in foxs ensemble
 JOBNAME=`pwd | awk '{print "basename "$0}' |sh`
@@ -52,24 +55,24 @@ date
 module load sali-libraries
 
 #get energies
-/netapp/sali/allosmod/get_score_soap.sh list_soap
+$SCRIPT_DIR/get_score_soap.sh list_soap
 rm list_soap
 
 #filter unfolded and print filenames
-/netapp/sali/allosmod/filter_lowq.sh \${bnPM} "*.pdb"
-/netapp/sali/allosmod/comp_intsctn2 filenames 1 energy_soap.dat 1 | awk '{print \$1".dat "\$2}' >filenames.txt
+$SCRIPT_DIR/filter_lowq.sh \${bnPM} "*.pdb"
+$SCRIPT_DIR/comp_intsctn2 filenames 1 energy_soap.dat 1 | awk '{print \$1".dat "\$2}' >filenames.txt
 
 #make profiles
-/netapp/sali/allosmod/get_profiles.sh \${bnPM}
+$SCRIPT_DIR/get_profiles.sh \${bnPM}
 
 #run foxs_ensemble
-/netapp/sali/allosmod/get_foxs_ens.sh \${jobname} 
+$SCRIPT_DIR/get_foxs_ens.sh \${jobname}
 rm -rf [1-5]_1[1-9] [1-5]_[2-9][0-9] [1-5]_[1-9][0-9][0-9] #dont keep too many
 
 #assign output structures using rmsd clustering
-/netapp/sali/allosmod/get_struct_cluster.sh \${bnPM}
+$SCRIPT_DIR/get_struct_cluster.sh \${bnPM}
 #get structure properties of "new state"
-/netapp/sali/allosmod/get_ens_score_newstate.sh \${bnPM}
+$SCRIPT_DIR/get_ens_score_newstate.sh \${bnPM}
 
 # Copy back output files from  here...
 #rm *pdb *.plt

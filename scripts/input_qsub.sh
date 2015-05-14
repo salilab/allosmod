@@ -67,7 +67,7 @@ if test `echo "${isHET}==0" |bc -l` -eq 1; then
 fi
 #modify residues that Modeller cannot recognize
 for s in `cat list`; do
-    /netapp/sali/allosmod/pdb_fix_res.sh $s >tempgms20008; mv tempgms20008 $s
+    @SCRIPT_DIR@/pdb_fix_res.sh $s >tempgms20008; mv tempgms20008 $s
 done
 
 #set up random numbers for structure generation
@@ -85,7 +85,7 @@ if test XSAMP == "simulation" -o XSAMP == "moderate_am"; then
 ##########
 #make initial structure: 1) randomized, interpolation of pdbs if NTOT>1 or ligand binding site is modeled 2) single model wtih rotations/translations if NTOT=1
 ##########
-NTOT=`/netapp/sali/allosmod/get_ntotal.sh align.ali list pm.pdb`
+NTOT=`@SCRIPT_DIR@/get_ntotal.sh align.ali list pm.pdb`
 isLIGMOD=`awk 'BEGIN{a=1}($3=="XX"&&NR==1){a=0}END{print a}' lig.pdb`
 if test `echo "${NTOT}>1" |bc -l` -eq 1 -o `echo "${isLIGMOD}==1" |bc -l` -eq 1; then
     #generate pm's for input structures
@@ -93,19 +93,19 @@ if test `echo "${NTOT}>1" |bc -l` -eq 1 -o `echo "${isLIGMOD}==1" |bc -l` -eq 1;
     for s in `cat list`; do
 	echo $s >listin
 echo making input structure $s
-	/netapp/sali/allosmod/get_pm_initialstruct.sh align.ali listin ./ 1 slow pm.pdb OPT2
+	@SCRIPT_DIR@/get_pm_initialstruct.sh align.ali listin ./ 1 slow pm.pdb OPT2
 	awk 'BEGIN{FS=""}($1$2$3$4=="ATOM"||$1$2$3$4=="HETA"){print $0}'  pred_${s}/pm.pdb.B99990001.pdb >pm_${s}
 	if (test ! -s pm_${s}); then
 	    echo "MODELLER has failed to create an initial model of the following structure: "${s} >>${OUTDIR}/error.log
 	    echo "Perhaps there is an issue with the alignment file, check model_ini0.log in dir: "pred_${s} >>${OUTDIR}/error.log
 	    echo "The alignment headers and sequence should look something like: " >>${OUTDIR}/error.log
-	    /netapp/sali/allosmod/pdb2ali.sh $s >>${OUTDIR}/error.log
+	    @SCRIPT_DIR@/pdb2ali.sh $s >>${OUTDIR}/error.log
 	    echo "Also, double check that the alignments themselves make sense." >>${OUTDIR}/error.log
 	    break
 	fi
 echo completed input structure $s
 	#align onto ligpdb so can be visualed with ligand
-	/netapp/sali/allosmod/salign0.sh XLPDB pm_${s}
+	@SCRIPT_DIR@/salign0.sh XLPDB pm_${s}
 	PMFIT=`echo pm_${s} | awk 'BEGIN{FS=""}{if($(NF-3)$(NF-2)$(NF-1)$NF==".pdb"){for(a=1;a<=NF-4;a++){printf $a}}else{printf $0}}END{print "_fit.pdb"}'`
 	if (test -s $PMFIT); then
 	    awk 'BEGIN{FS=""}($1$2$3$4=="ATOM"||$1$2$3$4=="HETA"){print $0}' ${PMFIT} >pm_${s}
@@ -119,7 +119,7 @@ echo completed input structure $s
     #exit here if initial structures not generated
     if (test -e ${OUTDIR}/error.log); then
 	echo "" >>${OUTDIR}/error.log
-	/netapp/sali/allosmod/get_MULTsi20.sh 
+	@SCRIPT_DIR@/get_MULTsi20.sh
 	echo "See align_suggested.ali for a possible alignment file.  " >>${OUTDIR}/error.log
 	echo "***WARNING*** Small errors in the alignment can cause big errors during a simulation due to energy conservation problems. " >>${OUTDIR}/error.log
 	echo "Make sure there are no misalignments in which adjacent residues are aligned far apart \
@@ -127,7 +127,7 @@ echo completed input structure $s
 	mv * $OUTDIR; exit
     fi
 
-    /netapp/sali/allosmod/getavgpdb2.sh pm_XASPDB pm_XOTHPDB XASPDB XOTHPDB
+    @SCRIPT_DIR@/getavgpdb2.sh pm_XASPDB pm_XOTHPDB XASPDB XOTHPDB
     cp list list4contacts
 
 else #NTOT=1
@@ -148,10 +148,10 @@ else #NTOT=1
 	RR3=`echo "scale=0; ((${ctr}+23)*${JOB_ID}+3*${RR})%360" |bc -l | awk '{printf "%9.0f",$1}' | awk '{print $1}'`
 	#rotate
 echo $RAND_NUM $RR1 $RR2 $RR3
-	/netapp/sali/allosmod/rotatepdb $s $RR1 $RR2 $RR3 >random.ini
+	@SCRIPT_DIR@/rotatepdb $s $RR1 $RR2 $RR3 >random.ini
 	#translate
-	RG[$ctr]=`/netapp/sali/allosmod/getrofg random.ini`
-	COFM=(`/netapp/sali/allosmod/getcofm random.ini`)
+	RG[$ctr]=`@SCRIPT_DIR@/getrofg random.ini`
+	COFM=(`@SCRIPT_DIR@/getcofm random.ini`)
 	DIST=`echo "1.3*(${RG[0]}+${RG[${ctr}]})" | bc -l`
 	iD=`echo $ctr | awk '{if($1<7){print $1%7}else{print ($1-7)%6+1}}'`
 	if test `echo "${iD}==1" |bc -l` -eq 1; then iVECT=$((${iVECT} + 1)); fi
@@ -159,7 +159,7 @@ echo $iD $iVECT $DX $DY $DZ
 	DX=`echo "-1*(${COFM[0]})+(${XVECT[${iD}]}*${iVECT}*${DIST})" | bc -l`
 	DY=`echo "-1*(${COFM[1]})+(${YVECT[${iD}]}*${iVECT}*${DIST})" | bc -l`
 	DZ=`echo "-1*(${COFM[2]})+(${ZVECT[${iD}]}*${iVECT}*${DIST})" | bc -l`
-	/netapp/sali/allosmod/translatepdb random.ini $DX $DY $DZ > $s
+	@SCRIPT_DIR@/translatepdb random.ini $DX $DY $DZ > $s
 	rm random.ini
 	
 	#reset lig.pdb to c of m
@@ -172,7 +172,7 @@ echo $iD $iVECT $DX $DY $DZ
     #generate input structure
     cp list listin
     s=`head -n1 list`
-    /netapp/sali/allosmod/get_pm_initialstruct.sh align.ali listin ./ 1 slow pm.pdb OPT2
+    @SCRIPT_DIR@/get_pm_initialstruct.sh align.ali listin ./ 1 slow pm.pdb OPT2
     awk 'BEGIN{FS=""}($1$2$3$4=="ATOM"||$1$2$3$4=="HETA"){print $0}'  pred_${s}/pm.pdb.B99990001.pdb >avgpdb.pdb
     if (test ! -s avgpdb.pdb); then
 	echo "MODELLER has failed to create an initial model of the following structure: avgpdb.pdb" >>${OUTDIR}/error.log
@@ -191,7 +191,7 @@ echo input structure completed
 ############
 if test `echo "${jobname}==0" |bc -l` -eq 1; then
 #generate allosteric site
-/netapp/sali/allosmod/get_allostericsite2.sh XLPDB lig.pdb pm_XLPDB XrAS
+@SCRIPT_DIR@/get_allostericsite2.sh XLPDB lig.pdb pm_XLPDB XrAS
 cp allostericsite_XrAS/atomlistASRS .
 cp allostericsite_XrAS/allostericsite.pdb .
 rm -rf allostericsite_XrAS
@@ -203,13 +203,13 @@ TEST_NUC=`awk 'BEGIN{FS=""}($1$2$3$4=="ATOM"){print $18$19$20}' pm_XASPDB | sort
     ($1=="ADE"||$1=="CYT"||$1=="GUA"||$1=="THY"||$1=="DA"||$1=="DC"||$1=="DG"||$1=="DT"){test="NUC"}END{print test}'` #use longer sc-sc dist for nucleotides
 if test "XrAS" != "1000"; then #use ASPDB restraints if AS defined
     echo XASPDB >listin
-    /netapp/sali/allosmod/get_pm2.sh pm.pdb listin ini${TEST_NUC} -3333 3 3 3 XDEV
-    /netapp/sali/allosmod/modeller-SVN/bin/modSVN model_ini.py
+    @SCRIPT_DIR@/get_pm2.sh pm.pdb listin ini${TEST_NUC} -3333 3 3 3 XDEV
+    @SCRIPT_DIR@/modeller-SVN/bin/modSVN model_ini.py
     mv pm.pdb.rsr listAS.rsr
 fi
 awk '(NF>0){print $0}' list >listin
-/netapp/sali/allosmod/get_pm2.sh pm.pdb listin ini${TEST_NUC} -3333 3 3 3 XDEV
-/netapp/sali/allosmod/modeller-SVN/bin/modSVN model_ini.py
+@SCRIPT_DIR@/get_pm2.sh pm.pdb listin ini${TEST_NUC} -3333 3 3 3 XDEV
+@SCRIPT_DIR@/modeller-SVN/bin/modSVN model_ini.py
 mv pm.pdb.rsr listOTH.rsr
 if test "XrAS" == "1000"; then cp listOTH.rsr listAS.rsr; fi #use all restraints if AS not defined
 
@@ -226,30 +226,30 @@ if test "XdE" == "CALC"; then
     NATOM1=`awk 'END{print NR}' pm_XASPDB`
     NATOM2=`awk 'END{print NR}' tempiq7781`
     if test `echo "${NATOM1}==${NATOM2}" |bc -l` -eq 1; then 
-	NTOT=`/netapp/sali/allosmod/get_ntotal.sh align.ali list pm.pdb`
-	/netapp/sali/allosmod/editrestraints2.sh listOTH.rsr listAS.rsr tempiq7781 list4contacts atomlistASRS 2.0,2.0,2.0 11.0 $NTOT 0.1 0 false false false >>crap
+	NTOT=`@SCRIPT_DIR@/get_ntotal.sh align.ali list pm.pdb`
+	@SCRIPT_DIR@/editrestraints2.sh listOTH.rsr listAS.rsr tempiq7781 list4contacts atomlistASRS 2.0,2.0,2.0 11.0 $NTOT 0.1 0 false false false >>crap
     else #redo steps without nucleotides
 	echo redo restraints without nucleotides
-	/netapp/sali/allosmod/get_allostericsite2.sh XLPDB lig.pdb tempiq7781 XrAS
+	@SCRIPT_DIR@/get_allostericsite2.sh XLPDB lig.pdb tempiq7781 XrAS
 	cp allostericsite_XrAS/atomlistASRS ./atomlistASRS2
 	rm -rf allostericsite_XrAS
 	cp align.ali align.ali.bak
-	/netapp/sali/allosmod/pdb2ali.sh tempiq7781 >>align.ali
+	@SCRIPT_DIR@/pdb2ali.sh tempiq7781 >>align.ali
 	echo tempiq7781 >listin
-	/netapp/sali/allosmod/get_pm2.sh tempiq7781 listin ini -3333 3 3 3 XDEV
-	/netapp/sali/allosmod/modeller-SVN/bin/modSVN model_ini.py
+	@SCRIPT_DIR@/get_pm2.sh tempiq7781 listin ini -3333 3 3 3 XDEV
+	@SCRIPT_DIR@/modeller-SVN/bin/modSVN model_ini.py
 	mv tempiq7781.rsr listAS2.rsr
-	/netapp/sali/allosmod/pdb2ali.sh tempiq7782 >>align.ali
+	@SCRIPT_DIR@/pdb2ali.sh tempiq7782 >>align.ali
 	echo tempiq7782 >listin
-	/netapp/sali/allosmod/get_pm2.sh tempiq7782 listin ini -3333 3 3 3 XDEV
-	/netapp/sali/allosmod/modeller-SVN/bin/modSVN model_ini.py
+	@SCRIPT_DIR@/get_pm2.sh tempiq7782 listin ini -3333 3 3 3 XDEV
+	@SCRIPT_DIR@/modeller-SVN/bin/modSVN model_ini.py
 	mv tempiq7782.rsr listOTH2.rsr #will this make sense in all cases?
 
-	NTOT=`/netapp/sali/allosmod/get_ntotal.sh align.ali list pm.pdb`
+	NTOT=`@SCRIPT_DIR@/get_ntotal.sh align.ali list pm.pdb`
 	mv align.ali.bak align.ali
 
-	/netapp/sali/allosmod/editrestraints2.sh listOTH2.rsr listAS2.rsr tempiq7781 list4contacts atomlistASRS2 2.0,2.0,2.0 11.0 $NTOT 0.1 0 false false false >>crap
-##	/netapp/sali/allosmod/editrestraints2.sh listOTH.rsr listAS.rsr pm_XASPDB list4contacts atomlistASRS 2.0,2.0,2.0 11.0 $NTOT 0.1 0 false false >>crap
+	@SCRIPT_DIR@/editrestraints2.sh listOTH2.rsr listAS2.rsr tempiq7781 list4contacts atomlistASRS2 2.0,2.0,2.0 11.0 $NTOT 0.1 0 false false false >>crap
+##	@SCRIPT_DIR@/editrestraints2.sh listOTH.rsr listAS.rsr pm_XASPDB list4contacts atomlistASRS 2.0,2.0,2.0 11.0 $NTOT 0.1 0 false false >>crap
 
 	rm listOTH2.rsr listAS2.rsr atomlistASRS2 tempiq778[12].ini
     fi
@@ -277,14 +277,14 @@ fi
 #handle break.dat options
 if test "XBREAK" == "true"; then
     awk '(NF>0){print $0}' list >listin
-    /netapp/sali/allosmod/get_pm2.sh pm.pdb listin ini -3333 3 3 3 XDEV #redo here because nucleotides change max_sc_sc_distance
-    /netapp/sali/allosmod/modeller-SVN/bin/modSVN model_ini.py
-    /netapp/sali/allosmod/calc_contpres.sh pm.pdb.rsr pm_XASPDB XZCUTOFF XSCLBREAK XCHEMFR
+    @SCRIPT_DIR@/get_pm2.sh pm.pdb listin ini -3333 3 3 3 XDEV #redo here because nucleotides change max_sc_sc_distance
+    @SCRIPT_DIR@/modeller-SVN/bin/modSVN model_ini.py
+    @SCRIPT_DIR@/calc_contpres.sh pm.pdb.rsr pm_XASPDB XZCUTOFF XSCLBREAK XCHEMFR
     echo "Chemical frustration is implemented: contacts with buried acidic/basic residues are scaled by XSCLBREAK, z-score cutoff is XZCUTOFF" >>run.log
     echo "Chemical frustration type is XCHEMFR" >>run.log
 fi
 if test "XLOCRIGID" == "true"; then
-    /netapp/sali/allosmod/get_loopadjres.sh #strengthen residues adjacent to loops
+    @SCRIPT_DIR@/get_loopadjres.sh #strengthen residues adjacent to loops
 fi
 if (test -e break.dat); then
     nbreak=`awk 'BEGIN{a=0}(NF>0){a+=1}END{print a}' break.dat`
@@ -296,17 +296,17 @@ fi
 #merge restraint files and add additional restraints
 ########
 if (test ! -e ${OUTDIR}/error.log); then 
-    NTOT=`/netapp/sali/allosmod/get_ntotal.sh align.ali list pm.pdb`
-    /netapp/sali/allosmod/editrestraints2.sh listOTH.rsr listAS.rsr pm_XASPDB list4contacts atomlistASRS 2.0,2.0,2.0 11.0 \
+    NTOT=`@SCRIPT_DIR@/get_ntotal.sh align.ali list pm.pdb`
+    @SCRIPT_DIR@/editrestraints2.sh listOTH.rsr listAS.rsr pm_XASPDB list4contacts atomlistASRS 2.0,2.0,2.0 11.0 \
                                              $NTOT ${delEmax} ${nbreak} XCOARSE XLOCRIGID >>run.log
     #add restraints between protein and sugar
     if test `echo "XGLYC2==1" |bc -l` -eq 1; then 
-	/netapp/sali/allosmod/get_glyc_restraint.sh pm_XASPDB allosmod.py >>edited.rsr
+	@SCRIPT_DIR@/get_glyc_restraint.sh pm_XASPDB allosmod.py >>edited.rsr
     fi
     #add restraints for bonds and distance upper/lower bounds
-    /netapp/sali/allosmod/get_add_restraint.sh ${RUNDIR}/input.dat pm_XASPDB HARM >tempaddrestr
-    /netapp/sali/allosmod/get_add_restraint.sh ${RUNDIR}/input.dat pm_XASPDB UPBD >>tempaddrestr
-    /netapp/sali/allosmod/get_add_restraint.sh ${RUNDIR}/input.dat pm_XASPDB LOBD >>tempaddrestr
+    @SCRIPT_DIR@/get_add_restraint.sh ${RUNDIR}/input.dat pm_XASPDB HARM >tempaddrestr
+    @SCRIPT_DIR@/get_add_restraint.sh ${RUNDIR}/input.dat pm_XASPDB UPBD >>tempaddrestr
+    @SCRIPT_DIR@/get_add_restraint.sh ${RUNDIR}/input.dat pm_XASPDB LOBD >>tempaddrestr
     if (test -s tempaddrestr); then
 	cat tempaddrestr >>edited.rsr
 	echo "" >>run.log; echo "additional restraints: " >>run.log; cat tempaddrestr >>run.log; echo "" >>run.log
@@ -324,7 +324,7 @@ if (test ! -e ${OUTDIR}/error.log); then
 	    for s in `cat list`; do
 		awk 'BEGIN{FS=""}($1$2$3$4=="ATOM"||$1$2$3$4=="HETA"){print $0}'  pred_${s}/pm.pdb.B99990001.pdb >pm_${s}
 	    done
-	    /netapp/sali/allosmod/getavgpdb2.sh pm_XASPDB pm_XOTHPDB XASPDB XOTHPDB
+	    @SCRIPT_DIR@/getavgpdb2.sh pm_XASPDB pm_XOTHPDB XASPDB XOTHPDB
 	else
 	    s=`head -n1 list`
 	    awk 'BEGIN{FS=""}($1$2$3$4=="ATOM"||$1$2$3$4=="HETA"){print $0}'  pred_${s}/pm.pdb.B99990001.pdb >avgpdb.pdb
@@ -339,7 +339,7 @@ else #notfirst: use previously calculated atomlistASRS and restraints
 delEmax=XdE
 echo searching for converted.rsr
 date
-for c in `/netapp/sali/allosmod/count.pl 1 60`; do
+for c in `@SCRIPT_DIR@/count.pl 1 60`; do
     echo $c
 #    FIRSTDIR="/scratch/XASPDB_0_$JOB_ID/"
     FIRSTDIR=${RUNDIR}/pred_dEXdErASXrAS/XASPDB_0
@@ -370,18 +370,18 @@ echo edited.rsr file complete
 if (test -e ${OUTDIR}/error.log); then mv * $OUTDIR; exit; fi
 
 #initialize starting structure
-/netapp/sali/allosmod/get_pm2.sh pm.pdb list ini $RAND_NUM $RR1 $RR2 $RR3 XDEV
-/netapp/sali/allosmod/modeller-SVN/bin/modSVN model_ini.py
-/netapp/sali/allosmod/setchainX random.ini $CHAIN_PM | awk 'BEGIN{FS=""}($1$2$3$4=="ATOM"||$1$2$3$4=="HETA"){print $0}' >tempini
+@SCRIPT_DIR@/get_pm2.sh pm.pdb list ini $RAND_NUM $RR1 $RR2 $RR3 XDEV
+@SCRIPT_DIR@/modeller-SVN/bin/modSVN model_ini.py
+@SCRIPT_DIR@/setchainX random.ini $CHAIN_PM | awk 'BEGIN{FS=""}($1$2$3$4=="ATOM"||$1$2$3$4=="HETA"){print $0}' >tempini
 mv tempini random.ini
 if (test ! -s random.ini); then echo structure not initialized >> ${OUTDIR}/error.log; mv * $OUTDIR; exit; fi
 
 #convert restraints to splines
 if test `echo "${jobname}==0" |bc -l` -eq 1; then
     if test `echo "XGLYC1==0" |bc -l` -eq 1; then #skip if hydrogens are needed
-	/netapp/sali/allosmod/get_pm2.sh pm.pdb list run $RAND_NUM $RR1 $RR2 $RR3 XDEV convert
+	@SCRIPT_DIR@/get_pm2.sh pm.pdb list run $RAND_NUM $RR1 $RR2 $RR3 XDEV convert
 	echo convert to splines 
-	/netapp/sali/allosmod/modeller-SVN/bin/modSVN model_run.py
+	@SCRIPT_DIR@/modeller-SVN/bin/modSVN model_run.py
 	cp converted.rsr atomlistASRS allostericsite.pdb contacts.dat ${RUNDIR}/pred_dEXdErASXrAS/XASPDB_0
 	if (test -e allosmod.py); then cp allosmod.py ${RUNDIR}/pred_dEXdErASXrAS/XASPDB_0; fi
     fi
@@ -395,75 +395,75 @@ fi ### end setup AllosMod landscape ###
 
 #get AllosModel subclasses
 if (test ! -e allosmod.py); then 
-    cp /netapp/sali/allosmod/allosmod.py .
+    cp @SCRIPT_DIR@/allosmod.py .
 fi
 MDTEMP=`echo XMDTEMP | tr [A-Z] [a-z] | awk '{if($1=="scan"){print ('${jobname}'%5)*50+300.0}else{print $1}}'`
-/netapp/sali/allosmod/change_temp.sh $MDTEMP
+@SCRIPT_DIR@/change_temp.sh $MDTEMP
 
 #generate scripts and structures
 if test `echo "XGLYC1==0" |bc -l` -eq 1; then
     if test "XSAMP" == "simulation"; then
 	echo "randomized numbers: $RAND_NUM $RR1 $RR2 $RR3" >>run.log
-	/netapp/sali/allosmod/get_pm2.sh pm.pdb list run $RAND_NUM $RR1 $RR2 $RR3 XDEV script
-	cp /netapp/sali/allosmod/README_user $RUNDIR/README
+	@SCRIPT_DIR@/get_pm2.sh pm.pdb list run $RAND_NUM $RR1 $RR2 $RR3 XDEV script
+	cp @SCRIPT_DIR@/README_user $RUNDIR/README
 	if test "XSCRAPP" == "true"; then
-	    /netapp/sali/allosmod/modeller0/bin/modSVN model_run.py
+	    @SCRIPT_DIR@/modeller0/bin/modSVN model_run.py
 	    JOBID=`echo $RUNDIR | awk 'BEGIN{FS="/"}{print $(NF-1)}'`
 	    OUTDIR=/scrapp/${JOBID}/DDD/XASPDB_${jobname}
 	    mkdir -p $OUTDIR
 	    echo /scrapp/${JOBID}/DDD > $RUNDIR/DDD/XASPDB_${jobname}/OUTPUT_IS_HERE
 	fi
     elif test "XSAMP" == "moderate_cm" -o "XSAMP" == "moderate_am" -o "XSAMP" == "fast_cm"; then
-	/netapp/sali/allosmod/get_pm2.sh pm.pdb list run $RAND_NUM $RR1 $RR2 $RR3 XDEV XSAMP
+	@SCRIPT_DIR@/get_pm2.sh pm.pdb list run $RAND_NUM $RR1 $RR2 $RR3 XDEV XSAMP
 	echo running modeller
-	RUNMOD=`/netapp/sali/allosmod/modeller0/bin/modSVN model_run.py`
+	RUNMOD=`@SCRIPT_DIR@/modeller0/bin/modSVN model_run.py`
 	echo $RUNMOD
 	echo done with modeller
 #    elif test "XSAMP" == "moderate_cm_simulation"; then
-#	/netapp/sali/allosmod/get_pm2.sh pm.pdb list run $RAND_NUM $RR1 $RR2 $RR3 XDEV XSAMP
-#	/netapp/sali/allosmod/modeller0/bin/modSVN model_run.py
+#	@SCRIPT_DIR@/get_pm2.sh pm.pdb list run $RAND_NUM $RR1 $RR2 $RR3 XDEV XSAMP
+#	@SCRIPT_DIR@/modeller0/bin/modSVN model_run.py
 #	cp pm.pdb.B99990001.pdb random.ini
-#	/netapp/sali/allosmod/get_pm2.sh pm.pdb list run $RAND_NUM $RR1 $RR2 $RR3 0.0 script
+#	@SCRIPT_DIR@/get_pm2.sh pm.pdb list run $RAND_NUM $RR1 $RR2 $RR3 0.0 script
     else
 	echo "sampling type not properly defined" >>${OUTDIR}/error.log; mv * $OUTDIR; exit
     fi
 else #glycosylation
     ls -lrt
-    cp /netapp/sali/allosmod/[A-Z][A-Z][A-Z].rsr .
-    /netapp/sali/allosmod/get_pm_glyc.sh pm.pdb list $RAND_NUM XREP_OPT XATT_GAP script
+    cp @SCRIPT_DIR@/[A-Z][A-Z][A-Z].rsr .
+    @SCRIPT_DIR@/get_pm_glyc.sh pm.pdb list $RAND_NUM XREP_OPT XATT_GAP script
     #generate protein model with correct chains
-    /netapp/sali/allosmod/modeller0/bin/modSVN model_ini0.py
+    @SCRIPT_DIR@/modeller0/bin/modSVN model_ini0.py
     CHAIN=`awk 'BEGIN{FS=""}($1$2$3$4=="ATOM"||$1$2$3$4=="HETA"){print $22$23}' pm.pdb.B99990001.pdb | awk '{print $1}' | sort -u | head -n1`
     if test -z $CHAIN; then
 	NC=A #`grep pm.pdb align.ali | grep -v P1 | awk 'BEGIN{FS=":"}{print $4}' | awk 'BEGIN{a="A"}(NR==1){a=$1}{print a}'`
-	/netapp/sali/allosmod/setchainX pm.pdb.B99990001.pdb $NC >tempgpi49501
+	@SCRIPT_DIR@/setchainX pm.pdb.B99990001.pdb $NC >tempgpi49501
 	mv tempgpi49501 pm.pdb.B99990001.pdb
     fi
     #generate initial glycosylation model and restraints
-    /netapp/sali/allosmod/get_pm_glyc.sh pm.pdb list $RAND_NUM XREP_OPT XATT_GAP pm.pdb.B99990001.pdb 
-    /netapp/sali/allosmod/modeller0/bin/modSVN model_ini.py
-    /netapp/sali/allosmod/get_rest.sh pm.pdb.B99990001.pdb >> pm.pdb.rsr
+    @SCRIPT_DIR@/get_pm_glyc.sh pm.pdb list $RAND_NUM XREP_OPT XATT_GAP pm.pdb.B99990001.pdb 
+    @SCRIPT_DIR@/modeller0/bin/modSVN model_ini.py
+    @SCRIPT_DIR@/get_rest.sh pm.pdb.B99990001.pdb >> pm.pdb.rsr
     mv pm.pdb.rsr converted.rsr
     #sample glycosylated structures
-    /netapp/sali/allosmod/modeller0/bin/modSVN model_glyc.py
+    @SCRIPT_DIR@/modeller0/bin/modSVN model_glyc.py
 #    if test "XSAMP" == "moderate_cm_simulation"; then #to run simulations with sugar
 #	cp pm.pdb.B99990001.pdb random.ini
 #	cp converted.rsr tempsav.rsr
-#	cp /netapp/sali/allosmod/allosmod.py ./allosmod2.py
+#	cp @SCRIPT_DIR@/allosmod.py ./allosmod2.py
 #	#convert protein restraints (with hydrogens)
-#	/netapp/sali/allosmod/modeller0/bin/modSVN model_ini0.py
+#	@SCRIPT_DIR@/modeller0/bin/modSVN model_ini0.py
 #	MAX_PROT_AIND=`awk '($6>1){print $9"\n"$10}' pm.pdb.rsr | sort -nk1 | tail -n1`
 #	grep ATOM pm.pdb.B99990001.pdb >pm_rand.pdb
 #	awk '{print NR" AS"}' pm_rand.pdb >atomlistASRS
-#	/netapp/sali/allosmod/editrestraints2.sh pm.pdb.rsr pm.pdb.rsr pm_rand.pdb pm_rand.pdb atomlistASRS 2.0,2.0,2.0 11.0 XNTOT ${delEmax} >>run.log
-#	/netapp/sali/allosmod/get_pm2.sh pm.pdb list run $RAND_NUM $RR1 $RR2 $RR3 XDEV convert
-#	/netapp/sali/allosmod/modeller-SVN/bin/modSVN model_run.py
+#	@SCRIPT_DIR@/editrestraints2.sh pm.pdb.rsr pm.pdb.rsr pm_rand.pdb pm_rand.pdb atomlistASRS 2.0,2.0,2.0 11.0 XNTOT ${delEmax} >>run.log
+#	@SCRIPT_DIR@/get_pm2.sh pm.pdb list run $RAND_NUM $RR1 $RR2 $RR3 XDEV convert
+#	@SCRIPT_DIR@/modeller-SVN/bin/modSVN model_run.py
 #	#get glyc restraints
 #	awk '($6==2&&($9>'${MAX_PROT_AIND}'||$10>'${MAX_PROT_AIND}')){print $0}' tempsav.rsr >>converted.rsr
 #	awk '($6==3&&($9>'${MAX_PROT_AIND}'||$10>'${MAX_PROT_AIND}'||$11>'${MAX_PROT_AIND}')){print $0}' tempsav.rsr >>converted.rsr
 #	awk '($6==4&&($9>'${MAX_PROT_AIND}'||$10>'${MAX_PROT_AIND}'||$11>'${MAX_PROT_AIND}'||$12>'${MAX_PROT_AIND}')){print $0}' tempsav.rsr >>converted.rsr
 #	#generate simulation script
-#	/netapp/sali/allosmod/get_pm2.sh pm.pdb list run $RAND_NUM $RR1 $RR2 $RR3 0.0 script_glyc
+#	@SCRIPT_DIR@/get_pm2.sh pm.pdb list run $RAND_NUM $RR1 $RR2 $RR3 0.0 script_glyc
 #	rm pm_rand.pdb atomlistASRS model_ini0.py allosmod2.py tempsav.rsr
 #    fi
     rm [A-Z][A-Z][A-Z].rsr get_rest.in

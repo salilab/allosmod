@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Absolute path containing this and other scripts
+SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
+
 FIL_PM=$1
 LS2PDB=$2 #used to list all pdb's: ls input/pred_dE*/*_[0-9]
 
@@ -47,7 +50,7 @@ echo $NRES 1 $NRES >>targlist
 echo 11.0 >>targlist
 awk 'BEGIN{a=0}(NF>0){a+=1}END{print a}' tempflq >>targlist
 cat tempflq >>targlist
-/netapp/sali/allosmod/getq_ca
+$SCRIPT_DIR/getq_ca
 
 paste tempflq qscore1to${NRES}.dat | awk '($3<'${QCUT}'){print "Q = "$3", rm "$1}' >>run.log
 paste tempflq qscore1to${NRES}.dat | awk '($3<'${QCUT}'){print "rm "$1}' | sh

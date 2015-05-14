@@ -5,6 +5,9 @@
 INPFIL=$1 #file containing sequence used experiment (one letter code)
 DIR=$2 #path to INPFIL and list
 
+# Absolute path containing this and other scripts
+SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
+
 cd $DIR
 
 NRES=`awk 'BEGIN{FS=""}{for(a=1;a<=NF;a++){print $a}}' $INPFIL | awk 'BEGIN{a=0}($1!="/"){a+=1}END{print a}'`
@@ -57,12 +60,12 @@ for fil in `cat list`; do
 	
 	for i in ${R_FF[@]}; do
 	    ctr=$((${ctr} + 1))
-	    /netapp/sali/allosmod/setchainX $i ${R_CHAIN[${ctr}]} >>$fil
+	    $SCRIPT_DIR/setchainX $i ${R_CHAIN[${ctr}]} >>$fil
 	done
 	rm tempgms_*.pdb
     fi
 
-    /netapp/sali/allosmod/pdb2ali.sh $fil >>tempms004.ali
+    $SCRIPT_DIR/pdb2ali.sh $fil >>tempms004.ali
 done
 
 cat <<EOF >modeller.in

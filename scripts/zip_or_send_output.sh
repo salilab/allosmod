@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Absolute path containing this and other scripts
+SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
+
 #run from directory in which all runs have been collected into single directory called output (allosmod postprocessing)
 PWD0=`pwd`
 cd output/
@@ -18,7 +21,7 @@ if test -s input/saxs.dat; then #allosmod-foxs run
 	PM=`head -n1 input/list | awk '{print "pm_"$1}' | awk '{print "ls -1 input/pred_dE*/*[0-9]/"$1}' | sh | head -n1`
 	if test -z $PM; then PM=`ls -1 input/pred_dE*/*[0-9]/pm.pdb.B99990001.pdb | head -n1`; fi
 	if (test ! -z $PM); then 
-	    /netapp/sali/allosmod/filter_lowq.sh $PM "input/pred_dE*/*[0-9]/pm.pdb.B[1-9]*"
+	    $SCRIPT_DIR/filter_lowq.sh $PM "input/pred_dE*/*[0-9]/pm.pdb.B[1-9]*"
 #	    mkdir ${PWD0}/data; mv qscore.dat ${PWD0}/data
 	    mv qscore.dat ${PWD0}
 	fi
@@ -73,7 +76,7 @@ else
     #regular allosmod run
     cd $PWD0
     #collect energies
-    ls -1d output/*/pred_dE* | awk '{print "echo "$1" >list\n/netapp/sali/allosmod/get_e.sh"}' |sh
+    ls -1d output/*/pred_dE* | awk '{print "echo "$1" >list\n$SCRIPT_DIR/get_e.sh"}' |sh
     rm output/*/scan
     zip -r output.zip output
     echo "nofoxs" > urlout

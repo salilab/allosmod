@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Absolute path containing this and other scripts
+SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
+
 #fix output2.zip, allow deleted files, get rid of gmail req
 EMAIL=`awk '($1=="email"){print $2}' output/input/foxs.in`
 if test $EMAIL == "pweinkam@gmail.com"; then 
@@ -24,7 +27,7 @@ if test -s input/saxs.dat; then #allosmod-foxs run
     for ens in ${R_ENS[@]}; do
 	ctr=$((${ctr} + 1))
 	clust=${R_CLUST[${ctr}]}
-	awk 'BEGIN{printf "/netapp/sali/allosmod/pdb_merge.pl"}{printf " input/"$('${clust}'*3-2)}\
+	awk 'BEGIN{printf "$SCRIPT_DIR/pdb_merge.pl"}{printf " input/"$('${clust}'*3-2)}\
              END{printf " >'${PWD0}'/send/ens_'${ens}'_clust_'${clust}'.pdb\n"}' input/struct_cluster_${ens}.out |sh
     done
     #get fit results
@@ -75,7 +78,7 @@ else
     #regular allosmod run
     cd $PWD0
     #collect energies
-    ls -1d output/*/pred_dE* | awk '{print "echo "$1" >list\n/netapp/sali/allosmod/get_e.sh"}' |sh
+    ls -1d output/*/pred_dE* | awk '{print "echo "$1" >list\n$SCRIPT_DIR/get_e.sh"}' |sh
     zip -r output.zip output
     echo "nofoxs" > urlout
 

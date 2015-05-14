@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Absolute path containing this and other scripts
+SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
+
 unzip input.zip
 
 #Test for 0 directories or >100 directories
@@ -271,7 +274,7 @@ for d in `ls -1d *`; do
 	fi
 
 	# generate qsub.sh
-	/netapp/sali/allosmod/run.sh $d $SAMPLING $GLYC1 $GLYC2
+	$SCRIPT_DIR/run.sh $d $SAMPLING $GLYC1 $GLYC2
 
 	cd ..
     fi
