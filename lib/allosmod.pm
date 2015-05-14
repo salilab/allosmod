@@ -408,7 +408,8 @@ sub get_alignment {
 	system("echo $seq >> $inpseq");
 
 	#preprocess PDB files and get sequence alignment
-	open(FOO, "/netapp/sali/allosmod/get_MULTsi20b.sh inpseq $jobdir |") || die "dont let script output to std out";
+        my $script_dir = $self->{config}->{allosmod}->{script_directory};
+	open(FOO, "$script_dir/get_MULTsi20b.sh inpseq $jobdir |") || die "dont let script output to std out";
 	close(FOO);
 
 	#check if alignment fails
@@ -548,7 +549,8 @@ sub get_submit_page {
 	close(FILE);
 
 	#check alignment is valid
-	open(FOO, "/netapp/sali/allosmod/check_align.sh $jobdir |") || die "dont let script output to std out";
+        my $script_dir = $self->{config}->{allosmod}->{script_directory};
+	open(FOO, "$script_dir/check_align.sh $jobdir |") || die "dont let script output to std out";
 	close(FOO);
 	my $tempfile = "$jobdir/align.ali";
 	my $tempread = do {
