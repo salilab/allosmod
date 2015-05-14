@@ -15,13 +15,15 @@ class Job(saliweb.backend.Job):
     
     def run(self):
         #preprocess job to keep track of iterations
-        subprocess.call(["/netapp/sali/allosmod/preproccess.sh"])
+        subprocess.call([os.path.join(self.config.script_directory,
+                                      "preproccess.sh")])
         CTRFILE = open("jobcounter","r") #jobcounter: -1 is all sims complete, -99 is first pass, >0 indicates number of jobs cycles completed
         jobcounter = int(CTRFILE.readline())
         os.system("echo run jobctr %i >>pwout" % jobcounter)
         #unzip input.zip, check inputs, make input scripts for subdirs
         if jobcounter == 1 or jobcounter == -99:
-            subprocess.call(["/netapp/sali/allosmod/run_all.sh"])
+            subprocess.call([os.path.join(self.config.script_directory,
+                                          "run_all.sh")])
             os.system("cp dirlist dirlist_all")
 
         #create sge script
@@ -53,7 +55,8 @@ sleep 10s
                 r = self.runnercls2()
             elif allosmodfox == 1:
                 #execute foxs ensemble search, all files should be in directory called "input"
-                os.system("/netapp/sali/allosmod/run_foxs_ensemble.sh")
+                os.system(os.path.join(self.config.script_directory,
+                                       "run_foxs_ensemble.sh"))
                 script = """
 source ./%s/qsub.sh
 sleep 10s
@@ -126,8 +129,10 @@ sleep 10s
 
     def complete(self):
         os.chmod(".", 0775)
-        os.system("/netapp/sali/allosmod/zip_or_send_output2.sh")
-        os.system("/netapp/sali/allosmod/zip_or_send_output.sh")
+        os.system(os.path.join(self.config.script_directory,
+                               "zip_or_send_output2.sh"))
+        os.system(os.path.join(self.config.script_directory,
+                               "zip_or_send_output.sh"))
         URLFOXS = open("urlout","r")
         urltest = URLFOXS.readlines()
         self.urlout = urltest[len(urltest)-1].strip()
