@@ -5,6 +5,9 @@ OUTDIR=$RUNDIR/DDD/XASPDB_${jobname}
 mkdir -p $OUTDIR
 echo $OUTDIR
 
+# Get the 'allosmod' binary in the path
+module load allosmod
+
 # Make a temporary directory on the scratch disk, 
 # specific to the user and SGE job.  
 TMPDIR="/scratch/XASPDB_${jobname}_$JOB_ID/"
@@ -99,7 +102,7 @@ echo making input structure $s
 	    echo "MODELLER has failed to create an initial model of the following structure: "${s} >>${OUTDIR}/error.log
 	    echo "Perhaps there is an issue with the alignment file, check model_ini0.log in dir: "pred_${s} >>${OUTDIR}/error.log
 	    echo "The alignment headers and sequence should look something like: " >>${OUTDIR}/error.log
-	    @SCRIPT_DIR@/pdb2ali.sh $s >>${OUTDIR}/error.log
+	    allosmod pdb2ali $s >>${OUTDIR}/error.log
 	    echo "Also, double check that the alignments themselves make sense." >>${OUTDIR}/error.log
 	    break
 	fi
@@ -234,12 +237,12 @@ if test "XdE" == "CALC"; then
 	cp allostericsite_XrAS/atomlistASRS ./atomlistASRS2
 	rm -rf allostericsite_XrAS
 	cp align.ali align.ali.bak
-	@SCRIPT_DIR@/pdb2ali.sh tempiq7781 >>align.ali
+	allosmod pdb2ali tempiq7781 >>align.ali
 	echo tempiq7781 >listin
 	@SCRIPT_DIR@/get_pm2.sh tempiq7781 listin ini -3333 3 3 3 XDEV
 	@SCRIPT_DIR@/modeller-SVN/bin/modSVN model_ini.py
 	mv tempiq7781.rsr listAS2.rsr
-	@SCRIPT_DIR@/pdb2ali.sh tempiq7782 >>align.ali
+	allosmod pdb2ali tempiq7782 >>align.ali
 	echo tempiq7782 >listin
 	@SCRIPT_DIR@/get_pm2.sh tempiq7782 listin ini -3333 3 3 3 XDEV
 	@SCRIPT_DIR@/modeller-SVN/bin/modSVN model_ini.py

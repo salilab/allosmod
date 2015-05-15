@@ -8,6 +8,9 @@ DIR=$2 #path to INPFIL and list
 # Absolute path containing this and other scripts
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 
+# Get the 'allosmod' binary in the path
+module load allosmod
+
 cd $DIR
 
 NRES=`awk 'BEGIN{FS=""}{for(a=1;a<=NF;a++){print $a}}' $INPFIL | awk 'BEGIN{a=0}($1!="/"){a+=1}END{print a}'`
@@ -65,7 +68,7 @@ for fil in `cat list`; do
 	rm tempgms_*.pdb
     fi
 
-    $SCRIPT_DIR/pdb2ali.sh $fil >>tempms004.ali
+    allosmod pdb2ali $fil >>tempms004.ali
 done
 
 cat <<EOF >modeller.in

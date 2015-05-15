@@ -7,6 +7,9 @@ DIR=$1 #path to alignment and list files
 # Absolute path containing this and other scripts
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 
+# Get the 'allosmod' binary in the path
+module load allosmod
+
 cd $DIR
 
 #get rid of odd newline problems
@@ -94,7 +97,7 @@ for fil in `cat list`; do
                  awk '(NF<=0){print "ERROR"}(NF==2){print $0}(NF==1){printf $0$1+999"\n"}'`)
     seq2=(`awk 'BEGIN{FS=""}(NR>='${S2[0]}'&&NR<='${S2[1]}'){for(a=1;a<=NF;a++){print $a}}' align.ali | sed "s/*//g" | sed "s/-//g" | sed "s/\///g"`)
 
-    $SCRIPT_DIR/pdb2ali.sh $fil >temp3910
+    allosmod pdb2ali $fil >temp3910
     Sf=(3 9999)
     seqf=(`awk 'BEGIN{FS=""}(NR>='${Sf[0]}'&&NR<='${Sf[1]}'){for(a=1;a<=NF;a++){print $a}}' temp3910 | sed "s/*//g" | sed "s/\///g"`)
 

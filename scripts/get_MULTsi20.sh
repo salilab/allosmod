@@ -1,6 +1,8 @@
 #!/bin/bash
 #find si between pdbs in list
 
+# Get the 'allosmod' binary in the path
+module load allosmod
 
 S1=`grep -n pm.pdb align.ali | awk 'BEGIN{FS=":"}(NR==1){print $1}'`
 SE=`awk 'END{print NR}' align.ali`
@@ -8,7 +10,7 @@ S2=`grep -n P1 align.ali | awk 'BEGIN{FS=":";a='${S1}';b=-1}($1>a){b=$1-1;exit}E
 
 awk '(NR>='${S1}'&&NR<='${S2}'){print $0}' align.ali >tempms004.ali
 for fil in `cat list`; do
-    /netapp/sali/allosmod/pdb2ali.sh $fil >>tempms004.ali
+    allosmod pdb2ali $fil >>tempms004.ali
 done
 
 cat <<EOF >modeller.in
