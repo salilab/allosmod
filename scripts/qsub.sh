@@ -11,6 +11,9 @@ if ( $status != 0 ) then
 endif
 mkdir $OUTDIR
 
+# Get the 'allosmod' binary in the path
+module load allosmod
+
 # Make a temporary directory on the scratch disk, 
 # specific to the user and SGE job.  
 set TMPDIR="/scratch/pweinkam/_${jobname}_$JOB_ID/"
@@ -73,7 +76,7 @@ set RR2=`echo "scale=0; (5433*${JOB_ID}+2*${RR})%360" |bc -l`
 set RR3=`echo "scale=0; (11*${JOB_ID}+3*${RR})%360" |bc -l`
 /netapp/sali/allosmod/get_pm2.sh pm.pdb list ini $RAND_NUM $RR1 $RR2 $RR3
 /netapp/sali/pweinkam/utils/modeller_v3/bin/modSVN model_ini.py
-/netapp/sali/allosmod/setchainX random.ini A | awk '($1=="ATOM"||$1=="HETATM"){print $0}' >tempini
+allosmod setchain random.ini A | awk '($1=="ATOM"||$1=="HETATM"){print $0}' >tempini
 mv tempini random.ini
 
 #convert restraints to splines

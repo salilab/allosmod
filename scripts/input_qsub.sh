@@ -375,7 +375,7 @@ if (test -e ${OUTDIR}/error.log); then mv * $OUTDIR; exit; fi
 #initialize starting structure
 @SCRIPT_DIR@/get_pm2.sh pm.pdb list ini $RAND_NUM $RR1 $RR2 $RR3 XDEV
 @SCRIPT_DIR@/modeller-SVN/bin/modSVN model_ini.py
-@SCRIPT_DIR@/setchainX random.ini $CHAIN_PM | awk 'BEGIN{FS=""}($1$2$3$4=="ATOM"||$1$2$3$4=="HETA"){print $0}' >tempini
+allosmod setchain random.ini $CHAIN_PM | awk 'BEGIN{FS=""}($1$2$3$4=="ATOM"||$1$2$3$4=="HETA"){print $0}' >tempini
 mv tempini random.ini
 if (test ! -s random.ini); then echo structure not initialized >> ${OUTDIR}/error.log; mv * $OUTDIR; exit; fi
 
@@ -439,7 +439,7 @@ else #glycosylation
     CHAIN=`awk 'BEGIN{FS=""}($1$2$3$4=="ATOM"||$1$2$3$4=="HETA"){print $22$23}' pm.pdb.B99990001.pdb | awk '{print $1}' | sort -u | head -n1`
     if test -z $CHAIN; then
 	NC=A #`grep pm.pdb align.ali | grep -v P1 | awk 'BEGIN{FS=":"}{print $4}' | awk 'BEGIN{a="A"}(NR==1){a=$1}{print a}'`
-	@SCRIPT_DIR@/setchainX pm.pdb.B99990001.pdb $NC >tempgpi49501
+	allosmod setchain pm.pdb.B99990001.pdb $NC >tempgpi49501
 	mv tempgpi49501 pm.pdb.B99990001.pdb
     fi
     #generate initial glycosylation model and restraints

@@ -1,7 +1,6 @@
 #!/bin/bash
 #preprocess pdb files then find si between pdbs in list
 
-
 INPFIL=$1 #file containing sequence used experiment (one letter code)
 DIR=$2 #path to INPFIL and list
 
@@ -63,7 +62,7 @@ for fil in `cat list`; do
 	
 	for i in ${R_FF[@]}; do
 	    ctr=$((${ctr} + 1))
-	    $SCRIPT_DIR/setchainX $i ${R_CHAIN[${ctr}]} >>$fil
+	    allosmod setchain $i ${R_CHAIN[${ctr}]} >>$fil
 	done
 	rm tempgms_*.pdb
     fi

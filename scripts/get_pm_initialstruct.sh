@@ -4,6 +4,9 @@
 #DEFAULT: templates must be very similar to target! (>50%) since automatic seq alignment performed, to abstain set OPT2
 #OPT3 set to exit upon making restraint file
 
+# Get the 'allosmod' binary in the path
+module load allosmod
+
 AFIL=$1
 SLIST=$2
 PDIR=$3
@@ -120,7 +123,7 @@ if test -z $OPT3; then
     CHAIN=`awk 'BEGIN{FS=""}($1$2$3$4=="ATOM"||$1$2$3$4=="HETA"){print $22$23}' ${F[0]}.B99990001.pdb | awk '{print $1}' | sort -u | head -n1`
     if test -z $CHAIN; then
 	NC=`grep ${F[0]} ${AFIL} | grep -v P1 | awk 'BEGIN{FS=":"}{print $4}' | awk 'BEGIN{a="A"}(NR==1){a=$1}{print a}'`
-	/netapp/sali/allosmod/setchainX ${F[0]}.B99990001.pdb $NC >tempgpi49501
+	allosmod setchain ${F[0]}.B99990001.pdb $NC >tempgpi49501
 	mv tempgpi49501 ${F[0]}.B99990001.pdb
     fi
 fi

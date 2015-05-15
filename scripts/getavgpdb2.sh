@@ -1,6 +1,9 @@
 #!/bin/bash
 #averages two files... must have exact same #atoms
 
+# Get the 'allosmod' binary in the path
+module load allosmod
+
 FIL1=$1 #if hetatm's, then taken from this file first (not randomized)
 FIL2=$2
 ID1=$3 #input structures
@@ -11,8 +14,8 @@ NATOM1=`awk 'BEGIN{FS=""}($1$2$3$4=="ATOM"){print $0}' $FIL1 | awk 'END{print NR
 NATOM2=`awk 'BEGIN{FS=""}($1$2$3$4=="ATOM"){print $0}' $FIL2 | awk 'END{print NR}'`
 if test $NATOM1 != $NATOM2; then echo ERROR pm files not same length; exit; fi
 
-/netapp/sali/allosmod/setchainX $FIL1 A > temp9941
-/netapp/sali/allosmod/setchainX $FIL2 A > temp9942
+allosmod setchain $FIL1 A > temp9941
+allosmod setchain $FIL2 A > temp9942
 
 echo >>run.log
 #structurally align 2 allosteric states
