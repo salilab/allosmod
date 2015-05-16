@@ -153,8 +153,8 @@ else #NTOT=1
 echo $RAND_NUM $RR1 $RR2 $RR3
 	allosmod rotatepdb -- $s $RR1 $RR2 $RR3 >random.ini
 	#translate
-	RG[$ctr]=`@SCRIPT_DIR@/getrofg random.ini`
-	COFM=(`@SCRIPT_DIR@/getcofm random.ini`)
+	RG[$ctr]=`allosmod getrofg random.ini`
+	COFM=(`allosmod getcofm random.ini`)
 	DIST=`echo "1.3*(${RG[0]}+${RG[${ctr}]})" | bc -l`
 	iD=`echo $ctr | awk '{if($1<7){print $1%7}else{print ($1-7)%6+1}}'`
 	if test `echo "${iD}==1" |bc -l` -eq 1; then iVECT=$((${iVECT} + 1)); fi
