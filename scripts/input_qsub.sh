@@ -151,7 +151,7 @@ else #NTOT=1
 	RR3=`echo "scale=0; ((${ctr}+23)*${JOB_ID}+3*${RR})%360" |bc -l | awk '{printf "%9.0f",$1}' | awk '{print $1}'`
 	#rotate
 echo $RAND_NUM $RR1 $RR2 $RR3
-	@SCRIPT_DIR@/rotatepdb $s $RR1 $RR2 $RR3 >random.ini
+	allosmod rotatepdb -- $s $RR1 $RR2 $RR3 >random.ini
 	#translate
 	RG[$ctr]=`@SCRIPT_DIR@/getrofg random.ini`
 	COFM=(`@SCRIPT_DIR@/getcofm random.ini`)
@@ -162,7 +162,7 @@ echo $iD $iVECT $DX $DY $DZ
 	DX=`echo "-1*(${COFM[0]})+(${XVECT[${iD}]}*${iVECT}*${DIST})" | bc -l`
 	DY=`echo "-1*(${COFM[1]})+(${YVECT[${iD}]}*${iVECT}*${DIST})" | bc -l`
 	DZ=`echo "-1*(${COFM[2]})+(${ZVECT[${iD}]}*${iVECT}*${DIST})" | bc -l`
-	@SCRIPT_DIR@/translatepdb random.ini $DX $DY $DZ > $s
+	allosmod translatepdb -- random.ini $DX $DY $DZ > $s
 	rm random.ini
 	
 	#reset lig.pdb to c of m

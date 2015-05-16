@@ -139,14 +139,14 @@ for het0 in ${R_iHET0[@]}; do
 	awk 'BEGIN{FS=""}{print $23$24$25$26$27" "$0}' $FIL1 |\
             awk '($1=='${het1}'){print $0}' |\
             awk 'BEGIN{FS=""}{for(a=7;a<=NF;a++){printf $a;if(a==NF){printf "\n"}}}' >tempgap2441
-	/netapp/sali/allosmod/translatepdb tempgap2441 200 0 0 >>$FIL2
+	allosmod translatepdb -- tempgap2441 200 0 0 >>$FIL2
 	rm tempgap2441
     fi
     if test `echo "${match1}==0 && ${match2}==1" |bc -l` -eq 1; then
 	awk 'BEGIN{FS=""}{print $23$24$25$26$27" "$0}' $FIL2 |\
 	    awk '($1=='${het2}'){print $0}' |\
 	    awk 'BEGIN{FS=""}{for(a=7;a<=NF;a++){printf $a;if(a==NF){printf "\n"}}}' >tempgap2441
-	/netapp/sali/allosmod/translatepdb tempgap2441 200 0 0 >>$FIL1
+	allosmod translatepdb -- tempgap2441 200 0 0 >>$FIL1
 	rm tempgap2441
     fi
 done
