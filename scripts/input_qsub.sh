@@ -70,7 +70,7 @@ if test `echo "${isHET}==0" |bc -l` -eq 1; then
 fi
 #modify residues that Modeller cannot recognize
 for s in `cat list`; do
-    @SCRIPT_DIR@/pdb_fix_res.sh $s >tempgms20008; mv tempgms20008 $s
+    allosmod pdb_fix_res --in-place $s
 done
 
 #set up random numbers for structure generation
@@ -439,8 +439,7 @@ else #glycosylation
     CHAIN=`awk 'BEGIN{FS=""}($1$2$3$4=="ATOM"||$1$2$3$4=="HETA"){print $22$23}' pm.pdb.B99990001.pdb | awk '{print $1}' | sort -u | head -n1`
     if test -z $CHAIN; then
 	NC=A #`grep pm.pdb align.ali | grep -v P1 | awk 'BEGIN{FS=":"}{print $4}' | awk 'BEGIN{a="A"}(NR==1){a=$1}{print a}'`
-	allosmod setchain pm.pdb.B99990001.pdb $NC >tempgpi49501
-	mv tempgpi49501 pm.pdb.B99990001.pdb
+	allosmod setchain pm.pdb.B99990001.pdb --in-place $NC
     fi
     #generate initial glycosylation model and restraints
     @SCRIPT_DIR@/get_pm_glyc.sh pm.pdb list $RAND_NUM XREP_OPT XATT_GAP pm.pdb.B99990001.pdb 
