@@ -108,7 +108,7 @@ echo making input structure $s
 	fi
 echo completed input structure $s
 	#align onto ligpdb so can be visualed with ligand
-	@SCRIPT_DIR@/salign0.sh XLPDB pm_${s}
+	allosmod salign0 XLPDB pm_${s}
 	PMFIT=`echo pm_${s} | awk 'BEGIN{FS=""}{if($(NF-3)$(NF-2)$(NF-1)$NF==".pdb"){for(a=1;a<=NF-4;a++){printf $a}}else{printf $0}}END{print "_fit.pdb"}'`
 	if (test -s $PMFIT); then
 	    awk 'BEGIN{FS=""}($1$2$3$4=="ATOM"||$1$2$3$4=="HETA"){print $0}' ${PMFIT} >pm_${s}
@@ -480,7 +480,6 @@ if test -e targlist; then rm targlist; fi
 if test -e model_ini.log; then rm model_ini.log; fi
 rm pm.pdb.rsr crap
 rm *fit.pdb listin list4contacts
-rm tempdmod.in*
 rm edited.rsr
 rm pm.pdb.B0*.pdb model_ini.py model_ini0.py 
 rm list*rsr avgpdb.pdb

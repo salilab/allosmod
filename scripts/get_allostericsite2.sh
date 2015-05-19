@@ -18,6 +18,9 @@ PMLEN=`awk 'BEGIN{FS="";a=0}($1$2$3$4=="ATOM"){a+=1}END{print a}' $PDB2`
 PMHET=`awk 'BEGIN{FS="";a=0}($1$2$3$4=="HETA"){a+=1}END{print a}' $PDB2`
 rcut=$4
 
+# Get the 'allosmod' binary in the path
+module load allosmod
+
 mkdir allostericsite_${rcut}
 cd allostericsite_${rcut}
 cp ../$PDB1 ../$LIG1 ../$PDB2 ./
@@ -25,8 +28,7 @@ cp ../$PDB1 ../$LIG1 ../$PDB2 ./
 if test `echo "${rcut}>0" |bc -l` -eq 1; then
 
 #align PDB2 to PDB1 and superimpose antigen
-if test -e tempdmod.in; then rm tempdmod.in; fi
-/netapp/sali/allosmod/salign0.sh $PDB1 $PDB2
+allosmod salign0 $PDB1 $PDB2
 PMFIT=`echo ${PDB2} | awk 'BEGIN{FS=""}{if($(NF-3)$(NF-2)$(NF-1)$NF==".pdb"){for(a=1;a<=NF-4;a++){printf $a}}else{printf $0}}END{print "_fit.pdb"}'`
 
 #determine residues in PDB2 that contact LIG1
@@ -79,4 +81,4 @@ echo ${PMLEN} ${PMHET} | awk '{for(a=1;a<=($1+$2);a++){print a" RS"}}' >atomlist
 echo "" >allostericsite.pdb
 fi
 
-rm tempdps1[01] temp321 temp5773.ali  tempbindmat  tempdmod.in  tempdmod.in.log tempas661
+rm tempdps1[01] temp321 tempbindmat tempas661
