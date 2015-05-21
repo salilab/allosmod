@@ -96,7 +96,8 @@ if test `echo "${NTOT}>1" |bc -l` -eq 1 -o `echo "${isLIGMOD}==1" |bc -l` -eq 1;
     for s in `cat list`; do
 	echo $s >listin
 echo making input structure $s
-	@SCRIPT_DIR@/get_pm_initialstruct.sh align.ali listin ./ 1 slow pm.pdb OPT2
+	allosmod get_pm_initialstruct --target pm.pdb --keep-alignment \
+                                      align.ali listin ./ 1 slow
 	awk 'BEGIN{FS=""}($1$2$3$4=="ATOM"||$1$2$3$4=="HETA"){print $0}'  pred_${s}/pm.pdb.B99990001.pdb >pm_${s}
 	if (test ! -s pm_${s}); then
 	    echo "MODELLER has failed to create an initial model of the following structure: "${s} >>${OUTDIR}/error.log
@@ -175,7 +176,8 @@ echo $iD $iVECT $DX $DY $DZ
     #generate input structure
     cp list listin
     s=`head -n1 list`
-    @SCRIPT_DIR@/get_pm_initialstruct.sh align.ali listin ./ 1 slow pm.pdb OPT2
+    allosmod get_pm_initialstruct --target pm.pdb --keep-alignment \
+                                  align.ali listin ./ 1 slow
     awk 'BEGIN{FS=""}($1$2$3$4=="ATOM"||$1$2$3$4=="HETA"){print $0}'  pred_${s}/pm.pdb.B99990001.pdb >avgpdb.pdb
     if (test ! -s avgpdb.pdb); then
 	echo "MODELLER has failed to create an initial model of the following structure: avgpdb.pdb" >>${OUTDIR}/error.log
