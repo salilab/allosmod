@@ -88,7 +88,7 @@ if test XSAMP == "simulation" -o XSAMP == "moderate_am"; then
 ##########
 #make initial structure: 1) randomized, interpolation of pdbs if NTOT>1 or ligand binding site is modeled 2) single model wtih rotations/translations if NTOT=1
 ##########
-NTOT=`@SCRIPT_DIR@/get_ntotal.sh align.ali list pm.pdb`
+NTOT=`allosmod count_alignments align.ali list pm.pdb`
 isLIGMOD=`awk 'BEGIN{a=1}($3=="XX"&&NR==1){a=0}END{print a}' lig.pdb`
 if test `echo "${NTOT}>1" |bc -l` -eq 1 -o `echo "${isLIGMOD}==1" |bc -l` -eq 1; then
     #generate pm's for input structures
@@ -231,7 +231,7 @@ if test "XdE" == "CALC"; then
     NATOM1=`awk 'END{print NR}' pm_XASPDB`
     NATOM2=`awk 'END{print NR}' tempiq7781`
     if test `echo "${NATOM1}==${NATOM2}" |bc -l` -eq 1; then 
-	NTOT=`@SCRIPT_DIR@/get_ntotal.sh align.ali list pm.pdb`
+	NTOT=`allosmod count_alignments align.ali list pm.pdb`
 	@SCRIPT_DIR@/editrestraints2.sh listOTH.rsr listAS.rsr tempiq7781 list4contacts atomlistASRS 2.0,2.0,2.0 11.0 $NTOT 0.1 0 false false false >>crap
     else #redo steps without nucleotides
 	echo redo restraints without nucleotides
@@ -250,7 +250,7 @@ if test "XdE" == "CALC"; then
                                  -3333 3 3 3 XDEV > model_ini.log
 	mv tempiq7782.rsr listOTH2.rsr #will this make sense in all cases?
 
-	NTOT=`@SCRIPT_DIR@/get_ntotal.sh align.ali list pm.pdb`
+	NTOT=`allosmod count_alignments align.ali list pm.pdb`
 	mv align.ali.bak align.ali
 
 	@SCRIPT_DIR@/editrestraints2.sh listOTH2.rsr listAS2.rsr tempiq7781 list4contacts atomlistASRS2 2.0,2.0,2.0 11.0 $NTOT 0.1 0 false false false >>crap
@@ -302,7 +302,7 @@ fi
 #merge restraint files and add additional restraints
 ########
 if (test ! -e ${OUTDIR}/error.log); then 
-    NTOT=`@SCRIPT_DIR@/get_ntotal.sh align.ali list pm.pdb`
+    NTOT=`allosmod count_alignments align.ali list pm.pdb`
     @SCRIPT_DIR@/editrestraints2.sh listOTH.rsr listAS.rsr pm_XASPDB list4contacts atomlistASRS 2.0,2.0,2.0 11.0 \
                                              $NTOT ${delEmax} ${nbreak} XCOARSE XLOCRIGID >>run.log
     #add restraints between protein and sugar
