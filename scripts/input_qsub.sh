@@ -241,13 +241,13 @@ if test "XdE" == "CALC"; then
 	cp align.ali align.ali.bak
 	allosmod pdb2ali tempiq7781 >>align.ali
 	echo tempiq7781 >listin
-	@SCRIPT_DIR@/get_pm2.sh tempiq7781 listin ini -3333 3 3 3 XDEV
-	@SCRIPT_DIR@/modeller-SVN/bin/modSVN model_ini.py
+	allosmod make_mod_inputs -- tempiq7781 listin \
+                                 -3333 3 3 3 XDEV > model_ini.log
 	mv tempiq7781.rsr listAS2.rsr
 	allosmod pdb2ali tempiq7782 >>align.ali
 	echo tempiq7782 >listin
-	@SCRIPT_DIR@/get_pm2.sh tempiq7782 listin ini -3333 3 3 3 XDEV
-	@SCRIPT_DIR@/modeller-SVN/bin/modSVN model_ini.py
+	allosmod make_mod_inputs -- tempiq7782 listin \
+                                 -3333 3 3 3 XDEV > model_ini.log
 	mv tempiq7782.rsr listOTH2.rsr #will this make sense in all cases?
 
 	NTOT=`@SCRIPT_DIR@/get_ntotal.sh align.ali list pm.pdb`
@@ -282,8 +282,9 @@ fi
 #handle break.dat options
 if test "XBREAK" == "true"; then
     awk '(NF>0){print $0}' list >listin
-    @SCRIPT_DIR@/get_pm2.sh pm.pdb listin ini -3333 3 3 3 XDEV #redo here because nucleotides change max_sc_sc_distance
-    @SCRIPT_DIR@/modeller-SVN/bin/modSVN model_ini.py
+    #redo here because nucleotides change max_sc_sc_distance
+    allosmod make_mod_inputs -- pm.pdb listin \
+                       -3333 3 3 3 XDEV > model_ini.log
     @SCRIPT_DIR@/calc_contpres.sh pm.pdb.rsr pm_XASPDB XZCUTOFF XSCLBREAK XCHEMFR
     echo "Chemical frustration is implemented: contacts with buried acidic/basic residues are scaled by XSCLBREAK, z-score cutoff is XZCUTOFF" >>run.log
     echo "Chemical frustration type is XCHEMFR" >>run.log
@@ -375,8 +376,8 @@ echo edited.rsr file complete
 if (test -e ${OUTDIR}/error.log); then mv * $OUTDIR; exit; fi
 
 #initialize starting structure
-@SCRIPT_DIR@/get_pm2.sh pm.pdb list ini $RAND_NUM $RR1 $RR2 $RR3 XDEV
-@SCRIPT_DIR@/modeller-SVN/bin/modSVN model_ini.py
+allosmod make_mod_inputs -- pm.pdb list $RAND_NUM \
+                         $RR1 $RR2 $RR3 XDEV > model_ini.log
 allosmod setchain random.ini $CHAIN_PM | awk 'BEGIN{FS=""}($1$2$3$4=="ATOM"||$1$2$3$4=="HETA"){print $0}' >tempini
 mv tempini random.ini
 if (test ! -s random.ini); then echo structure not initialized >> ${OUTDIR}/error.log; mv * $OUTDIR; exit; fi
