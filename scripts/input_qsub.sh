@@ -205,16 +205,16 @@ rm -rf allostericsite_XrAS
 #get restraints
 ############
 TEST_NUC=`awk 'BEGIN{FS=""}($1$2$3$4=="ATOM"){print $18$19$20}' pm_XASPDB | sort -u | awk 'BEGIN{test=""}\
-    ($1=="ADE"||$1=="CYT"||$1=="GUA"||$1=="THY"||$1=="DA"||$1=="DC"||$1=="DG"||$1=="DT"){test="NUC"}END{print test}'` #use longer sc-sc dist for nucleotides
+    ($1=="ADE"||$1=="CYT"||$1=="GUA"||$1=="THY"||$1=="DA"||$1=="DC"||$1=="DG"||$1=="DT"){test="--nucleic-acids"}END{print test}'` #use longer sc-sc dist for nucleotides
 if test "XrAS" != "1000"; then #use ASPDB restraints if AS defined
     echo XASPDB >listin
-    @SCRIPT_DIR@/get_pm2.sh pm.pdb listin ini${TEST_NUC} -3333 3 3 3 XDEV
-    @SCRIPT_DIR@/modeller-SVN/bin/modSVN model_ini.py
+    allosmod make_mod_inputs ${TEST_NUC} -- pm.pdb listin \
+                             -3333 3 3 3 XDEV > model_ini.log
     mv pm.pdb.rsr listAS.rsr
 fi
 awk '(NF>0){print $0}' list >listin
-@SCRIPT_DIR@/get_pm2.sh pm.pdb listin ini${TEST_NUC} -3333 3 3 3 XDEV
-@SCRIPT_DIR@/modeller-SVN/bin/modSVN model_ini.py
+allosmod make_mod_inputs ${TEST_NUC} -- pm.pdb listin \
+                         -3333 3 3 3 XDEV > model_ini.log
 mv pm.pdb.rsr listOTH.rsr
 if test "XrAS" == "1000"; then cp listOTH.rsr listAS.rsr; fi #use all restraints if AS not defined
 
@@ -384,7 +384,7 @@ if (test ! -s random.ini); then echo structure not initialized >> ${OUTDIR}/erro
 #convert restraints to splines
 if test `echo "${jobname}==0" |bc -l` -eq 1; then
     if test `echo "XGLYC1==0" |bc -l` -eq 1; then #skip if hydrogens are needed
-	@SCRIPT_DIR@/get_pm2.sh pm.pdb list run $RAND_NUM $RR1 $RR2 $RR3 XDEV convert
+	@SCRIPT_DIR@/get_pm2.sh pm.pdb list $RAND_NUM XDEV convert
 	echo convert to splines 
 	@SCRIPT_DIR@/modeller-SVN/bin/modSVN model_run.py
 	cp converted.rsr atomlistASRS allostericsite.pdb contacts.dat ${RUNDIR}/pred_dEXdErASXrAS/XASPDB_0
@@ -409,7 +409,7 @@ MDTEMP=`echo XMDTEMP | tr [A-Z] [a-z] | awk '{if($1=="scan"){print ('${jobname}'
 if test `echo "XGLYC1==0" |bc -l` -eq 1; then
     if test "XSAMP" == "simulation"; then
 	echo "randomized numbers: $RAND_NUM $RR1 $RR2 $RR3" >>run.log
-	@SCRIPT_DIR@/get_pm2.sh pm.pdb list run $RAND_NUM $RR1 $RR2 $RR3 XDEV script
+	@SCRIPT_DIR@/get_pm2.sh pm.pdb list $RAND_NUM XDEV script
 	cp @SCRIPT_DIR@/README_user $RUNDIR/README
 	if test "XSCRAPP" == "true"; then
 	    @SCRIPT_DIR@/modeller0/bin/modSVN model_run.py
@@ -419,7 +419,7 @@ if test `echo "XGLYC1==0" |bc -l` -eq 1; then
 	    echo /scrapp/${JOBID}/DDD > $RUNDIR/DDD/XASPDB_${jobname}/OUTPUT_IS_HERE
 	fi
     elif test "XSAMP" == "moderate_cm" -o "XSAMP" == "moderate_am" -o "XSAMP" == "fast_cm"; then
-	@SCRIPT_DIR@/get_pm2.sh pm.pdb list run $RAND_NUM $RR1 $RR2 $RR3 XDEV XSAMP
+	@SCRIPT_DIR@/get_pm2.sh pm.pdb list $RAND_NUM XDEV XSAMP
 	echo running modeller
 	RUNMOD=`@SCRIPT_DIR@/modeller0/bin/modSVN model_run.py`
 	echo $RUNMOD
