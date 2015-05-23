@@ -310,9 +310,9 @@ if (test ! -e ${OUTDIR}/error.log); then
 	@SCRIPT_DIR@/get_glyc_restraint.sh pm_XASPDB allosmod.py >>edited.rsr
     fi
     #add restraints for bonds and distance upper/lower bounds
-    @SCRIPT_DIR@/get_add_restraint.sh ${RUNDIR}/input.dat pm_XASPDB HARM >tempaddrestr
-    @SCRIPT_DIR@/get_add_restraint.sh ${RUNDIR}/input.dat pm_XASPDB UPBD >>tempaddrestr
-    @SCRIPT_DIR@/get_add_restraint.sh ${RUNDIR}/input.dat pm_XASPDB LOBD >>tempaddrestr
+    allosmod get_add_restraint ${RUNDIR}/input.dat pm_XASPDB HARM >tempaddrestr
+    allosmod get_add_restraint ${RUNDIR}/input.dat pm_XASPDB UPBD >>tempaddrestr
+    allosmod get_add_restraint ${RUNDIR}/input.dat pm_XASPDB LOBD >>tempaddrestr
     if (test -s tempaddrestr); then
 	cat tempaddrestr >>edited.rsr
 	echo "" >>run.log; echo "additional restraints: " >>run.log; cat tempaddrestr >>run.log; echo "" >>run.log
