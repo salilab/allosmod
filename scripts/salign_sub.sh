@@ -2,6 +2,9 @@
 # 1) FILE1 2) FILE2_subset 3) FILE2_whole
 # saligns FILE2_subset onto FILE1 and then superimposes FILE2_whole onto FILE2_subset
 
+# Get the 'allosmod' binary in the path
+module load allosmod
+
 PDIR=./
 cp ${PDIR}/$1 ./1temp88.pdb
 cp ${PDIR}/$2 ./2temp88.pdb
@@ -32,8 +35,7 @@ fi
 #get alignment file
 if test -e list; then cp list list.bak; fi
 ls -1 $FF2 $FF3 >list
-/netapp/sali/allosmod/get_MULTsi20.sh >>run.log
-mv align_suggested.ali 1dsio.ali
+allosmod get_auto_align align.ali pm.pdb list 1dsio.ali >>run.log
 if test -e list.bak; then mv list.bak list; fi
 
 cat <<EOF >modeller.in

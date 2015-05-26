@@ -123,7 +123,7 @@ echo completed input structure $s
     #exit here if initial structures not generated
     if (test -e ${OUTDIR}/error.log); then
 	echo "" >>${OUTDIR}/error.log
-	@SCRIPT_DIR@/get_MULTsi20.sh
+	allosmod get_auto_align align.ali pm.pdb list align_suggested.ali
 	echo "See align_suggested.ali for a possible alignment file.  " >>${OUTDIR}/error.log
 	echo "***WARNING*** Small errors in the alignment can cause big errors during a simulation due to energy conservation problems. " >>${OUTDIR}/error.log
 	echo "Make sure there are no misalignments in which adjacent residues are aligned far apart \
