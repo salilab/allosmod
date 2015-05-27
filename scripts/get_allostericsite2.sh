@@ -32,14 +32,7 @@ allosmod salign0 $PDB1 $PDB2
 PMFIT=`echo ${PDB2} | awk 'BEGIN{FS=""}{if($(NF-3)$(NF-2)$(NF-1)$NF==".pdb"){for(a=1;a<=NF-4;a++){printf $a}}else{printf $0}}END{print "_fit.pdb"}'`
 
 #determine residues in PDB2 that contact LIG1
-echo ${PMFIT} >targlist
-awk 'BEGIN{FS=""}($1$2$3$4=="ATOM"){print $0}' ${PMFIT} |\
-      awk 'BEGIN{FS="";lc=""}(lc!=$22){li=0}(li!=$23$24$25$26){a+=1}{li=$23$24$25$26;lc=$22}END{print a}' >>targlist
-echo $LIG1 >>targlist
-awk 'BEGIN{FS=""}($1$2$3$4=="ATOM"||$1$2$3$4=="HETA"){print $22$23$24$25$26}' $LIG1 | sed "s/ //g" | sort -u | awk 'END{print NR}' >>targlist
-#awk '($1=="ATOM"||$1=="HETATM"){print $5$6}' $LIG1 | sort -u | awk 'END{print NR}' >>targlist
-echo $rcut >>targlist
-/netapp/sali/allosmod/getcont_inter_sc >tempbindmat
+allosmod get_inter_contacts ${PMFIT} ${LIG1} $rcut >tempbindmat
 cat tempbindmat | awk '{print $2$1}' |sort -u | awk 'BEGIN{FS=""}{print $1,$2$3$4$5}' |sort -nk2 | awk '{print $1$2}' >temp321
 
 #print out residues to pdb for allosteric site
