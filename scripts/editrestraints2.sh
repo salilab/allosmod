@@ -34,11 +34,7 @@ if test $NATOM1 != $NATOM2; then echo ERROR pm file not same length as atomlistA
 #get contacts
 if test -e tempbindmat; then rm tempbindmat; fi
 for pdb in `cat ${LIST_PDB} | awk '{print "pm_"$1}'`; do
-    echo $pdb >targlist
-    awk 'BEGIN{FS=""}($1$2$3$4=="ATOM"){print $0}' ${pdb} |\
-        awk 'BEGIN{FS="";lc=""}(lc!=$22){li=0}(li!=$23$24$25$26){a+=1}{li=$23$24$25$26;lc=$22}END{print a}' >>targlist
-    echo $rcut >>targlist
-    /netapp/sali/allosmod/getcont_sc_gt2 | awk '{print $1,$2,$3,$4}' >>tempbindmat
+    allosmod get_contacts $pdb $rcut | awk '{print $1,$2,$3,$4}' >>tempbindmat
     echo "contact def exec: getcont_sc_gt2: "$pdb
 done
 sort -u tempbindmat >temp55
