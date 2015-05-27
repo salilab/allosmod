@@ -67,7 +67,7 @@ else
     echo 0 >>targlist
 fi
 #test for beta structure
-/netapp/sali/allosmod/get_ss.sh $PDB1
+allosmod get_ss $PDB1 > dssp.out
 PBETA=`awk '($1=="E"){a+=1}END{if(NR>0){print a/NR}else{print 0}}' dssp.out`
 PHELX=`awk '($1=="H"){a+=1}END{if(NR>0){print a/NR}else{print 0}}' dssp.out`
 SSTEST=`echo $PBETA $PHELX | awk '{if($1>.20&&$2<.05){print "true"}else{print "false"}}'`
