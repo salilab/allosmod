@@ -404,13 +404,12 @@ if (test ! -e allosmod.py); then
     cp @SCRIPT_DIR@/allosmod.py .
 fi
 MDTEMP=`echo XMDTEMP | tr [A-Z] [a-z] | awk '{if($1=="scan"){print ('${jobname}'%5)*50+300.0}else{print $1}}'`
-@SCRIPT_DIR@/change_temp.sh $MDTEMP
 
 #generate scripts and structures
 if test `echo "XGLYC1==0" |bc -l` -eq 1; then
     if test "XSAMP" == "simulation"; then
 	echo "randomized numbers: $RAND_NUM $RR1 $RR2 $RR3" >>run.log
-	@SCRIPT_DIR@/get_pm2.sh pm.pdb list $RAND_NUM XDEV script
+	@SCRIPT_DIR@/get_pm2.sh pm.pdb list $RAND_NUM XDEV script $MDTEMP
 	cp @SCRIPT_DIR@/README_user $RUNDIR/README
 	if test "XSCRAPP" == "true"; then
 	    @SCRIPT_DIR@/modeller0/bin/modSVN model_run.py
@@ -420,7 +419,7 @@ if test `echo "XGLYC1==0" |bc -l` -eq 1; then
 	    echo /scrapp/${JOBID}/DDD > $RUNDIR/DDD/XASPDB_${jobname}/OUTPUT_IS_HERE
 	fi
     elif test "XSAMP" == "moderate_cm" -o "XSAMP" == "moderate_am" -o "XSAMP" == "fast_cm"; then
-	@SCRIPT_DIR@/get_pm2.sh pm.pdb list $RAND_NUM XDEV XSAMP
+	@SCRIPT_DIR@/get_pm2.sh pm.pdb list $RAND_NUM XDEV XSAMP $MDTEMP
 	echo running modeller
 	RUNMOD=`@SCRIPT_DIR@/modeller0/bin/modSVN model_run.py`
 	echo $RUNMOD
@@ -429,14 +428,14 @@ if test `echo "XGLYC1==0" |bc -l` -eq 1; then
 #	@SCRIPT_DIR@/get_pm2.sh pm.pdb list run $RAND_NUM $RR1 $RR2 $RR3 XDEV XSAMP
 #	@SCRIPT_DIR@/modeller0/bin/modSVN model_run.py
 #	cp pm.pdb.B99990001.pdb random.ini
-#	@SCRIPT_DIR@/get_pm2.sh pm.pdb list run $RAND_NUM $RR1 $RR2 $RR3 0.0 script
+#	@SCRIPT_DIR@/get_pm2.sh pm.pdb list run $RAND_NUM $RR1 $RR2 $RR3 0.0 script $MDTEMP
     else
 	echo "sampling type not properly defined" >>${OUTDIR}/error.log; mv * $OUTDIR; exit
     fi
 else #glycosylation
     ls -lrt
     cp @SCRIPT_DIR@/[A-Z][A-Z][A-Z].rsr .
-    @SCRIPT_DIR@/get_pm_glyc.sh pm.pdb list $RAND_NUM XREP_OPT XATT_GAP script
+    @SCRIPT_DIR@/get_pm_glyc.sh pm.pdb list $RAND_NUM XREP_OPT XATT_GAP script $MDTEMP
     #generate protein model with correct chains
     @SCRIPT_DIR@/modeller0/bin/modSVN model_ini0.py
     CHAIN=`awk 'BEGIN{FS=""}($1$2$3$4=="ATOM"||$1$2$3$4=="HETA"){print $22$23}' pm.pdb.B99990001.pdb | awk '{print $1}' | sort -u | head -n1`
@@ -468,7 +467,7 @@ else #glycosylation
 #	awk '($6==3&&($9>'${MAX_PROT_AIND}'||$10>'${MAX_PROT_AIND}'||$11>'${MAX_PROT_AIND}')){print $0}' tempsav.rsr >>converted.rsr
 #	awk '($6==4&&($9>'${MAX_PROT_AIND}'||$10>'${MAX_PROT_AIND}'||$11>'${MAX_PROT_AIND}'||$12>'${MAX_PROT_AIND}')){print $0}' tempsav.rsr >>converted.rsr
 #	#generate simulation script
-#	@SCRIPT_DIR@/get_pm2.sh pm.pdb list run $RAND_NUM $RR1 $RR2 $RR3 0.0 script_glyc
+#	@SCRIPT_DIR@/get_pm2.sh pm.pdb list run $RAND_NUM $RR1 $RR2 $RR3 0.0 script_glyc $MDTEMP
 #	rm pm_rand.pdb atomlistASRS model_ini0.py allosmod2.py tempsav.rsr
 #    fi
     rm [A-Z][A-Z][A-Z].rsr get_rest.in

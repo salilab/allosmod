@@ -9,6 +9,7 @@ LIST_KNOWNS=$2
 RAND=$3 #random seed
 DEVIATION=$4
 OPT=$5
+MDTEMP=$6
 
 # get pdb file names/chains
 F=(`cat ${LIST_KNOWNS}`)
@@ -90,7 +91,7 @@ a.library_schedule = allosmod.MDopt
 a.max_var_iterations = 500
 
 # MD optimization:
-a.md_level = allosmod.consttemp
+a.md_level = allosmod.ConstTemp(md_temp=${MDTEMP})
 
 # Repeat the whole cycle 1 time and do not stop unless obj.func. > 1E9
 a.repeat_optimization = 1
@@ -131,7 +132,7 @@ a.library_schedule = allosmod.MDopt
 a.max_var_iterations = 500
 
 # MD optimization:
-a.md_level = allosmod.consttemp
+a.md_level = allosmod.ConstTemp(md_temp=${MDTEMP})
 
 # Repeat the whole cycle 1 time and do not stop unless obj.func. > 1E9
 a.repeat_optimization = 1
@@ -252,7 +253,7 @@ a.library_schedule = allosmod.MDopt
 a.max_var_iterations = 500
 
 # MD optimization:
-a.md_level = allosmod.moderate_am
+a.md_level = allosmod.ModerateAM(md_temp=${MDTEMP})
 
 # Repeat the whole cycle 1 time and do not stop unless obj.func. > 1E9
 a.repeat_optimization = 1
