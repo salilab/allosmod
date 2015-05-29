@@ -4,6 +4,9 @@
 # Get the 'allosmod' binary in the path
 module load allosmod
 
+# Absolute path containing this and other scripts
+SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
+
 FIL1=$1 #if hetatm's, then taken from this file first (not randomized)
 FIL2=$2
 ID1=$3 #input structures
@@ -28,16 +31,16 @@ echo ${NRES} >>targlist
 echo $rcut >>targlist
 echo 1 >>targlist
 echo temp9942 >>targlist
-/netapp/sali/allosmod/getqiavg_ca >>run.log
+$SCRIPT_DIR/getqiavg_ca >>run.log
 QI=(`awk '{printf $2" "}' qi_1.dat`)
 if test -e tempfit.pdb; then rm tempfit.pdb; fi
-for i in `/netapp/sali/allosmod/count.pl 1 ${NRES}`; do
+for i in `$SCRIPT_DIR/count.pl 1 ${NRES}`; do
     if test `echo "${QI[$i-1]}>0.8" |bc -l` -eq 1; then
-	/netapp/sali/allosmod/getsegpdb temp9942 A $i $i >>tempfit.pdb
+	$SCRIPT_DIR/getsegpdb temp9942 A $i $i >>tempfit.pdb
     fi
 done
 
-/netapp/sali/allosmod/salign_sub.sh temp9941 tempfit.pdb temp9942
+$SCRIPT_DIR/salign_sub.sh temp9941 tempfit.pdb temp9942
 
 echo >>run.log
 
@@ -56,12 +59,12 @@ awk 'BEGIN{FS=""}($1$2$3$4=="ATOM"){print $0}' tempfit_fit.pdb >temp9942
 #make random numbers between 0 and 1
 if test -e tempN; then rm tempN; fi
 NN=`awk 'END{print NR}' temp9941`
-for s in `/netapp/sali/allosmod/count.pl 1 $NN`; do
+for s in `$SCRIPT_DIR/count.pl 1 $NN`; do
     date --rfc-3339=ns | awk -F. '{print $2}' | awk -F- '{print $1/1000000000}' >>tempN
 done
-NMIN=`/netapp/sali/allosmod/getmin tempN 1`
-NMAX=`/netapp/sali/allosmod/getmax tempN 1`
-perl /netapp/sali/allosmod/randomize_list_2.pl tempN | awk '{a=($1-"'${NMIN}'")/("'${NMAX}'"-"'${NMIN}'")}{print a,1-a}' >tempNN
+NMIN=`$SCRIPT_DIR/getmin tempN 1`
+NMAX=`$SCRIPT_DIR/getmax tempN 1`
+perl $SCRIPT_DIR/randomize_list_2.pl tempN | awk '{a=($1-"'${NMIN}'")/("'${NMAX}'"-"'${NMIN}'")}{print a,1-a}' >tempNN
 
 #interpolate between two structures
 awk 'BEGIN{FS=""}{for(a=31;a<=38;a++){printf $a}}{printf " "}\

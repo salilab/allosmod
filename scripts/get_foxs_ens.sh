@@ -9,6 +9,7 @@ delZCUTOFF=1.0 #cut off for chi, below which defines "analyzed ensemble", is def
 BACKADJ=`awk '($1=="backadj"){print $2}' foxs.in | sed "s/on/1/g" | sed "s/off/0/g"`
 
 #run FoXS ensemble
+#todo: update this to use multi_foxs in latest IMP instead
 /netapp/sali/dina/foxs/bin/foxs_ensemble saxs.dat filenames.txt -s ${ESIZE} -k 10000 -b ${BACKADJ} &> foxs_ensemble.out
 
 #print cluster assignments

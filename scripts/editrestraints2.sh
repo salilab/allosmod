@@ -2,6 +2,9 @@
 # 1-2) restraint_file 3-4) pdb_file 2 define res-res contacts 5) atomlistASRS 6) sigmas 7) rcut 8) #templates 9) delEmax
 #IMPORTANT: inputs PDB's must have numbering from 1 to N (including HETATM's) with no gaps or repeats, vital for communication between getcont.f and editrestraints.f
 
+# Absolute path containing this and other scripts
+SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
+
 RESTR_FIL1=$1 #first restrt file is for templates used for RS-RS contacts only (usually 2 templates)
 RESTR_FIL2=$2 #second restrt file is for template used for AS-AS contacts and AS-RS interface contacts (usually 1 template)
 PDB1=$3 #PDB1 used in editrestraints.f to extract atom characteristics (AS v RS,SC v BB)
@@ -78,7 +81,7 @@ else
     echo 0 dssp.out >>targlist
 fi
 
-/netapp/sali/allosmod/editrestraints >edited.rsr
+$SCRIPT_DIR/editrestraints >edited.rsr
 
 cp tempbindmat contacts.dat
 echo

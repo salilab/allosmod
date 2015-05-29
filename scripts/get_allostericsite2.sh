@@ -7,6 +7,9 @@
 # 3) model of PDB2 file (used to determine allosteric site).. to be superimposed onto PDB1 
 # 4) rcut to define allosteric site using PDB2
 
+# Absolute path containing this and other scripts
+SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
+
 PDB1=$1
 ############
 LIG1=$2
@@ -50,7 +53,7 @@ done
 #print atomlistASRS
 if test -s tempdps10; then
     sort -nk1 tempdps10 >tempdps11
-    /netapp/sali/allosmod/get_fillindex.sh tempdps11 AS RS $PMLEN >atomlistASRS
+    $SCRIPT_DIR/get_fillindex.sh tempdps11 AS RS $PMLEN >atomlistASRS
     if test `echo "${PMHET}>0" |bc -l` -eq 1; then
 	echo 1 | awk '{for(a=('${PMLEN}'+1);a<=('${PMLEN}'+'${PMHET}');a++){print a" AS"}}' >>atomlistASRS
     fi
@@ -63,7 +66,7 @@ if test -s allostericsite.pdb; then
     NRES=`awk 'BEGIN{FS=""}($1$2$3$4=="ATOM"){print $0}' ${PMFIT} |\
       awk 'BEGIN{FS="";lc=""}(lc!=$22){li=0}(li!=$23$24$25$26){a+=1}{li=$23$24$25$26;lc=$22}END{print a}'`
     awk 'BEGIN{FS=""}($1$2$3$4=="ATOM"){print $23$24$25$26}' allostericsite.pdb | sort -nu >tempas661
-    /netapp/sali/allosmod/get_fillindex.sh tempas661 1 2 $NRES |\
+    $SCRIPT_DIR/get_fillindex.sh tempas661 1 2 $NRES |\
          awk 'BEGIN{print "2";ctr=0}{printf "%3.0f",$2;ctr+=1}(ctr==10){printf "\n";ctr=0}END{printf "\n"}' >subregion.in
 else
     echo "" >allostericsite.pdb

@@ -15,6 +15,7 @@ COARSE=`awk '($1=="coarse"){print $2}' foxs.in | sed "s/on/true/g" | sed "s/off/
 
 for pdb in ${R_PDB[@]}; do
 
+    # todo: update to use foxs from recent IMP instead
     /netapp/sali/dina/foxs/bin/foxs $pdb -p -q ${QMAX} -s ${PSIZE} -b ${BACKADJ} -r ${COARSE}
 
 done

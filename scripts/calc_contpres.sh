@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Absolute path containing this and other scripts
+SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
+
 F_RSR=$1 #restraint file
 PM=$2 #PM file pertaining to sequence in restraint file
 ZCUTOFF=$3
@@ -30,11 +33,11 @@ cat tempccp0841a tempccp0841b tempccp0841c $F_RSR |\
 cat tempccp0841a $F_RSR | awk '(NR==1){for(a=1;a<='${NATOM}';a++){a2r[a]=$a}}\
                                (NR>1&&$6==2&&$5!=1){print a2r[$9]"\n"a2r[$10]}' | sort -n >tempccp0842tot
 
-java -classpath /netapp/sali/allosmod/  gen_Pbin tempccp0842 1 0,${ATOM2RES[$((${NATOM}-1))]} ${ATOM2RES[$((${NATOM}-1))]} | awk '{print $1+0.5,$3}' > tempccp0843
-java -classpath /netapp/sali/allosmod/  gen_Pbin tempccp0842tot 1 0,${ATOM2RES[$((${NATOM}-1))]} ${ATOM2RES[$((${NATOM}-1))]} | awk '{print $1+0.5,$3}' > tempccp0843tot
+java -classpath $SCRIPT_DIR gen_Pbin tempccp0842 1 0,${ATOM2RES[$((${NATOM}-1))]} ${ATOM2RES[$((${NATOM}-1))]} | awk '{print $1+0.5,$3}' > tempccp0843
+java -classpath $SCRIPT_DIR gen_Pbin tempccp0842tot 1 0,${ATOM2RES[$((${NATOM}-1))]} ${ATOM2RES[$((${NATOM}-1))]} | awk '{print $1+0.5,$3}' > tempccp0843tot
 
-/netapp/sali/allosmod/get_fillindex.sh tempccp0843 @ 0 ${ATOM2RES[$((${NATOM}-1))]} >charge_contpres.dat
-/netapp/sali/allosmod/get_fillindex.sh tempccp0843tot @ 0 ${ATOM2RES[$((${NATOM}-1))]} >tot_contpres.dat
+$SCRIPT_DIR/get_fillindex.sh tempccp0843 @ 0 ${ATOM2RES[$((${NATOM}-1))]} >charge_contpres.dat
+$SCRIPT_DIR/get_fillindex.sh tempccp0843tot @ 0 ${ATOM2RES[$((${NATOM}-1))]} >tot_contpres.dat
 
 #print num charge contacts per res if buried
 paste charge_contpres.dat tot_contpres.dat | awk '{if($4>143){print $1,$2}else{print $1" 0"}}' >contpres.dat

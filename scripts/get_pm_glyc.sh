@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Absolute path containing this and other scripts
+SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
+
 TARG_SEQ=$1 #pm.pdb in alignment
 LIST_KNOWNS=$2
 RAND=$3 #random seed
@@ -31,12 +34,12 @@ from modeller import *
 from modeller.scripts import complete_pdb
 import allosmod
 
-env =environ(rand_seed=${RAND}, restyp_lib_file='/netapp/sali/allosmod/restyp.dat', copy=None)
+env =environ(rand_seed=${RAND}, restyp_lib_file='$SCRIPT_DIR/restyp.dat', copy=None)
 
 # Read in HETATM records from template PDBs
 env.io.atom_files_directory = ['.', '../atom_files']
-env.libs.topology.read(file='/netapp/sali/allosmod/top_all_glyco.lib')
-env.libs.parameters.read(file='/netapp/sali/allosmod/par_all_glyco.lib')
+env.libs.topology.read(file='$SCRIPT_DIR/top_all_glyco.lib')
+env.libs.parameters.read(file='$SCRIPT_DIR/par_all_glyco.lib')
 env.io.hetatm = True
 env.io.hydrogen = True
 
@@ -71,12 +74,12 @@ from modeller import *
 from modeller.scripts import complete_pdb
 import allosmod
 
-env =environ(rand_seed=${RAND}, restyp_lib_file='/netapp/sali/allosmod/restyp.dat', copy=None)
+env =environ(rand_seed=${RAND}, restyp_lib_file='$SCRIPT_DIR/restyp.dat', copy=None)
 
 # Read in HETATM records from template PDBs
 env.io.atom_files_directory = ['.', '../atom_files']
-env.libs.topology.read(file='/netapp/sali/allosmod/top_all_glyco.lib')
-env.libs.parameters.read(file='/netapp/sali/allosmod/par_all_glyco.lib')
+env.libs.topology.read(file='$SCRIPT_DIR/top_all_glyco.lib')
+env.libs.parameters.read(file='$SCRIPT_DIR/par_all_glyco.lib')
 env.io.hetatm = True
 env.io.hydrogen = True
 
@@ -111,12 +114,12 @@ from modeller import *
 from modeller.scripts import complete_pdb
 import allosmod
 
-env =environ(rand_seed=${RAND}, restyp_lib_file='/netapp/sali/allosmod/restyp.dat', copy=None)
+env =environ(rand_seed=${RAND}, restyp_lib_file='$SCRIPT_DIR/restyp.dat', copy=None)
 
 # Read in HETATM records from template PDBs
 env.io.atom_files_directory = ['.', '../atom_files']
-env.libs.topology.read(file='/netapp/sali/allosmod/top_all_glyco.lib')
-env.libs.parameters.read(file='/netapp/sali/allosmod/par_all_glyco.lib')
+env.libs.topology.read(file='$SCRIPT_DIR/top_all_glyco.lib')
+env.libs.parameters.read(file='$SCRIPT_DIR/par_all_glyco.lib')
 env.io.hetatm = True
 env.io.hydrogen = True
 
@@ -260,7 +263,7 @@ if test $ATT_GAP == "true"; then
 	for lb in ${R_LB[@]}; do
 	    ctr=$((${ctr} + 1))
 	    ub=${R_UB[$ctr]}
-	    /netapp/sali/allosmod/ali_insertgap.sh align2.ali 1 $lb $ub >tempgpg11
+	    $SCRIPT_DIR/ali_insertgap.sh align2.ali 1 $lb $ub >tempgpg11
 	    mv tempgpg11 align2.ali
 	done
     fi
