@@ -398,9 +398,10 @@ if (test ! -s converted.rsr); then echo restraints failed to be converted >> ${O
 
 fi ### end setup AllosMod landscape ###
 
-#get AllosModel subclasses
+#get AllosModel subclasses from allosmod-lib
 if (test ! -e allosmod.py); then 
-    cp @SCRIPT_DIR@/allosmod.py .
+    ALLOSMOD_PY=`python -c 'import allosmod.modeller, os; print(os.path.splitext(allosmod.modeller.__file__)[0])'`
+    cp ${ALLOSMOD_PY}.py allosmod.py
 fi
 MDTEMP=`echo XMDTEMP | tr [A-Z] [a-z] | awk '{if($1=="scan"){print ('${jobname}'%5)*50+300.0}else{print $1}}'`
 
