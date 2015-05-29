@@ -385,9 +385,8 @@ if (test ! -s random.ini); then echo structure not initialized >> ${OUTDIR}/erro
 #convert restraints to splines
 if test `echo "${jobname}==0" |bc -l` -eq 1; then
     if test `echo "XGLYC1==0" |bc -l` -eq 1; then #skip if hydrogens are needed
-	@SCRIPT_DIR@/get_pm2.sh pm.pdb list $RAND_NUM XDEV convert
 	echo convert to splines 
-	@SCRIPT_DIR@/modeller-SVN/bin/modSVN model_run.py
+	allosmod spline pm.pdb edited.rsr converted.rsr
 	cp converted.rsr atomlistASRS allostericsite.pdb contacts.dat ${RUNDIR}/pred_dEXdErASXrAS/XASPDB_0
 	if (test -e allosmod.py); then cp allosmod.py ${RUNDIR}/pred_dEXdErASXrAS/XASPDB_0; fi
     fi
@@ -460,8 +459,7 @@ else #glycosylation
 #	grep ATOM pm.pdb.B99990001.pdb >pm_rand.pdb
 #	awk '{print NR" AS"}' pm_rand.pdb >atomlistASRS
 #	@SCRIPT_DIR@/editrestraints2.sh pm.pdb.rsr pm.pdb.rsr pm_rand.pdb pm_rand.pdb atomlistASRS 2.0,2.0,2.0 11.0 XNTOT ${delEmax} >>run.log
-#	@SCRIPT_DIR@/get_pm2.sh pm.pdb list run $RAND_NUM $RR1 $RR2 $RR3 XDEV convert
-#	@SCRIPT_DIR@/modeller-SVN/bin/modSVN model_run.py
+#	allosmod spline pm.pdb edited.rsr converted.rsr
 #	#get glyc restraints
 #	awk '($6==2&&($9>'${MAX_PROT_AIND}'||$10>'${MAX_PROT_AIND}')){print $0}' tempsav.rsr >>converted.rsr
 #	awk '($6==3&&($9>'${MAX_PROT_AIND}'||$10>'${MAX_PROT_AIND}'||$11>'${MAX_PROT_AIND}')){print $0}' tempsav.rsr >>converted.rsr

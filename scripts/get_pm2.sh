@@ -15,53 +15,7 @@ MDTEMP=$6
 F=(`cat ${LIST_KNOWNS}`)
 RUNTYPE="run"
 
-if test $OPT == "convert"; then
-
-cat <<EOF >model_${RUNTYPE}.py
-from modeller import *
-from modeller.automodel import *
-from modeller.scripts import complete_pdb
-
-env = environ(rand_seed=${RAND})
-env.io.atom_files_directory = ['../atom_files']
-env.libs.topology.read(file='\$(LIB)/top_heav.lib')
-env.libs.parameters.read(file='\$(LIB)/par.lib')
-
-# Read in HETATM records from template PDBs
-env.io.hetatm = True 
-
-# Give less weight to all soft-sphere restraints:
-#env.schedule_scale = physical.values(default=0.1)
-#env.io.atom_files_directory = ['.', '../atom_files']
-
-a = automodel(env, inifile  = 'random.ini', deviation=None, alnfile='align.ali', 
-EOF
-
-echo "MDtemp=300.0, tmstep=3.0, incmov=10, incequil=2, nmov=20, cap_atom_shift=.0829598000, convert_restraints=True, write_intermediates=True, " >>model_${RUNTYPE}.py
-echo "csrfile  = 'edited.rsr', " >>model_${RUNTYPE}.py
-echo -n "knowns=('${F[0]}'" >>model_${RUNTYPE}.py
-awk '(NR>1&&NF>0){printf ",@"$1"@"}' ${LIST_KNOWNS} | sed "s/@/'/g" >>model_${RUNTYPE}.py
-echo "), sequence='${TARG_SEQ}')" >>model_${RUNTYPE}.py
-echo >>model_${RUNTYPE}.py
-
-cat <<EOF >>model_${RUNTYPE}.py
-# Very thorough VTFM optimization:
-a.library_schedule = autosched.MDnone
-a.max_var_iterations = 500
-
-# MD optimization:
-a.md_level = refine.none
-
-# Repeat the whole cycle 1 time and do not stop unless obj.func. > 1E9
-a.repeat_optimization = 1
-a.max_molpdf = 1e9
-
-a.starting_model = 1
-a.ending_model = 1
-a.make()
-EOF
-
-elif test $OPT == "script"; then
+if test $OPT == "script"; then
 
 cat <<EOF >model_${RUNTYPE}.py
 from modeller import *
