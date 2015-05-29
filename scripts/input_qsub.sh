@@ -412,7 +412,7 @@ if test `echo "XGLYC1==0" |bc -l` -eq 1; then
 	@SCRIPT_DIR@/get_pm2.sh pm.pdb list $RAND_NUM XDEV script $MDTEMP
 	cp @SCRIPT_DIR@/README_user $RUNDIR/README
 	if test "XSCRAPP" == "true"; then
-	    @SCRIPT_DIR@/modeller0/bin/modSVN model_run.py
+	    python model_run.py > model_run.log
 	    JOBID=`echo $RUNDIR | awk 'BEGIN{FS="/"}{print $(NF-1)}'`
 	    OUTDIR=/scrapp/${JOBID}/DDD/XASPDB_${jobname}
 	    mkdir -p $OUTDIR
@@ -421,12 +421,11 @@ if test `echo "XGLYC1==0" |bc -l` -eq 1; then
     elif test "XSAMP" == "moderate_cm" -o "XSAMP" == "moderate_am" -o "XSAMP" == "fast_cm"; then
 	@SCRIPT_DIR@/get_pm2.sh pm.pdb list $RAND_NUM XDEV XSAMP $MDTEMP
 	echo running modeller
-	RUNMOD=`@SCRIPT_DIR@/modeller0/bin/modSVN model_run.py`
-	echo $RUNMOD
+	python model_run.py > model_run.log
 	echo done with modeller
 #    elif test "XSAMP" == "moderate_cm_simulation"; then
 #	@SCRIPT_DIR@/get_pm2.sh pm.pdb list run $RAND_NUM $RR1 $RR2 $RR3 XDEV XSAMP
-#	@SCRIPT_DIR@/modeller0/bin/modSVN model_run.py
+#	python model_run.py > model_run.log
 #	cp pm.pdb.B99990001.pdb random.ini
 #	@SCRIPT_DIR@/get_pm2.sh pm.pdb list run $RAND_NUM $RR1 $RR2 $RR3 0.0 script $MDTEMP
     else
@@ -437,7 +436,7 @@ else #glycosylation
     cp @SCRIPT_DIR@/[A-Z][A-Z][A-Z].rsr .
     @SCRIPT_DIR@/get_pm_glyc.sh pm.pdb list $RAND_NUM XREP_OPT XATT_GAP script $MDTEMP
     #generate protein model with correct chains
-    @SCRIPT_DIR@/modeller0/bin/modSVN model_ini0.py
+    python model_ini0.py > model_ini0.log
     CHAIN=`awk 'BEGIN{FS=""}($1$2$3$4=="ATOM"||$1$2$3$4=="HETA"){print $22$23}' pm.pdb.B99990001.pdb | awk '{print $1}' | sort -u | head -n1`
     if test -z $CHAIN; then
 	NC=A #`grep pm.pdb align.ali | grep -v P1 | awk 'BEGIN{FS=":"}{print $4}' | awk 'BEGIN{a="A"}(NR==1){a=$1}{print a}'`
@@ -445,17 +444,17 @@ else #glycosylation
     fi
     #generate initial glycosylation model and restraints
     @SCRIPT_DIR@/get_pm_glyc.sh pm.pdb list $RAND_NUM XREP_OPT XATT_GAP pm.pdb.B99990001.pdb 
-    @SCRIPT_DIR@/modeller0/bin/modSVN model_ini.py
+    python model_ini.py > model_ini.log
     @SCRIPT_DIR@/get_rest.sh pm.pdb.B99990001.pdb >> pm.pdb.rsr
     mv pm.pdb.rsr converted.rsr
     #sample glycosylated structures
-    @SCRIPT_DIR@/modeller0/bin/modSVN model_glyc.py
+    python model_glyc.py > model_glyc.log
 #    if test "XSAMP" == "moderate_cm_simulation"; then #to run simulations with sugar
 #	cp pm.pdb.B99990001.pdb random.ini
 #	cp converted.rsr tempsav.rsr
 #	cp @SCRIPT_DIR@/allosmod.py ./allosmod2.py
 #	#convert protein restraints (with hydrogens)
-#	@SCRIPT_DIR@/modeller0/bin/modSVN model_ini0.py
+#	python model_ini0.py > model_ini0.log
 #	MAX_PROT_AIND=`awk '($6>1){print $9"\n"$10}' pm.pdb.rsr | sort -nk1 | tail -n1`
 #	grep ATOM pm.pdb.B99990001.pdb >pm_rand.pdb
 #	awk '{print NR" AS"}' pm_rand.pdb >atomlistASRS
