@@ -3,6 +3,9 @@
 # Absolute path containing this and other scripts
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 
+# Get the 'allosmod' binary in the path
+module load allosmod
+
 F_RSR=$1 #restraint file
 PM=$2 #PM file pertaining to sequence in restraint file
 ZCUTOFF=$3
@@ -33,8 +36,8 @@ cat tempccp0841a tempccp0841b tempccp0841c $F_RSR |\
 cat tempccp0841a $F_RSR | awk '(NR==1){for(a=1;a<='${NATOM}';a++){a2r[a]=$a}}\
                                (NR>1&&$6==2&&$5!=1){print a2r[$9]"\n"a2r[$10]}' | sort -n >tempccp0842tot
 
-java -classpath $SCRIPT_DIR gen_Pbin tempccp0842 1 0,${ATOM2RES[$((${NATOM}-1))]} ${ATOM2RES[$((${NATOM}-1))]} | awk '{print $1+0.5,$3}' > tempccp0843
-java -classpath $SCRIPT_DIR gen_Pbin tempccp0842tot 1 0,${ATOM2RES[$((${NATOM}-1))]} ${ATOM2RES[$((${NATOM}-1))]} | awk '{print $1+0.5,$3}' > tempccp0843tot
+allosmod bin_data tempccp0842 0 0 ${ATOM2RES[$((${NATOM}-1))]} ${ATOM2RES[$((${NATOM}-1))]} | awk '{print $1+0.5,$3}' > tempccp0843
+allosmod bin_data tempccp0842tot 0 0 ${ATOM2RES[$((${NATOM}-1))]} ${ATOM2RES[$((${NATOM}-1))]} | awk '{print $1+0.5,$3}' > tempccp0843tot
 
 $SCRIPT_DIR/get_fillindex.sh tempccp0843 @ 0 ${ATOM2RES[$((${NATOM}-1))]} >charge_contpres.dat
 $SCRIPT_DIR/get_fillindex.sh tempccp0843tot @ 0 ${ATOM2RES[$((${NATOM}-1))]} >tot_contpres.dat
