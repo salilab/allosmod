@@ -6,6 +6,7 @@ import re
 import copy
 import math
 import random
+import shutil
 from operator import itemgetter 
 from os import path, access, R_OK
 
@@ -37,7 +38,7 @@ class Job(saliweb.backend.Job):
         if jobcounter == 1 or jobcounter == -99:
             subprocess.call([os.path.join(self.config.script_directory,
                                           "run_all.sh")])
-            os.system("cp dirlist dirlist_all")
+            shutil.copy("dirlist", "dirlist_all")
 
         #create sge script
         DIRFILE = open("dirlist","r")
@@ -68,8 +69,8 @@ sleep 10s
                 r = self.runnercls2()
             elif allosmodfox == 1:
                 #execute foxs ensemble search, all files should be in directory called "input"
-                os.system(os.path.join(self.config.script_directory,
-                                       "run_foxs_ensemble.sh"))
+                subprocess.call([os.path.join(self.config.script_directory,
+                                              "run_foxs_ensemble.sh")])
                 script = """
 source ./%s/qsub.sh
 sleep 10s
@@ -80,8 +81,10 @@ sleep 10s
                 r = self.runnercls(script)
                 r.set_sge_options("-j y -l arch=linux-x64 -l netapp=1.0G,scratch=2.0G -l mem_free=4G -l h_rt=90:00:00 -t 1-1 -V")
 
-                os.system("echo -1 >jobcounter")
-                os.system("echo 0 >%s/allosmodfox" % dir.replace('\n', ''))
+                with open('jobcounter', 'w') as fh:
+                    print("-1", file=fh)
+                with open('%s/allosmodfox' % dir.replace('\n', ''), 'w') as fh:
+                    print("0", file=fh)
                 self.debug_log("allosmodfox=-1 numsim %d" % numsim)
             else:
                 script = """
@@ -116,7 +119,7 @@ sleep 10s
 #            else:
 #                os.system("sleep 5m")
 
-            os.system("mkdir output")
+            os.mkdir("output")
             DIRFILE = open("dirlist_all","r")
             r_dirs = DIRFILE.readlines()
             #if input dir made because no directory is uploaded, delete unecessary files
@@ -139,10 +142,10 @@ sleep 10s
 
     def complete(self):
         os.chmod(".", 0775)
-        os.system(os.path.join(self.config.script_directory,
-                               "zip_or_send_output2.sh"))
-        os.system(os.path.join(self.config.script_directory,
-                               "zip_or_send_output.sh"))
+        subprocess.call([os.path.join(self.config.script_directory,
+                                      "zip_or_send_output2.sh")])
+        subprocess.call([os.path.join(self.config.script_directory,
+                                      "zip_or_send_output.sh")])
         URLFOXS = open("urlout","r")
         urltest = URLFOXS.readlines()
         self.urlout = urltest[len(urltest)-1].strip()
