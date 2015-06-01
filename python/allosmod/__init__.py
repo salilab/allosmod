@@ -1,3 +1,4 @@
+from __future__ import print_function
 import saliweb.backend
 import subprocess
 import os
@@ -12,14 +13,26 @@ class Job(saliweb.backend.Job):
     runnercls = saliweb.backend.SGERunner
     runnercls2 = saliweb.backend.DoNothingRunner
     urlout = ''
+
+    def debug_log(self, msg):
+        """Write a progress message to the debug log file"""
+        with open('pwout', 'a') as fh:
+            print(msg, file=fh)
+
+    def get_job_counter(self):
+        """Read jobcounter file and return it.
+           -1 is all sims complete,
+           -99 is first pass,
+           >0 indicates number of jobs cycles completed"""
+        with open("jobcounter") as fh:
+            return int(fh.readline())
     
     def run(self):
         #preprocess job to keep track of iterations
         subprocess.call([os.path.join(self.config.script_directory,
                                       "preproccess.sh")])
-        CTRFILE = open("jobcounter","r") #jobcounter: -1 is all sims complete, -99 is first pass, >0 indicates number of jobs cycles completed
-        jobcounter = int(CTRFILE.readline())
-        os.system("echo run jobctr %i >>pwout" % jobcounter)
+        jobcounter = self.get_job_counter()
+        self.debug_log("run jobctr %d" % jobcounter)
         #unzip input.zip, check inputs, make input scripts for subdirs
         if jobcounter == 1 or jobcounter == -99:
             subprocess.call([os.path.join(self.config.script_directory,
@@ -32,7 +45,7 @@ class Job(saliweb.backend.Job):
 
         ERRFILE = open("%s/error" % dir.replace('\n', ''),"r")
         err = int(ERRFILE.readline())
-        os.system("echo run err %i >>pwout" % err)
+        self.debug_log("run err %d" % err)
         if err == 0 and jobcounter != -1:
             script = """
 source ./%s/qsub.sh
@@ -50,7 +63,7 @@ sleep 10s
         elif err == 0 and jobcounter == -1:
             FOXSFILE = open("%s/allosmodfox" % dir.replace('\n', ''),"r")
             allosmodfox = int(FOXSFILE.readline())
-            os.system("echo run allosmodfox %i >>pwout" % allosmodfox)
+            self.debug_log("run allosmodfox %d" % allosmodfox)
             if allosmodfox == 0:
                 r = self.runnercls2()
             elif allosmodfox == 1:
@@ -69,7 +82,7 @@ sleep 10s
 
                 os.system("echo -1 >jobcounter")
                 os.system("echo 0 >%s/allosmodfox" % dir.replace('\n', ''))
-                os.system("echo allosmodfox=-1 numsim %i >>pwout" % numsim)
+                self.debug_log("allosmodfox=-1 numsim %d" % numsim)
             else:
                 script = """
 echo fail
@@ -89,10 +102,9 @@ sleep 10s
 
     def postprocess(self):
         MAXJOBS = 200
-        CTRFILE = open("jobcounter","r")
-        jobcounter = int(CTRFILE.readline())
+        jobcounter = self.get_job_counter()
+        self.debug_log("post jobctr %d" % jobcounter)
 
-        os.system("echo post jobctr %i >>pwout" % jobcounter)
         #submit next job
         if jobcounter > -1 and jobcounter < MAXJOBS:
             self.reschedule_run()
@@ -101,11 +113,9 @@ sleep 10s
 #            PATH = './input/saxs.dat'
 #            if path.exists(PATH) and path.isfile(PATH) and access(PATH, R_OK):
 #                os.system("sleep 1m")
-#                os.system("echo sleep 1m >>pwout")
 #            else:
 #                os.system("sleep 5m")
-#                os.system("echo sleep 5m >>pwout")
-                
+
             os.system("mkdir output")
             DIRFILE = open("dirlist_all","r")
             r_dirs = DIRFILE.readlines()
