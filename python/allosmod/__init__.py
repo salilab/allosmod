@@ -10,6 +10,23 @@ import shutil
 from operator import itemgetter 
 from os import path, access, R_OK
 
+class JobCounter(object):
+    """Track where in a multi-step job we are.
+       State is stored in a file called 'jobcounter' in the job directory."""
+
+    def get(self):
+        """Read jobcounter file and return it.
+           -1 is all sims complete,
+           -99 is first pass,
+           >0 indicates number of jobs cycles completed"""
+        with open("jobcounter") as fh:
+            return int(fh.readline())
+
+    def set(self, val):
+        with open("jobcounter", "w") as fh:
+            print("%d" % val, file=fh)
+
+
 class Job(saliweb.backend.Job):
     runnercls = saliweb.backend.SGERunner
     runnercls2 = saliweb.backend.DoNothingRunner
@@ -20,19 +37,34 @@ class Job(saliweb.backend.Job):
         with open('pwout', 'a') as fh:
             print(msg, file=fh)
 
-    def get_job_counter(self):
-        """Read jobcounter file and return it.
-           -1 is all sims complete,
-           -99 is first pass,
-           >0 indicates number of jobs cycles completed"""
-        with open("jobcounter") as fh:
-            return int(fh.readline())
-    
+    def setup_run(self):
+        """Determine where we are in a multi-run job"""
+        job_counter = JobCounter()
+        if os.path.exists("dirlist"): # after first pass
+            with open('dirlist') as fh:
+                dirs = fh.readlines()
+            if len(dirs) > 1:
+                # Remove first entry from dirlist and set up to run next one
+                del dirs[0]
+                with open('dirlist', 'w') as fh:
+                    for dir in dirs:
+                        fh.write(dir)
+                job_counter.set(job_counter.get() + 1)
+            else:
+                # All sims complete
+                job_counter.set(-1)
+
+        else: # first pass
+            dirs = [d for d in os.listdir('.') if os.path.isdir(d)]
+            if len(dirs) > 1:
+                job_counter.set(1)
+            else:
+                job_counter.set(-99)
+        return job_counter.get()
+
     def run(self):
         #preprocess job to keep track of iterations
-        subprocess.call([os.path.join(self.config.script_directory,
-                                      "preproccess.sh")])
-        jobcounter = self.get_job_counter()
+        jobcounter = self.setup_run()
         self.debug_log("run jobctr %d" % jobcounter)
         #unzip input.zip, check inputs, make input scripts for subdirs
         if jobcounter == 1 or jobcounter == -99:
@@ -81,8 +113,7 @@ sleep 10s
                 r = self.runnercls(script)
                 r.set_sge_options("-j y -l arch=linux-x64 -l netapp=1.0G,scratch=2.0G -l mem_free=4G -l h_rt=90:00:00 -t 1-1 -V")
 
-                with open('jobcounter', 'w') as fh:
-                    print("-1", file=fh)
+                JobCounter().write(-1)
                 with open('%s/allosmodfox' % dir.replace('\n', ''), 'w') as fh:
                     print("0", file=fh)
                 self.debug_log("allosmodfox=-1 numsim %d" % numsim)
@@ -105,7 +136,7 @@ sleep 10s
 
     def postprocess(self):
         MAXJOBS = 200
-        jobcounter = self.get_job_counter()
+        jobcounter = JobCounter().get()
         self.debug_log("post jobctr %d" % jobcounter)
 
         #submit next job
