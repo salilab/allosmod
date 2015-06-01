@@ -54,7 +54,7 @@ echo "jobname=\${TASK[\$SGE_TASK_ID]}" >>qsub.sh
 echo "cd "$DIR >>qsub.sh
 
 cat $SCRIPT_DIR/input_qsub.sh | sed "s/DDD/pred_dE${delEmax}rAS${rAS}/g" | sed "s/XASPDB/${ASPDB}/g" | sed "s/XOTHPDB/${OTHERPDB}/g" \
-    | sed "s/@SCRIPT_DIR@/$SCRIPT_DIR/g"
+    | sed "s^@SCRIPT_DIR@^$SCRIPT_DIR^g" \
     | sed "s/XdE/${delEmax}/g" | sed "s/XrAS/${rAS}/g" | sed "s/XLPDB/${LIGPDB}/g" | sed "s/XDEV/${DEV}/g" \
     | sed "s/XSAMP/${SAMPLING}/g" | sed "s/XGLYC1/${GLYC1}/g" | sed "s/XREP_OPT/${REP_OPT}/g" | sed "s/XMDTEMP/${MDTEMP}/g" \
     | sed "s/XATT_GAP/${ATT_GAP}/g" | sed "s/XBREAK/${BREAK}/g" | sed "s/XSCRAPP/${SCRAPP}/g" | sed "s/XCOARSE/${COARSE}/g" \
