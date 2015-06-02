@@ -26,12 +26,7 @@ echo "getavgpdb: Salign 2 allosteric states (only consider similar residues) to 
 NRES=`awk 'BEGIN{FS=""}($1$2$3$4=="ATOM"){print $0}' temp9941 |\
       awk 'BEGIN{FS="";lc=""}(lc!=$22){li=0}(li!=$23$24$25$26){a+=1}{li=$23$24$25$26;lc=$22}END{print a}'`
 rcut=10.0
-echo temp9941 >targlist
-echo ${NRES} >>targlist
-echo $rcut >>targlist
-echo 1 >>targlist
-echo temp9942 >>targlist
-allosmod getqiavg_ca >>run.log
+allosmod get_qiavg_ca temp9941 $rcut temp9942 >>run.log
 QI=(`awk '{printf $2" "}' qi_1.dat`)
 if test -e tempfit.pdb; then rm tempfit.pdb; fi
 for i in `$SCRIPT_DIR/count.pl 1 ${NRES}`; do
@@ -154,6 +149,6 @@ for het0 in ${R_iHET0[@]}; do
     fi
 done
 
-rm tempfit.pdb 1temp88.pdb 2temp88.pdb 3temp88.pdb 1dsio.ali temp9991 temp9992 modeller.in targlist
+rm tempfit.pdb 1temp88.pdb 2temp88.pdb 3temp88.pdb 1dsio.ali temp9991 temp9992 modeller.in
 rm temp5773.ali 2temp88_fit.pdb modeller.in.log modeller2.in modeller2.in.log tempfit_sub.pdb qi_1.dat qi_avg.dat
 rm temp[ade] temp994[12] tempN tempNN tempdd 1temp88_fit.pdb tempfit_fit.pdb
