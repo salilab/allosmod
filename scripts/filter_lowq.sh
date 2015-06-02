@@ -45,12 +45,7 @@ NRES=`awk 'BEGIN{FS=""}($1$2$3$4=="ATOM"){print $0}' ${FIL_PM} |\
 
 ls -1 $LS2PDB >tempflq
 
-echo $FIL_PM >targlist
-echo $NRES 1 $NRES >>targlist
-echo 11.0 >>targlist
-awk 'BEGIN{a=0}(NF>0){a+=1}END{print a}' tempflq >>targlist
-cat tempflq >>targlist
-$SCRIPT_DIR/getq_ca
+allosmod get_q_ca $FIL_PM 11.0 `cat tempflq`
 
 paste tempflq qscore1to${NRES}.dat | awk '($3<'${QCUT}'){print "Q = "$3", rm "$1}' >>run.log
 paste tempflq qscore1to${NRES}.dat | awk '($3<'${QCUT}'){print "rm "$1}' | sh
@@ -58,4 +53,4 @@ paste tempflq qscore1to${NRES}.dat | awk '($3<'${QCUT}'){print "rm "$1}' | sh
 paste tempflq qscore1to${NRES}.dat | awk '($3>='${QCUT}'){print $1}' >filenames
 
 paste tempflq qscore1to${NRES}.dat >qscore.dat
-rm tempflq targlist qs_cut1to${NRES}.dat qscore1to${NRES}.dat
+rm tempflq qs_cut1to${NRES}.dat qscore1to${NRES}.dat
