@@ -31,7 +31,7 @@ echo ${NRES} >>targlist
 echo $rcut >>targlist
 echo 1 >>targlist
 echo temp9942 >>targlist
-$SCRIPT_DIR/getqiavg_ca >>run.log
+allosmod getqiavg_ca >>run.log
 QI=(`awk '{printf $2" "}' qi_1.dat`)
 if test -e tempfit.pdb; then rm tempfit.pdb; fi
 for i in `$SCRIPT_DIR/count.pl 1 ${NRES}`; do
