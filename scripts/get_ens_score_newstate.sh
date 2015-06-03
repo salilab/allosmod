@@ -4,9 +4,6 @@
 #ignore states with weights < 5 %
 #max 10 structures in each cluster (hard cutoff for get_qmatrix)
 
-# Absolute path containing this and other scripts
-SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
-
 FIL_PM=$1
 
 if (test ! -e struct_cluster_2.out); then echo struct_cluster_2.out missing; exit; fi
@@ -16,7 +13,7 @@ if (test ! -e ${FIL_PM}); then echo ${FIL_PM} missing; exit; fi
 mkdir tempfc321
 ls -1 1_[0-9]/*.pdb 1_10/*.pdb | awk '{print "cp "$1" tempfc321"}' |sh
 cd tempfc321
-$SCRIPT_DIR/get_qmatrix.sh ../$FIL_PM "*.pdb"
+allosmod get_qmatrix ../$FIL_PM 11.0 *.pdb
 mv cq_aq_qavg_qsd.dat ../newstate1_cq_aq_qavg_qsd.dat
 mv qmatrix.dat ../newstate1_qmatrix.dat
 cd ..
@@ -30,7 +27,7 @@ for s in ${F_2STATE[@]}; do
     ls -1 2_*/$s | awk '{print "cp "$1" tempfc321"}' |sh
 done
 cd tempfc321
-$SCRIPT_DIR/get_qmatrix.sh ../$FIL_PM "*.pdb"
+allosmod get_qmatrix ../$FIL_PM 11.0 *.pdb
 mv cq_aq_qavg_qsd.dat ../newstate2_cq_aq_qavg_qsd.dat
 mv qmatrix.dat ../newstate2_qmatrix.dat
 cd ..
@@ -43,7 +40,7 @@ for s in ${F_3STATE[@]}; do
     ls -1 3_*/$s | awk '{print "cp "$1" tempfc321"}' |sh
 done
 cd tempfc321
-$SCRIPT_DIR/get_qmatrix.sh ../$FIL_PM "*.pdb"
+allosmod get_qmatrix ../$FIL_PM 11.0 *.pdb
 mv cq_aq_qavg_qsd.dat ../newstate3a_cq_aq_qavg_qsd.dat
 mv qmatrix.dat ../newstate3a_qmatrix.dat
 cd ..
@@ -53,7 +50,7 @@ for s in ${F_3STATE[@]}; do
     ls -1 3_*/$s | awk '{print "cp "$1" tempfc321"}' |sh
 done
 cd tempfc321
-$SCRIPT_DIR/get_qmatrix.sh ../$FIL_PM "*.pdb"
+allosmod get_qmatrix ../$FIL_PM 11.0 *.pdb
 mv cq_aq_qavg_qsd.dat ../newstate3b_cq_aq_qavg_qsd.dat
 mv qmatrix.dat ../newstate3b_qmatrix.dat
 cd ..
@@ -65,7 +62,7 @@ for s in ${F_4STATE[@]}; do
     ls -1 4_*/$s | awk '{print "cp "$1" tempfc321"}' |sh
 done
 cd tempfc321
-$SCRIPT_DIR/get_qmatrix.sh ../$FIL_PM "*.pdb"
+allosmod get_qmatrix ../$FIL_PM 11.0 *.pdb
 mv cq_aq_qavg_qsd.dat ../newstate4a_cq_aq_qavg_qsd.dat
 mv qmatrix.dat ../newstate4a_qmatrix.dat
 cd ..
@@ -75,7 +72,7 @@ for s in ${F_4STATE[@]}; do
     ls -1 4_*/$s | awk '{print "cp "$1" tempfc321"}' |sh
 done
 cd tempfc321
-$SCRIPT_DIR/get_qmatrix.sh ../$FIL_PM "*.pdb"
+allosmod get_qmatrix ../$FIL_PM 11.0 *.pdb
 mv cq_aq_qavg_qsd.dat ../newstate4b_cq_aq_qavg_qsd.dat
 mv qmatrix.dat ../newstate4b_qmatrix.dat
 cd ..
@@ -85,7 +82,7 @@ for s in ${F_4STATE[@]}; do
     ls -1 4_*/$s | awk '{print "cp "$1" tempfc321"}' |sh
 done
 cd tempfc321
-$SCRIPT_DIR/get_qmatrix.sh ../$FIL_PM "*.pdb"
+allosmod get_qmatrix ../$FIL_PM 11.0 *.pdb
 mv cq_aq_qavg_qsd.dat ../newstate4c_cq_aq_qavg_qsd.dat
 mv qmatrix.dat ../newstate4c_qmatrix.dat
 cd ..
@@ -97,7 +94,7 @@ for s in ${F_5STATE[@]}; do
     ls -1 5_*/$s | awk '{print "cp "$1" tempfc321"}' |sh
 done
 cd tempfc321
-$SCRIPT_DIR/get_qmatrix.sh ../$FIL_PM "*.pdb"
+allosmod get_qmatrix ../$FIL_PM 11.0 *.pdb
 mv cq_aq_qavg_qsd.dat ../newstate5a_cq_aq_qavg_qsd.dat
 mv qmatrix.dat ../newstate5a_qmatrix.dat
 cd ..
@@ -107,7 +104,7 @@ for s in ${F_5STATE[@]}; do
     ls -1 5_*/$s | awk '{print "cp "$1" tempfc321"}' |sh
 done
 cd tempfc321
-$SCRIPT_DIR/get_qmatrix.sh ../$FIL_PM "*.pdb"
+allosmod get_qmatrix ../$FIL_PM 11.0 *.pdb
 mv cq_aq_qavg_qsd.dat ../newstate5b_cq_aq_qavg_qsd.dat
 mv qmatrix.dat ../newstate5b_qmatrix.dat
 cd ..
@@ -117,7 +114,7 @@ for s in ${F_5STATE[@]}; do
     ls -1 5_*/$s | awk '{print "cp "$1" tempfc321"}' |sh
 done
 cd tempfc321
-$SCRIPT_DIR/get_qmatrix.sh ../$FIL_PM "*.pdb"
+allosmod get_qmatrix ../$FIL_PM 11.0 *.pdb
 mv cq_aq_qavg_qsd.dat ../newstate5c_cq_aq_qavg_qsd.dat
 mv qmatrix.dat ../newstate5c_qmatrix.dat
 cd ..
@@ -127,7 +124,7 @@ for s in ${F_5STATE[@]}; do
     ls -1 5_*/$s | awk '{print "cp "$1" tempfc321"}' |sh
 done
 cd tempfc321
-$SCRIPT_DIR/get_qmatrix.sh ../$FIL_PM "*.pdb"
+allosmod get_qmatrix ../$FIL_PM 11.0 *.pdb
 mv cq_aq_qavg_qsd.dat ../newstate5d_cq_aq_qavg_qsd.dat
 mv qmatrix.dat ../newstate5d_qmatrix.dat
 cd ..
