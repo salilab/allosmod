@@ -386,7 +386,7 @@ if (test ! -s random.ini); then echo structure not initialized >> ${OUTDIR}/erro
 if test `echo "${jobname}==0" |bc -l` -eq 1; then
     if test `echo "XGLYC1==0" |bc -l` -eq 1; then #skip if hydrogens are needed
 	echo convert to splines 
-	allosmod spline pm.pdb edited.rsr converted.rsr
+	allosmod spline random.ini edited.rsr converted.rsr
 	cp converted.rsr atomlistASRS allostericsite.pdb contacts.dat ${RUNDIR}/pred_dEXdErASXrAS/XASPDB_0
 	if (test -e allosmod.py); then cp allosmod.py ${RUNDIR}/pred_dEXdErASXrAS/XASPDB_0; fi
     fi
