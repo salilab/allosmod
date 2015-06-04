@@ -31,7 +31,7 @@ cp ../$PDB1 ../$LIG1 ../$PDB2 ./
 if test `echo "${rcut}>0" |bc -l` -eq 1; then
 
 #align PDB2 to PDB1 and superimpose antigen
-allosmod salign0 $PDB1 $PDB2
+allosmod salign0 $PDB1 $PDB2 temp5773.ali
 PMFIT=`echo ${PDB2} | awk 'BEGIN{FS=""}{if($(NF-3)$(NF-2)$(NF-1)$NF==".pdb"){for(a=1;a<=NF-4;a++){printf $a}}else{printf $0}}END{print "_fit.pdb"}'`
 
 #determine residues in PDB2 that contact LIG1
