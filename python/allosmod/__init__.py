@@ -7,6 +7,8 @@ import copy
 import math
 import random
 import shutil
+import tarfile
+import time
 from operator import itemgetter 
 from os import path, access, R_OK
 
@@ -62,12 +64,59 @@ class Job(saliweb.backend.Job):
                 job_counter.set(-99)
         return job_counter.get()
 
+    def unzip_input(self):
+        """Extract inputs and check for sanity"""
+        if os.path.exists('input.zip'):
+            subprocess.check_call(["unzip", "input.zip"])
+        # Test for 0 directories or >100 directories
+        num_dirs = num_files = 0
+        for d in os.listdir('.'):
+            if os.path.isdir(d):
+                if os.path.exists(os.path.join(d, 'list')) \
+                   and os.path.exists(os.path.join(d, 'input.dat')) \
+                   and os.path.exists(os.path.join(d, 'align.ali')):
+                    num_dirs += 1
+                else:
+                    shutil.rmtree(d)
+            num_files += 1
+        if num_dirs > 100:
+            raise saliweb.backend.SanityError(
+                  "Individual server jobs should have no more than 100 "
+                  "input directories to minimize the output file size and "
+                  "to prevent disk writing errors")
+        elif num_dirs == 0:
+            if num_files > 0:
+                # non batch jobs; move files into input (to fix; this
+                # breaks job resubmission)
+                if os.path.exists('input.zip'):
+                    os.unlink('input.zip')
+                os.mkdir('input')
+                for f in os.listdir('.'):
+                    if f != 'input':
+                        shutil.move(f, 'input')
+            else:
+                raise saliweb.backend.SanityError("NO FILES UPLOADED")
+
+    def archive_inputs(self):
+        """Archive all input files"""
+        archive = self.config.input_archive_directory
+        if archive is None:
+            return
+        ndate = time.strftime("%Y_%b%d")
+        for d in [x for x in os.listdir('.') if os.path.isdir(x)]:
+            tarname = os.path.join(archive, "%s_%s_%s.tar.gz"
+                                   % (ndate, self.name, d))
+            t = tarfile.open(tarname, 'w:gz')
+            t.add(d)
+
     def run(self):
         #preprocess job to keep track of iterations
         jobcounter = self.setup_run()
         self.debug_log("run jobctr %d" % jobcounter)
         #unzip input.zip, check inputs, make input scripts for subdirs
         if jobcounter == 1 or jobcounter == -99:
+            self.unzip_input()
+            self.archive_inputs()
             subprocess.call([os.path.join(self.config.script_directory,
                                           "run_all.sh")])
             shutil.copy("dirlist", "dirlist_all")
@@ -209,6 +258,11 @@ class Config(saliweb.backend.Config):
         saliweb.backend.Config.populate(self, config)
         # Read our service-specific configuration
         self.script_directory = config.get('allosmod', 'script_directory')
+        if config.has_option('allosmod', 'input_archive_directory'):
+            self.input_archive_directory = config.get('allosmod',
+                                                      'input_archive_directory')
+        else:
+            self.input_archive_directory = None
 
 
 def get_web_service(config_file):

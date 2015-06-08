@@ -3,46 +3,10 @@
 # Absolute path containing this and other scripts
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 
-unzip input.zip
-
-#Test for 0 directories or >100 directories
-ctr=0; ctr2=0
-for d in `ls -1d *`; do
-    if test -d $d; then 
-	if test -e $d/list -a -e $d/input.dat -a -e $d/align.ali; then
-	    ctr=$((${ctr} + 1))
-	else
-	    rm -rf $d
-	fi
-    fi
-    ctr2=$((${ctr2} + 1))
-done
-echo $ctr $ctr2
-if test `echo "${ctr}>100" |bc -l` -eq 1; then
-    echo "Individual server jobs should have no more than 100 input directories \
-          to minimize the output file size and to prevent disk writing errors" >>error.log; echo 1 >error
-elif test `echo "${ctr}==0" |bc -l` -eq 1; then
-    if test `echo "${ctr2}>0" |bc -l` -eq 1; then
-	#non batch jobs
-	echo files moved into input
-	rm input.zip; mkdir input; mv * input
-    else
-	echo "NO FILES UPLOADED" >>error.log; echo 1 >error
-    fi
-fi
-
 if test -e dirlist; then rm dirlist; fi
 
 for d in `ls -1d *`; do
     if test -d $d; then 
-	#archive input
-	PWD0=`pwd`
-	NDATE=`date | awk '{print $6"_"$2$3}'`
-	JOBNAME=`basename ${PWD0}`
-	DIRNAME=`echo $d | sed "s/\///g"`
-	tar -czf ${NDATE}_${JOBNAME}_${DIRNAME}.tar.gz $d
-	mv ${NDATE}_${JOBNAME}_${DIRNAME}.tar.gz /modbase4/home/allosmod/service/archive/
-
 	echo $d >>dirlist
 	cd $d
 	#check for correct input files
