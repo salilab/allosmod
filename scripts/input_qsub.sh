@@ -196,10 +196,8 @@ echo input structure completed
 ############
 if test `echo "${jobname}==0" |bc -l` -eq 1; then
 #generate allosteric site
-@SCRIPT_DIR@/get_allostericsite2.sh XLPDB lig.pdb pm_XLPDB XrAS
-cp allostericsite_XrAS/atomlistASRS .
-cp allostericsite_XrAS/allostericsite.pdb .
-rm -rf allostericsite_XrAS
+allosmod get_allosteric_site --output_pdb allostericsite.pdb \
+               --atom_list atomlistASRS XLPDB lig.pdb pm_XLPDB XrAS
 
 ############
 #get restraints
@@ -235,9 +233,8 @@ if test "XdE" == "CALC"; then
 	@SCRIPT_DIR@/editrestraints2.sh listOTH.rsr listAS.rsr tempiq7781 list4contacts atomlistASRS 2.0,2.0,2.0 11.0 $NTOT 0.1 0 false false false >>crap
     else #redo steps without nucleotides
 	echo redo restraints without nucleotides
-	@SCRIPT_DIR@/get_allostericsite2.sh XLPDB lig.pdb tempiq7781 XrAS
-	cp allostericsite_XrAS/atomlistASRS ./atomlistASRS2
-	rm -rf allostericsite_XrAS
+        allosmod get_allosteric_site --atom_list atomlistASRS2 \
+                                  XLPDB lig.pdb tempiq7781 XrAS
 	cp align.ali align.ali.bak
 	allosmod pdb2ali tempiq7781 >>align.ali
 	echo tempiq7781 >listin
