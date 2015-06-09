@@ -131,6 +131,24 @@ class JobTests(saliweb.test.TestCase):
         self.assertTrue(files[0].endswith('testjob_dir0.tar.gz'))
         self.assertTrue(files[1].endswith('testjob_dir1.tar.gz'))
 
+    def test_unzip_input_bad_dirs(self):
+        """Test unzip_input() with only invalid directories"""
+        j = self.make_test_job(allosmod.Job, 'RUNNING')
+        d = saliweb.test.RunInTempDir()
+        z = zipfile.ZipFile('input.zip', 'w')
+        t = open('tempz', 'w')
+        for i in range(3):
+            dirname = 'dir%d' % i
+            if i != 0: z.write('tempz', '%s/list' % dirname)
+            if i != 1: z.write('tempz', '%s/input.dat' % dirname)
+            if i != 2: z.write('tempz', '%s/align.ali' % dirname)
+        z.close()
+        os.unlink('tempz')
+        j.unzip_input()
+        # Only input/ should remain; bad dirs should have been deleted
+        self.assertEqual(os.listdir('.'), ['input'])
+        self.assertEqual(os.listdir('input'), [])
+
     def make_zip(self, numdirs):
         z = zipfile.ZipFile('input.zip', 'w')
         t = open('tempz', 'w')
