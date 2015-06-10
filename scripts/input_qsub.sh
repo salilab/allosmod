@@ -282,7 +282,11 @@ if test "XBREAK" == "true"; then
     #redo here because nucleotides change max_sc_sc_distance
     allosmod make_mod_inputs -- pm.pdb listin \
                        -3333 3 3 3 XDEV > model_ini.log
-    @SCRIPT_DIR@/calc_contpres.sh pm.pdb.rsr pm_XASPDB XZCUTOFF XSCLBREAK XCHEMFR
+    if [ "XCHEMFR" = "cdensity" ]; then
+      allosmod contpres --cdensity_cutoff XZCUTOFF pm.pdb.rsr pm_XASPDB XSCLBREAK
+    else
+      allosmod contpres pm.pdb.rsr pm_XASPDB XSCLBREAK
+    fi
     echo "Chemical frustration is implemented: contacts with buried acidic/basic residues are scaled by XSCLBREAK, z-score cutoff is XZCUTOFF" >>run.log
     echo "Chemical frustration type is XCHEMFR" >>run.log
 fi
