@@ -223,8 +223,6 @@ sleep 10s
     def complete(self):
         os.chmod(".", 0775)
         subprocess.call([os.path.join(self.config.script_directory,
-                                      "zip_or_send_output2.sh")])
-        subprocess.call([os.path.join(self.config.script_directory,
                                       "zip_or_send_output.sh")])
         URLFOXS = open("urlout","r")
         urltest = URLFOXS.readlines()
