@@ -229,9 +229,9 @@ sleep 10s
         os.chmod(".", 0775)
         subprocess.call([os.path.join(self.config.script_directory,
                                       "zip_or_send_output.sh")])
-        URLFOXS = open("urlout","r")
-        urltest = URLFOXS.readlines()
-        self.urlout = urltest[len(urltest)-1].strip()
+        with open("urlout") as fh:
+            urltest = fh.readlines()
+        self.urlout = urltest[-1].strip()
         if self.urlout == 'fail':
             raise FoXSError("FoXS failed to generate outputs")
 
