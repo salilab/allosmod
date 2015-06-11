@@ -12,6 +12,9 @@ import time
 from operator import itemgetter 
 from os import path, access, R_OK
 
+class FoXSError(Exception):
+    pass
+
 class JobCounter(object):
     """Track where in a multi-step job we are.
        State is stored in a file called 'jobcounter' in the job directory."""
@@ -229,6 +232,8 @@ sleep 10s
         URLFOXS = open("urlout","r")
         urltest = URLFOXS.readlines()
         self.urlout = urltest[len(urltest)-1].strip()
+        if self.urlout == 'fail':
+            raise FoXSError("FoXS failed to generate outputs")
 
     def send_job_completed_email(self):
         """Email the user (if requested) to let them know job results are
@@ -240,17 +245,13 @@ sleep 10s
                      % self.name
             body = 'Your job %s has finished.\n\n' % self.name + \
                    'Results can be found at %s\n' % self.url
-            self.send_user_email(subject, body)
-        elif self.urlout == 'fail':
-            erremail = 'allosmod@salilab.org'
-            self.admin_fail(erremail)
         else:
             subject = 'Sali lab AllosMod-FoXS service: Job %s complete' \
                      % self.name
             body = 'Your job %s has finished.\n\n' % self.name + \
                    'Results can be found at %s\n' % self.urlout + \
                    'You may also download simulation trajectories at %s\n' % self.url
-            self.send_user_email(subject, body)
+        self.send_user_email(subject, body)
 
 
 class Config(saliweb.backend.Config):
