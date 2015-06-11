@@ -748,9 +748,6 @@ sub get_submit_page {
     if ($addlower_indices ne "") {
 	system("echo LOBD $addlower_dist $addlower_stdev $addlower_indices >> $jobdir/input.dat");
     }
-    if($email =~ "pweinkam" and $email =~ "gmail") {
-	system("echo PW=True >> $jobdir/input.dat");
-    }
 
     # handle SAXS options
     my $saxs_qmax = $q->param('saxs_qmax');
