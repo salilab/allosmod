@@ -7,7 +7,7 @@ SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 PWD0=`pwd`
 cd output/
 
-if test -s input/saxs.dat; then #allosmod-foxs run
+#allosmod-foxs run
     cp input/saxs.dat $PWD0
 
     if test -s input/pm_scan_1.pdb; then
@@ -72,17 +72,3 @@ if test -s input/saxs.dat; then #allosmod-foxs run
 
     rm -rf [1-9] [1-9][0-9]
     rm -rf output
-else
-    #regular allosmod run
-    cd $PWD0
-    #collect energies
-    ls -1d output/*/pred_dE* | awk '{print "echo "$1" >list\n$SCRIPT_DIR/get_e.sh"}' |sh
-    rm output/*/scan
-    zip -r output.zip output
-    echo "nofoxs" > urlout
-
-    sleep 1m
-    rm -rf output
-fi
-
-

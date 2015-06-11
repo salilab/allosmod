@@ -181,5 +181,49 @@ class JobTests(saliweb.test.TestCase):
         j.send_user_email = test_foxs
         j.send_job_completed_email()
 
+    def test_complete_nofoxs(self):
+        """Test job completion, no FoXS"""
+        j = self.make_test_job(allosmod.Job, 'RUNNING')
+        d = saliweb.test.RunInTempDir()
+        subd = 'output/land1/pred_dECALCrAS1000/land1.pdb_0'
+        os.makedirs(subd)
+        for f in ('output/land1/scan',
+                  os.path.join(subd, 'pm.pdb.B10010001.pdb'),
+                  os.path.join(subd, 'pm.pdb.B10020001.pdb')):
+            with open(f, 'w') as fh:
+                fh.write('dummy')
+        with open(os.path.join(subd, 'pm.pdb.D00000001'), 'w') as fh:
+            fh.write("""
+# Molecular dynamics simulation at 0.01 K
+#  Step   Current energy Av shift Mx shift   Kinetic energy    Kinetic temp.
+      0      14091.83789   0.0000   0.0000          0.08312          0.00993
+      2      14091.83789   0.0000   0.0000          0.08367          0.01000
+# Molecular dynamics simulation at 0.01 K
+#  Step   Current energy Av shift Mx shift   Kinetic energy    Kinetic temp.
+      0      14091.83789   0.0000   0.0000          0.08367          0.01000
+      2      14091.83789   0.0000   0.0000          0.08368          0.01000
+# Molecular dynamics simulation at 0.01 K
+#  Step   Current energy Av shift Mx shift   Kinetic energy    Kinetic temp.
+      0      14091.83789   0.0000   0.0000          0.08367          0.01000
+      2         10.00000   0.0000   0.0000          1.00000          0.00000
+# Molecular dynamics simulation at 0.01 K
+#  Step   Current energy Av shift Mx shift   Kinetic energy    Kinetic temp.
+      0      14091.83789   0.0000   0.0000          0.08367          0.01000
+      2         42.00000   0.0000   0.0000          2.00000          0.00000
+""")
+        j.complete()
+        # output dir should have been replaced by output.zip
+        self.assertEqual(os.listdir('.'), ['output.zip'])
+        z = zipfile.ZipFile('output.zip')
+        self.assertEqual(len(z.namelist()), 4)
+        z.extractall()
+        # scan file should not be in the archive
+        self.assertFalse(os.path.exists('output/land1/scan'))
+        with open(os.path.join(subd, "energy.dat")) as fh:
+            contents = fh.read()
+        self.assertEqual(contents,
+                         '10.00000 0.0000 0.0000 1.00000 0.00000\n'
+                         '42.00000 0.0000 0.0000 2.00000 0.00000\n')
+
 if __name__ == '__main__':
     unittest.main()

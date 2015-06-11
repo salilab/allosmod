@@ -1,6 +1,8 @@
 from __future__ import print_function
 import saliweb.backend
 import subprocess
+import zipfile
+import glob
 import os
 import re
 import copy
@@ -14,6 +16,13 @@ from os import path, access, R_OK
 
 class FoXSError(Exception):
     pass
+
+def zip_dir(z, dirpath):
+    """Recursively add a directory to a zipfile"""
+    dirpath = dirpath.rstrip('/')
+    for root, dirs, files in os.walk(dirpath):
+        for f in files:
+            z.write(root + '/' + f)
 
 class JobCounter(object):
     """Track where in a multi-step job we are.
@@ -227,6 +236,50 @@ sleep 10s
             os.system("mv %s output" % dir)
 
     def complete(self):
+        if os.path.exists('output/input/saxs.dat'):
+            self._complete_foxs()
+        else:
+            self._complete_nofoxs()
+
+    def collect_energies(self, subdir):
+        """Write the energy of each model produced (if any) into energy.dat"""
+        n_models = len(glob.glob(os.path.join(subdir, "pm.pdb.B[1-8]*pdb")))
+        if n_models == 0:
+            return
+        with open(os.path.join(subdir, 'pm.pdb.D00000001')) as fh:
+            energies = []
+            # Accumulate the energy for the last step in each MD simulation
+            for line in fh:
+                if line.startswith('# Molecular dynamics simulation'):
+                    energies.append(prevline.split())
+                prevline = line
+            energies.append(prevline.split())
+        # The last n_models energies are the final energies of the models
+        with open(os.path.join(subdir, 'energy.dat'), 'w') as fh:
+            for e in energies[-n_models:]:
+                # Discard first field (the MD step number)
+                print(" ".join(e[1:]), file=fh)
+
+    def _complete_nofoxs(self):
+        """Complete a regular AllosMod run"""
+        # Collect energies
+        for g in glob.glob("output/*/pred_dE*/*"):
+            self.collect_energies(g)
+
+        for g in glob.glob("output/*/scan"):
+            os.unlink(g)
+
+        # zip outputs
+        z = zipfile.ZipFile('output.zip', 'w')
+        zip_dir(z, 'output')
+        z.close()
+
+        shutil.rmtree('output')
+        self.urlout = 'nofoxs'
+
+    def _complete_foxs(self):
+        """Complete an AllosMod-FoXS run"""
+        # Make directory group writeable so FoXS can access it
         os.chmod(".", 0775)
         subprocess.call([os.path.join(self.config.script_directory,
                                       "zip_or_send_output.sh")])
