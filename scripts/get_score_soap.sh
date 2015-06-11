@@ -26,8 +26,10 @@ env.libs.parameters.read(file='\$(LIB)/par.lib')
 
 env.edat.dynamic_sphere = False
 env.edat.contact_shell = 8.
+# Note that in order for this to work, you must download soap_protein_od.hdf5
+# from http://salilab.org/SOAP/ and place it in Modeller's modlib directory
+# (or specify the full path to it as the 'library' argument to Scorer()).
 sl = soap_protein_od.Scorer()
-#sl = soap_protein_od.Scorer(library='/netapp/sali/pweinkam/bin/db/soap_protein_od.hdf5')
 env.edat.energy_terms.append(sl)
 
 ctr=1
