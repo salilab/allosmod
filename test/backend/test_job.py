@@ -159,5 +159,27 @@ class JobTests(saliweb.test.TestCase):
             z.write('tempz', '%s/align.ali' % dirname)
         os.unlink('tempz')
 
+    def test_email_nofoxs(self):
+        """Test send_job_completed_email, no FoXS"""
+        j = self.make_test_job(allosmod.Job, 'RUNNING')
+        j.urlout = 'nofoxs'
+        def test_nofoxs(subject, body):
+            self.assertEqual(subject,
+                         "Sali lab AllosMod service: Job testjob complete")
+        j.send_user_email = test_nofoxs
+        j.send_job_completed_email()
+
+    def test_email_foxs(self):
+        """Test send_job_completed_email, with FoXS"""
+        j = self.make_test_job(allosmod.Job, 'RUNNING')
+        j.urlout = 'foxs_url'
+        def test_foxs(subject, body):
+            self.assertEqual(subject,
+                         "Sali lab AllosMod-FoXS service: Job testjob complete")
+            self.assertTrue("You may also download simulation trajectories"
+                            in body)
+        j.send_user_email = test_foxs
+        j.send_job_completed_email()
+
 if __name__ == '__main__':
     unittest.main()
