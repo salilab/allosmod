@@ -42,11 +42,11 @@ sub get_project_menu {
 <a href="http://modbase.compbio.ucsf.edu/allosmod"><img src="$htmlroot/img/am_logo.gif" /></a>
 </left>
 </div><br />
-<h4><small>Developer:</small></h4><p>Patrick Weinkam</p>
+<h4><small>Developers:</small></h4><p>Patrick Weinkam<br />
+Ben Webb</p>
 <h4><small>Acknowledgements:</small></h4>
 <p>Ursula Pieper<br />
 Elina Tjioe<br />
-Ben Webb<br />
 <br />
 Andrej Sali</p>
 <p><i>Version $version</i></p>
