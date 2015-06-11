@@ -127,10 +127,11 @@ class Job(saliweb.backend.Job):
             shutil.copy("dirlist", "dirlist_all")
 
         #create sge script
-        DIRFILE = open("dirlist","r")
-        dir = DIRFILE.readline() #keep track of current job's directory
+        with open("dirlist") as fh:
+            #keep track of current job's directory
+            dir = fh.readline().rstrip('\r\n')
 
-        ERRFILE = open("%s/error" % dir.replace('\n', ''),"r")
+        ERRFILE = open("%s/error" % dir)
         err = int(ERRFILE.readline())
         self.debug_log("run err %d" % err)
         if err == 0 and jobcounter != -1:
@@ -141,14 +142,14 @@ hostname
 awk '{print $0}' tempdir  |sh
 rm tempdir
 sleep 10s
-""" % dir.replace('\n', '')
-            NSIMFILE = open("%s/numsim" % dir.replace('\n', ''),"r")
+""" % dir
+            NSIMFILE = open("%s/numsim" % dir,"r")
             numsim = int(NSIMFILE.readline())
             r = self.runnercls(script)
             r.set_sge_options("-j y -l arch=linux-x64 -l netapp=2G,scratch=2G -l mem_free=5G -l h_rt=90:00:00 -t 1-%i -V" % numsim)
 
         elif err == 0 and jobcounter == -1:
-            FOXSFILE = open("%s/allosmodfox" % dir.replace('\n', ''),"r")
+            FOXSFILE = open("%s/allosmodfox" % dir,"r")
             allosmodfox = int(FOXSFILE.readline())
             self.debug_log("run allosmodfox %d" % allosmodfox)
             if allosmodfox == 0:
@@ -160,15 +161,15 @@ sleep 10s
                 script = """
 source ./%s/qsub.sh
 sleep 10s
-""" % dir.replace('\n', '')
+""" % dir
                 
-                NSIMFILE = open("%s/numsim" % dir.replace('\n', ''),"r")
+                NSIMFILE = open("%s/numsim" % dir,"r")
                 numsim = int(NSIMFILE.readline())
                 r = self.runnercls(script)
                 r.set_sge_options("-j y -l arch=linux-x64 -l netapp=1.0G,scratch=2.0G -l mem_free=4G -l h_rt=90:00:00 -t 1-1 -V")
 
                 JobCounter().write(-1)
-                with open('%s/allosmodfox' % dir.replace('\n', ''), 'w') as fh:
+                with open('%s/allosmodfox' % dir, 'w') as fh:
                     print("0", file=fh)
                 self.debug_log("allosmodfox=-1 numsim %d" % numsim)
             else:
@@ -205,17 +206,17 @@ sleep 10s
 #                os.system("sleep 5m")
 
             os.mkdir("output")
-            DIRFILE = open("dirlist_all","r")
-            r_dirs = DIRFILE.readlines()
+            with open("dirlist_all") as fh:
+                r_dirs = [line.rstrip('\r\n') for line in fh]
             #if input dir made because no directory is uploaded, delete unecessary files
             os.system("rm -rf input/dirlist input/dirlist_all input/jobcounter input/output input/pwout") #input/input.zip
             os.system("cp error.log input/error.log output/")
             for dir in r_dirs:
-                os.system("rm %s/numsim" % dir.replace('\n', ''))
-                os.system("rm %s/error" % dir.replace('\n', ''))
-                os.system("rm %s/qsub.sh" % dir.replace('\n', ''))
+                os.system("rm %s/numsim" % dir)
+                os.system("rm %s/error" % dir)
+                os.system("rm %s/qsub.sh" % dir)
 
-                os.system("mv %s output" % dir.replace('\n', ''))
+                os.system("mv %s output" % dir)
 
             os.system("rm -rf dirlist dirlist_all jobcounter")
                 
@@ -223,7 +224,7 @@ sleep 10s
         if jobcounter >= MAXJOBS:
             os.system("echo Number of jobs have reached a maximum: %i >>error.log" % MAXJOBS)
             os.system("echo If less jobs were expected to run, this could be a user/server error >>error.log")
-            os.system("mv %s output" % dir.replace('\n', ''))
+            os.system("mv %s output" % dir)
 
     def complete(self):
         os.chmod(".", 0775)
