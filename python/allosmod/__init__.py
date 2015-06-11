@@ -131,8 +131,8 @@ class Job(saliweb.backend.Job):
             #keep track of current job's directory
             dir = fh.readline().rstrip('\r\n')
 
-        ERRFILE = open("%s/error" % dir)
-        err = int(ERRFILE.readline())
+        with open("%s/error" % dir) as fh:
+            err = int(fh.readline())
         self.debug_log("run err %d" % err)
         if err == 0 and jobcounter != -1:
             script = """
@@ -143,14 +143,14 @@ awk '{print $0}' tempdir  |sh
 rm tempdir
 sleep 10s
 """ % dir
-            NSIMFILE = open("%s/numsim" % dir,"r")
-            numsim = int(NSIMFILE.readline())
+            with open("%s/numsim" % dir) as fh:
+                numsim = int(fh.readline())
             r = self.runnercls(script)
             r.set_sge_options("-j y -l arch=linux-x64 -l netapp=2G,scratch=2G -l mem_free=5G -l h_rt=90:00:00 -t 1-%i -V" % numsim)
 
         elif err == 0 and jobcounter == -1:
-            FOXSFILE = open("%s/allosmodfox" % dir,"r")
-            allosmodfox = int(FOXSFILE.readline())
+            with open("%s/allosmodfox" % dir) as fh:
+                allosmodfox = int(fh.readline())
             self.debug_log("run allosmodfox %d" % allosmodfox)
             if allosmodfox == 0:
                 r = self.runnercls2()
@@ -163,8 +163,8 @@ source ./%s/qsub.sh
 sleep 10s
 """ % dir
                 
-                NSIMFILE = open("%s/numsim" % dir,"r")
-                numsim = int(NSIMFILE.readline())
+                with open("%s/numsim" % dir) as fh:
+                    numsim = int(fh.readline())
                 r = self.runnercls(script)
                 r.set_sge_options("-j y -l arch=linux-x64 -l netapp=1.0G,scratch=2.0G -l mem_free=4G -l h_rt=90:00:00 -t 1-1 -V")
 
