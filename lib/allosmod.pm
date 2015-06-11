@@ -777,10 +777,6 @@ sub get_submit_page {
 	if ($addlower_indices ne "") {
 	    system("echo LOBD $addlower_dist $addlower_stdev $addlower_indices >> $jobdir/input.dat");
 	}
-#	if($email =~ "pweinkam" and $email =~ "gmail") {
-#	    system("echo LOCALBETA=True >> $jobdir/input.dat");
-#	}
-
     } else {
 	#batch job
 
