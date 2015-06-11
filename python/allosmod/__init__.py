@@ -240,7 +240,7 @@ sleep 10s
                    'Results can be found at %s\n' % self.url
             self.send_user_email(subject, body)
         elif self.urlout == 'fail':
-            erremail = 'pweinkam@salilab.org'
+            erremail = 'allosmod@salilab.org'
             self.admin_fail(erremail)
         else:
             subject = 'Sali lab AllosMod-FoXS service: Job %s complete' \
