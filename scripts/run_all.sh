@@ -3,6 +3,9 @@
 # Absolute path containing this and other scripts
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 
+LOCAL_SCRATCH=$1
+GLOBAL_SCRATCH=$2
+
 if test -e dirlist; then rm dirlist; fi
 
 for d in `ls -1d *`; do
@@ -238,7 +241,7 @@ for d in `ls -1d *`; do
 	fi
 
 	# generate qsub.sh
-	$SCRIPT_DIR/run.sh $d $SAMPLING $GLYC1 $GLYC2
+	$SCRIPT_DIR/run.sh $d $SAMPLING $GLYC1 $GLYC2 $LOCAL_SCRATCH $GLOBAL_SCRATCH
 
 	cd ..
     fi

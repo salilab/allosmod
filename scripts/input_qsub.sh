@@ -8,9 +8,9 @@ echo $OUTDIR
 # Get the 'allosmod' binary in the path
 module load allosmod
 
-# Make a temporary directory on the scratch disk, 
-# specific to the user and SGE job.  
-TMPDIR="/scratch/XASPDB_${jobname}_$JOB_ID/"
+# Make a temporary directory on the local scratch disk,
+# specific to the user and SGE job.
+TMPDIR="@LOCAL_SCRATCH@/XASPDB_${jobname}_$JOB_ID/"
 mkdir -p $TMPDIR
 echo $TMPDIR
 
@@ -348,7 +348,6 @@ echo searching for converted.rsr
 date
 for c in `@SCRIPT_DIR@/count.pl 1 60`; do
     echo $c
-#    FIRSTDIR="/scratch/XASPDB_0_$JOB_ID/"
     FIRSTDIR=${RUNDIR}/pred_dEXdErASXrAS/XASPDB_0
     echo $FIRSTDIR
     ls $FIRSTDIR
@@ -415,9 +414,9 @@ if test `echo "XGLYC1==0" |bc -l` -eq 1; then
 	if test "XSCRAPP" == "true"; then
 	    python model_run.py > model_run.log
 	    JOBID=`echo $RUNDIR | awk 'BEGIN{FS="/"}{print $(NF-1)}'`
-	    OUTDIR=/scrapp/${JOBID}/DDD/XASPDB_${jobname}
+	    OUTDIR=@GLOBAL_SCRATCH@/${JOBID}/DDD/XASPDB_${jobname}
 	    mkdir -p $OUTDIR
-	    echo /scrapp/${JOBID}/DDD > $RUNDIR/DDD/XASPDB_${jobname}/OUTPUT_IS_HERE
+	    echo @GLOBAL_SCRATCH@/${JOBID}/DDD > $RUNDIR/DDD/XASPDB_${jobname}/OUTPUT_IS_HERE
 	fi
     elif test "XSAMP" == "moderate_cm" -o "XSAMP" == "moderate_am" -o "XSAMP" == "fast_cm"; then
 	@SCRIPT_DIR@/get_pm2.sh pm.pdb list $RAND_NUM XDEV XSAMP $MDTEMP

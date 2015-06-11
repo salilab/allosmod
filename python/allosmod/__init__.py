@@ -118,7 +118,9 @@ class Job(saliweb.backend.Job):
             self.unzip_input()
             self.archive_inputs()
             subprocess.call([os.path.join(self.config.script_directory,
-                                          "run_all.sh")])
+                                          "run_all.sh"),
+                             self.config.local_scratch,
+                             self.config.global_scratch])
             shutil.copy("dirlist", "dirlist_all")
 
         #create sge script
@@ -261,6 +263,8 @@ class Config(saliweb.backend.Config):
                                                       'input_archive_directory')
         else:
             self.input_archive_directory = None
+        self.local_scratch = config.get('allosmod', 'local_scratch')
+        self.global_scratch = config.get('allosmod', 'global_scratch')
 
 
 def get_web_service(config_file):

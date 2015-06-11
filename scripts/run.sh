@@ -16,11 +16,14 @@ DEV=`grep -i "DEVIATION" input.dat | awk 'BEGIN{FS="="}{print $2}' | awk '{print
 MDTEMP=`grep -i "MDTEMP" input.dat | awk 'BEGIN{FS="="}{print $2}' | awk 'BEGIN{a=300.0}{a=$1}END{print a}' | tr [A-Z] [a-z]` #option to change simulation temperature
 REP_OPT=`grep -i "repeat_optimization" input.dat | awk 'BEGIN{FS="="}{print $2}' | awk 'BEGIN{a=1}{a=$1}END{print a}'` #option to change repeat optimization for model_glyc.py
 ATT_GAP=`grep -i "attach_gaps" input.dat | awk 'BEGIN{FS="="}{print $2}' | awk 'BEGIN{a="True"}{a=$1}END{print a}' | tr [A-Z] [a-z]` #insert gaps for glyc attach sites
-SCRAPP=`grep -i "SCRAPP" input.dat | awk 'BEGIN{FS="="}{print $2}' | awk 'BEGIN{a="False"}{a=$1}END{print a}' | tr [A-Z] [a-z]` #move output to /scrapp
+SCRAPP=`grep -i "SCRAPP" input.dat | awk 'BEGIN{FS="="}{print $2}' | awk 'BEGIN{a="False"}{a=$1}END{print a}' | tr [A-Z] [a-z]` #move output to global scratch
 DIR=$1
 SAMPLING=$2
 GLYC1=$3
 GLYC2=$4
+LOCAL_SCRATCH=$5
+GLOBAL_SCRATCH=$6
+
 BREAK=`grep -i "BREAK" input.dat | grep -v "SCLBREAK" | awk 'BEGIN{FS="="}{print $2}' |\
        awk 'BEGIN{a="False"}{a=$1}END{print a}' | tr [A-Z] [a-z]` #break dist interactions for buried charged res
 SCLBREAK=`grep -i "SCLBREAK" input.dat | awk 'BEGIN{FS="="}{print $2}' | awk 'BEGIN{a=0.1}{a=$1}END{print a}'` #if break, contacts scaled by SCLBREAK
@@ -54,6 +57,8 @@ echo "jobname=\${TASK[\$SGE_TASK_ID]}" >>qsub.sh
 echo "cd "$DIR >>qsub.sh
 
 cat $SCRIPT_DIR/input_qsub.sh | sed "s/DDD/pred_dE${delEmax}rAS${rAS}/g" | sed "s/XASPDB/${ASPDB}/g" | sed "s/XOTHPDB/${OTHERPDB}/g" \
+    | sed "s^@LOCAL_SCRATCH@^$LOCAL_SCRATCH^g" \
+    | sed "s^@GLOBAL_SCRATCH@^$GLOBAL_SCRATCH^g" \
     | sed "s^@SCRIPT_DIR@^$SCRIPT_DIR^g" \
     | sed "s/XdE/${delEmax}/g" | sed "s/XrAS/${rAS}/g" | sed "s/XLPDB/${LIGPDB}/g" | sed "s/XDEV/${DEV}/g" \
     | sed "s/XSAMP/${SAMPLING}/g" | sed "s/XGLYC1/${GLYC1}/g" | sed "s/XREP_OPT/${REP_OPT}/g" | sed "s/XMDTEMP/${MDTEMP}/g" \

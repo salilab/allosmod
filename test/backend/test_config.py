@@ -37,6 +37,8 @@ expire: 1d
 
 [allosmod]
 script_directory: sdir
+local_scratch: /tmp
+global_scratch: /scrapp
 """
 
 def make_config(fname, archive_dir=None):
@@ -53,6 +55,8 @@ class Tests(saliweb.test.TestCase):
         make_config('test.config')
         c = allosmod.Config('test.config')
         self.assertEqual(c.script_directory, 'sdir')
+        self.assertEqual(c.local_scratch, '/tmp')
+        self.assertEqual(c.global_scratch, '/scrapp')
         self.assertEqual(c.input_archive_directory, None)
         os.unlink('test.config')
 
