@@ -249,7 +249,7 @@ sleep 10s
                      % self.name
             body = 'Your job %s has finished.\n\n' % self.name + \
                    'Results can be found at %s\n' % self.urlout + \
-                   'You may also download to simulation trajectories at %s\n' % self.url
+                   'You may also download simulation trajectories at %s\n' % self.url
             self.send_user_email(subject, body)
 
 
