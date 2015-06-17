@@ -230,7 +230,10 @@ if test "XdE" == "CALC"; then
     NATOM2=`awk 'END{print NR}' tempiq7781`
     if test `echo "${NATOM1}==${NATOM2}" |bc -l` -eq 1; then 
 	NTOT=`allosmod count_alignments align.ali list pm.pdb`
-	@SCRIPT_DIR@/editrestraints2.sh listOTH.rsr listAS.rsr tempiq7781 list4contacts atomlistASRS 2.0,2.0,2.0 11.0 $NTOT 0.1 0 false false false >>crap
+	allosmod edit_restraints --sigma_AS=2.0 --sigma_RS=2.0 \
+                 --sigma_inter=2.0 --cutoff=11.0 --ntotal=$NTOT --delEmax=0.1 \
+                 listOTH.rsr listAS.rsr tempiq7781 list4contacts \
+                 atomlistASRS > edited.rsr
     else #redo steps without nucleotides
 	echo redo restraints without nucleotides
         allosmod get_allosteric_site --atom_list atomlistASRS2 \
@@ -250,8 +253,10 @@ if test "XdE" == "CALC"; then
 	NTOT=`allosmod count_alignments align.ali list pm.pdb`
 	mv align.ali.bak align.ali
 
-	@SCRIPT_DIR@/editrestraints2.sh listOTH2.rsr listAS2.rsr tempiq7781 list4contacts atomlistASRS2 2.0,2.0,2.0 11.0 $NTOT 0.1 0 false false false >>crap
-##	@SCRIPT_DIR@/editrestraints2.sh listOTH.rsr listAS.rsr pm_XASPDB list4contacts atomlistASRS 2.0,2.0,2.0 11.0 $NTOT 0.1 0 false false >>crap
+	allosmod edit_restraints --sigma_AS=2.0 --sigma_RS=2.0 \
+                 --sigma_inter=2.0 --cutoff=11.0 --ntotal=$NTOT --delEmax=0.1 \
+                 listOTH2.rsr listAS2.rsr tempiq7781 list4contacts \
+                 atomlistASRS2 > edited.rsr
 
 	rm listOTH2.rsr listAS2.rsr atomlistASRS2 tempiq778[12].ini
     fi
@@ -294,9 +299,9 @@ if test "XLOCRIGID" == "true"; then
     @SCRIPT_DIR@/get_loopadjres.sh #strengthen residues adjacent to loops
 fi
 if (test -e break.dat); then
-    nbreak=`awk 'BEGIN{a=0}(NF>0){a+=1}END{print a}' break.dat`
+    break="break.dat"
 else
-    nbreak=0
+    break=""
 fi
 
 ########
@@ -304,8 +309,11 @@ fi
 ########
 if (test ! -e ${OUTDIR}/error.log); then 
     NTOT=`allosmod count_alignments align.ali list pm.pdb`
-    @SCRIPT_DIR@/editrestraints2.sh listOTH.rsr listAS.rsr pm_XASPDB list4contacts atomlistASRS 2.0,2.0,2.0 11.0 \
-                                             $NTOT ${delEmax} ${nbreak} XCOARSE XLOCRIGID >>run.log
+    allosmod edit_restraints --sigma_AS=2.0 --sigma_RS=2.0 \
+             --sigma_inter=2.0 --cutoff=11.0 --ntotal=$NTOT \
+             --delEmax=${delEmax} XCOARSE XLOCRIGID ${break} \
+             listOTH.rsr listAS.rsr pm_XASPDB list4contacts \
+             atomlistASRS > edited.rsr
     #add restraints between protein and sugar
     if test `echo "XGLYC2==1" |bc -l` -eq 1; then 
 	@SCRIPT_DIR@/get_glyc_restraint.sh pm_XASPDB allosmod.py >>edited.rsr

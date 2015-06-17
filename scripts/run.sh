@@ -33,6 +33,16 @@ COARSE=`grep -i "COARSE" input.dat | awk 'BEGIN{FS="="}{print $2}' | awk 'BEGIN{
 LOCRIGID=`grep -i "LOCALRIGID" input.dat | awk 'BEGIN{FS="="}{print $2}' | awk 'BEGIN{a="False"}{a=$1}END{print a}' | tr [A-Z] [a-z]` #increase local rigidity
 testmode=`grep -i "PW" input.dat | awk 'BEGIN{FS="="}{print $2}' | awk 'BEGIN{a="False"}{a=$1}END{print a}' | tr [A-Z] [a-z]` #run test code
 ####################
+if [ "${COARSE}" = "true" ]; then
+  COARSE="--coarse"
+else
+  COARSE=""
+fi
+if [ "${LOCRIGID}" = "true" ]; then
+  LOCRIGID="--locrigid"
+else
+  LOCRIGID=""
+fi
 
 RANGE_LETT=( `echo $NRUNS | awk '{for(a=0;a<$1;a++){print a}}'` ) #indep runs with different starting structures
 
