@@ -8,6 +8,7 @@ DIR=$1 #path to alignment and list files
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 
 # Get the 'allosmod' binary in the path
+. /etc/profile
 module load allosmod
 
 cd $DIR

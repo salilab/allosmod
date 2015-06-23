@@ -8,6 +8,7 @@ DIR=$2 #path to INPFIL and list
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 
 # Get the 'allosmod' binary in the path
+. /etc/profile
 module load allosmod
 
 cd $DIR
