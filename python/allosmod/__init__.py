@@ -270,7 +270,7 @@ sleep 10s
             os.unlink(g)
 
         # zip outputs
-        z = zipfile.ZipFile('output.zip', 'w')
+        z = zipfile.ZipFile('output.zip', 'w', allowZip64=True)
         zip_dir(z, 'output')
         z.close()
 
