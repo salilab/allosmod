@@ -131,7 +131,7 @@ echo completed input structure $s
 	mv * $OUTDIR; exit
     fi
 
-    @SCRIPT_DIR@/getavgpdb2.sh pm_XASPDB pm_XOTHPDB XASPDB XOTHPDB
+    allosmod getavgpdb pm_XASPDB pm_XOTHPDB XASPDB XOTHPDB
     cp list list4contacts
 
 else #NTOT=1
@@ -339,7 +339,7 @@ if (test ! -e ${OUTDIR}/error.log); then
 	    for s in `cat list`; do
 		awk 'BEGIN{FS=""}($1$2$3$4=="ATOM"||$1$2$3$4=="HETA"){print $0}'  pred_${s}/pm.pdb.B99990001.pdb >pm_${s}
 	    done
-	    @SCRIPT_DIR@/getavgpdb2.sh pm_XASPDB pm_XOTHPDB XASPDB XOTHPDB
+	    allosmod getavgpdb pm_XASPDB pm_XOTHPDB XASPDB XOTHPDB
 	else
 	    s=`head -n1 list`
 	    awk 'BEGIN{FS=""}($1$2$3$4=="ATOM"||$1$2$3$4=="HETA"){print $0}'  pred_${s}/pm.pdb.B99990001.pdb >avgpdb.pdb
