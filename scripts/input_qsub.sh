@@ -417,7 +417,7 @@ MDTEMP=`echo XMDTEMP | tr [A-Z] [a-z] | awk '{if($1=="scan"){print ('${jobname}'
 if test `echo "XGLYC1==0" |bc -l` -eq 1; then
     if test "XSAMP" == "simulation"; then
 	echo "randomized numbers: $RAND_NUM $RR1 $RR2 $RR3" >>run.log
-	@SCRIPT_DIR@/get_pm2.sh pm.pdb list $RAND_NUM XDEV script $MDTEMP
+	allosmod make_pm_script -- pm.pdb list $RAND_NUM XDEV script $MDTEMP
 	cp @SCRIPT_DIR@/README_user $RUNDIR/README
 	if test "XSCRAPP" == "true"; then
 	    python model_run.py > model_run.log
@@ -427,7 +427,7 @@ if test `echo "XGLYC1==0" |bc -l` -eq 1; then
 	    echo @GLOBAL_SCRATCH@/${JOBID}/DDD > $RUNDIR/DDD/XASPDB_${jobname}/OUTPUT_IS_HERE
 	fi
     elif test "XSAMP" == "moderate_cm" -o "XSAMP" == "moderate_am" -o "XSAMP" == "fast_cm"; then
-	@SCRIPT_DIR@/get_pm2.sh pm.pdb list $RAND_NUM XDEV XSAMP $MDTEMP
+	allosmod make_pm_script -- pm.pdb list $RAND_NUM XDEV XSAMP $MDTEMP
 	echo running modeller
 	python model_run.py > model_run.log
 	echo done with modeller
