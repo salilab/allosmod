@@ -56,47 +56,6 @@ a.ending_model = 1
 a.make()
 EOF
 
-elif test $OPT == "script_glyc"; then
-
-cat <<EOF >model_${RUNTYPE}.py
-from modeller import *
-from modeller.scripts import complete_pdb
-import allosmod
-
-env =environ(rand_seed=${RAND}, restyp_lib_file='/CHANGE_PATH/restyp.dat', copy=None)
-
-# Read in HETATM records from template PDBs
-env.io.atom_files_directory = ['.', '../atom_files']
-env.libs.topology.read(file='/CHANGE_PATH/top_all_glyco.lib')
-env.libs.parameters.read(file='/CHANGE_PATH/par_all_glyco.lib')
-env.io.hetatm = True
-env.io.hydrogen = True
-
-a = allosmod.AllosModel(env, inifile  = 'random.ini', csrfile='converted.rsr', deviation=None, alnfile='align2.ali', 
-EOF
-
-echo -n "knowns=('${F[0]}'" >>model_${RUNTYPE}.py
-awk '(NR>1&&NF>0){printf ",@"$1"@"}' ${LIST_KNOWNS} | sed "s/@/'/g" >>model_${RUNTYPE}.py
-echo "), sequence='${TARG_SEQ}')" >>model_${RUNTYPE}.py
-echo >>model_${RUNTYPE}.py
-
-cat <<EOF >>model_${RUNTYPE}.py
-# Very thorough VTFM optimization:
-a.library_schedule = allosmod.MDopt
-a.max_var_iterations = 500
-
-# MD optimization:
-a.md_level = allosmod.ConstTemp(md_temp=${MDTEMP})
-
-# Repeat the whole cycle 1 time and do not stop unless obj.func. > 1E9
-a.repeat_optimization = 1
-a.max_molpdf = 1e9
-
-a.starting_model = 1
-a.ending_model = 1
-a.make()
-EOF
-
 elif test $OPT == "moderate_cm" -o $OPT == "moderate_cm_simulation"; then
 #deviation set here because cm sampling does not include randomized structure
 cat <<EOF >model_${RUNTYPE}.py

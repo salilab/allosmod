@@ -431,11 +431,6 @@ if test `echo "XGLYC1==0" |bc -l` -eq 1; then
 	echo running modeller
 	python model_run.py > model_run.log
 	echo done with modeller
-#    elif test "XSAMP" == "moderate_cm_simulation"; then
-#	@SCRIPT_DIR@/get_pm2.sh pm.pdb list run $RAND_NUM $RR1 $RR2 $RR3 XDEV XSAMP
-#	python model_run.py > model_run.log
-#	cp pm.pdb.B99990001.pdb random.ini
-#	@SCRIPT_DIR@/get_pm2.sh pm.pdb list run $RAND_NUM $RR1 $RR2 $RR3 0.0 script $MDTEMP
     else
 	echo "sampling type not properly defined" >>${OUTDIR}/error.log; mv * $OUTDIR; exit
     fi
@@ -457,25 +452,6 @@ else #glycosylation
     mv pm.pdb.rsr converted.rsr
     #sample glycosylated structures
     python model_glyc.py > model_glyc.log
-#    if test "XSAMP" == "moderate_cm_simulation"; then #to run simulations with sugar
-#	cp pm.pdb.B99990001.pdb random.ini
-#	cp converted.rsr tempsav.rsr
-#	cp @SCRIPT_DIR@/allosmod.py ./allosmod2.py
-#	#convert protein restraints (with hydrogens)
-#	python model_ini0.py > model_ini0.log
-#	MAX_PROT_AIND=`awk '($6>1){print $9"\n"$10}' pm.pdb.rsr | sort -nk1 | tail -n1`
-#	grep ATOM pm.pdb.B99990001.pdb >pm_rand.pdb
-#	awk '{print NR" AS"}' pm_rand.pdb >atomlistASRS
-#	@SCRIPT_DIR@/editrestraints2.sh pm.pdb.rsr pm.pdb.rsr pm_rand.pdb pm_rand.pdb atomlistASRS 2.0,2.0,2.0 11.0 XNTOT ${delEmax} >>run.log
-#	allosmod spline pm.pdb edited.rsr converted.rsr
-#	#get glyc restraints
-#	awk '($6==2&&($9>'${MAX_PROT_AIND}'||$10>'${MAX_PROT_AIND}')){print $0}' tempsav.rsr >>converted.rsr
-#	awk '($6==3&&($9>'${MAX_PROT_AIND}'||$10>'${MAX_PROT_AIND}'||$11>'${MAX_PROT_AIND}')){print $0}' tempsav.rsr >>converted.rsr
-#	awk '($6==4&&($9>'${MAX_PROT_AIND}'||$10>'${MAX_PROT_AIND}'||$11>'${MAX_PROT_AIND}'||$12>'${MAX_PROT_AIND}')){print $0}' tempsav.rsr >>converted.rsr
-#	#generate simulation script
-#	@SCRIPT_DIR@/get_pm2.sh pm.pdb list run $RAND_NUM $RR1 $RR2 $RR3 0.0 script_glyc $MDTEMP
-#	rm pm_rand.pdb atomlistASRS model_ini0.py allosmod2.py tempsav.rsr
-#    fi
     rm [A-Z][A-Z][A-Z].rsr get_rest.in
 fi
 
