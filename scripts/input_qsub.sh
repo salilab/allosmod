@@ -354,7 +354,7 @@ else #notfirst: use previously calculated atomlistASRS and restraints
 delEmax=XdE
 echo searching for converted.rsr
 date
-for c in `@SCRIPT_DIR@/count.pl 1 60`; do
+for c in `seq 60`; do
     echo $c
     FIRSTDIR=${RUNDIR}/pred_dEXdErASXrAS/XASPDB_0
     echo $FIRSTDIR

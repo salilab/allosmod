@@ -29,7 +29,7 @@ rcut=10.0
 allosmod get_qiavg_ca temp9941 $rcut temp9942 >>run.log
 QI=(`awk '{printf $2" "}' qi_1.dat`)
 if test -e tempfit.pdb; then rm tempfit.pdb; fi
-for i in `$SCRIPT_DIR/count.pl 1 ${NRES}`; do
+for i in `seq ${NRES}`; do
     if test `echo "${QI[$i-1]}>0.8" |bc -l` -eq 1; then
 	$SCRIPT_DIR/getsegpdb temp9942 A $i $i >>tempfit.pdb
     fi
@@ -54,7 +54,7 @@ awk 'BEGIN{FS=""}($1$2$3$4=="ATOM"){print $0}' tempfit_fit.pdb >temp9942
 #make random numbers between 0 and 1
 if test -e tempN; then rm tempN; fi
 NN=`awk 'END{print NR}' temp9941`
-for s in `$SCRIPT_DIR/count.pl 1 $NN`; do
+for s in `seq $NN`; do
     date --rfc-3339=ns | awk -F. '{print $2}' | awk -F- '{print $1/1000000000}' >>tempN
 done
 NMIN=`$SCRIPT_DIR/getmin tempN 1`
