@@ -684,15 +684,15 @@ sub get_submit_page {
     my $addbond_dist = $q->param('addbond_dist');
     my $addbond_stdev = $q->param('addbond_stdev');
     my $addbond_indices = $q->param('addbond_indices');
-    $addbond_indices =~ s/\n+/,/g;
+    $addbond_indices =~ s/[\n\r]+/,/g;
     my $addupper_dist = $q->param('addupper_dist');
     my $addupper_stdev = $q->param('addupper_stdev');
     my $addupper_indices = $q->param('addupper_indices');
-    $addupper_indices =~ s/\n+/,/g;
+    $addupper_indices =~ s/[\n\r]+/,/g;
     my $addlower_dist = $q->param('addlower_dist');
     my $addlower_stdev = $q->param('addlower_stdev');
     my $addlower_indices = $q->param('addlower_indices');
-    $addlower_indices =~ s/\n+/,/g;
+    $addlower_indices =~ s/[\n\r]+/,/g;
 
     # make input.dat for allosmod
     if ($advancedopt eq "glycmod") {
