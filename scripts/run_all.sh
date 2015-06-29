@@ -16,7 +16,7 @@ for d in `ls -1d *`; do
 	cd $d
 	allosmod setup >> error.log
 	#record input file errors
-	if test -e error.log; then
+	if test -s error.log; then
 	    echo 1 >error
 	else
 	    echo 0 >error
