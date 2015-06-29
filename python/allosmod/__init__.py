@@ -120,6 +120,7 @@ class Job(saliweb.backend.Job):
                                    % (ndate, self.name, d))
             t = tarfile.open(tarname, 'w:gz')
             t.add(d)
+            t.close()
 
     def run(self):
         #preprocess job to keep track of iterations
