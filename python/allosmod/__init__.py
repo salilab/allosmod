@@ -191,12 +191,6 @@ sleep 10s
             self.reschedule_run()
         #sims are finished
         if jobcounter == -1:
-#            PATH = './input/saxs.dat'
-#            if path.exists(PATH) and path.isfile(PATH) and access(PATH, R_OK):
-#                os.system("sleep 1m")
-#            else:
-#                os.system("sleep 5m")
-
             os.mkdir("output")
             with open("dirlist_all") as fh:
                 r_dirs = [line.rstrip('\r\n') for line in fh]
