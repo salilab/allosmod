@@ -24,9 +24,9 @@ for d in `ls -1d *`; do
             NRUNS=`grep -i "NRUNS" input.dat | awk 'BEGIN{FS="="}{print $2}' | awk '{print $1}'` #number of runs
             if test -s numsim; then
                 L_NUMRUN=`cat numsim`
-                echo 1 | awk '{print '${NUMRUN}'+'${L_NUMRUN}'}' >numsim
+                echo 1 | awk '{print '${NRUNS}'+'${L_NUMRUN}'}' >numsim
             else
-                echo $NUMRUN >numsim
+                echo $NRUNS >numsim
             fi
 	fi
 
