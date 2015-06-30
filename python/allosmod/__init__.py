@@ -158,37 +158,7 @@ sleep 10s
             r.set_sge_options("-j y -l arch=linux-x64 -l netapp=2G,scratch=2G -l mem_free=5G -l h_rt=90:00:00 -t 1-%i -V" % numsim)
 
         elif err == 0 and jobcounter == -1:
-            with open("%s/allosmodfox" % dir) as fh:
-                allosmodfox = int(fh.readline())
-            self.debug_log("run allosmodfox %d" % allosmodfox)
-            if allosmodfox == 0:
-                r = self.runnercls2()
-            elif allosmodfox == 1:
-                #execute foxs ensemble search, all files should be in directory called "input"
-                subprocess.call([os.path.join(self.config.script_directory,
-                                              "run_foxs_ensemble.sh")])
-                script = """
-source ./%s/qsub.sh
-sleep 10s
-""" % dir
-                
-                with open("%s/numsim" % dir) as fh:
-                    numsim = int(fh.readline())
-                r = self.runnercls(script)
-                r.set_sge_options("-j y -l arch=linux-x64 -l netapp=1.0G,scratch=2.0G -l mem_free=4G -l h_rt=90:00:00 -t 1-1 -V")
-
-                JobCounter().write(-1)
-                with open('%s/allosmodfox' % dir, 'w') as fh:
-                    print("0", file=fh)
-                self.debug_log("allosmodfox=-1 numsim %d" % numsim)
-            else:
-                script = """
-echo fail
-sleep 10s
-"""
-            
-                r = self.runnercls(script)
-
+            r = self.runnercls2()
         else:
             script = """
 echo fail
