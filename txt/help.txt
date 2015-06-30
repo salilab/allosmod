@@ -109,7 +109,7 @@ landscape run can be uploaded as a batch run. <br />
 				   The residue index corresponds to the position in the input alignment file. Therefore, if there are multiple chains, the index for the 
 				   first residue in the second chain will be one more than the index for the last residue in the first chain 
 				   (refer to any output PDB for simplicity).
-				   (for example, click <a href=\"http://modbase.compbio.ucsf.edu/allosmod/html/file/bonds.dat\"> here</a>) </ul>  <br />
+				   (for example, click <a href="http://modbase.compbio.ucsf.edu/allosmod/html/file/bonds.dat"> here</a>) </ul>  <br />
 
 	 <br /><b> Alter residue contact energies (optional):</b> break.dat contains a list of residues whose pairwise contact energies (delEmax) 
 			    will be scaled by a specifed value. Each line contains one residue index (corresponding to simulated sequence) in the first 
