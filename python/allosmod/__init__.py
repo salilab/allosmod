@@ -146,11 +146,10 @@ class Job(saliweb.backend.Job):
         self.debug_log("run err %d" % err)
         if err == 0 and jobcounter != -1:
             script = """
-source ./%s/qsub.sh
+cd %s
+source ./qsub.sh
 pwd
 hostname
-awk '{print $0}' tempdir  |sh
-rm tempdir
 sleep 10s
 """ % dir
             with open("%s/numsim" % dir) as fh:
