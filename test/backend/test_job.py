@@ -225,5 +225,14 @@ class JobTests(saliweb.test.TestCase):
                          '10.00000 0.0000 0.0000 1.00000 0.00000\n'
                          '42.00000 0.0000 0.0000 2.00000 0.00000\n')
 
+    def test_check_log_errors(self):
+        """Test check_log_errors() method"""
+        j = self.make_test_job(allosmod.Job, 'RUNNING')
+        d = saliweb.test.RunInDir(j.directory)
+        j.check_log_errors()
+        with open('test.o1234.1', 'w') as fh:
+            fh.write('Traceback (most recent call last):')
+        self.assertRaises(allosmod.AllosModLogError, j.check_log_errors)
+
 if __name__ == '__main__':
     unittest.main()

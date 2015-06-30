@@ -17,6 +17,9 @@ from os import path, access, R_OK
 class FoXSError(Exception):
     pass
 
+class AllosModLogError(Exception):
+    pass
+
 def zip_dir(z, dirpath):
     """Recursively add a directory to a zipfile"""
     dirpath = dirpath.rstrip('/')
@@ -168,7 +171,17 @@ sleep 10s
             
         return r
 
+    def check_log_errors(self):
+        """Check log files for error messages"""
+        sge_logs = glob.glob("*.o*")
+        for logfile in sge_logs:
+            for line in open(logfile):
+                if 'Traceback (most recent call last)' in line:
+                    raise AllosModLogError("Job reported an error in %s: %s"
+                                           % (logfile, line))
+
     def postprocess(self):
+        self.check_log_errors()
         MAXJOBS = 200
         jobcounter = JobCounter().get()
         self.debug_log("post jobctr %d" % jobcounter)
