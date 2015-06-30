@@ -1,8 +1,6 @@
 #!/bin/bash
 
-# Absolute path containing this and other scripts
-SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
-
+. /etc/profile
 module load allosmod
 
 LOCAL_SCRATCH=$1
@@ -15,7 +13,7 @@ for d in `ls -1d *`; do
 	echo $d >>dirlist
 	cd $d
         # Make qsub.sh script
-	allosmod setup >> error.log
+	allosmod setup >> error.log 2>&1
 	#record input file errors
 	if test -s error.log; then
 	    echo 1 >error
