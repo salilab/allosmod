@@ -176,7 +176,9 @@ sleep 10s
         sge_logs = glob.glob("*.o*")
         for logfile in sge_logs:
             for line in open(logfile):
-                if 'Traceback (most recent call last)' in line:
+                if 'Traceback (most recent call last)' in line \
+                   or 'Summary of failed models' in line \
+                   or 'awk: fatal' in line:
                     raise AllosModLogError("Job reported an error in %s: %s"
                                            % (logfile, line))
 

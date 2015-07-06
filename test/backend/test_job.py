@@ -230,9 +230,11 @@ class JobTests(saliweb.test.TestCase):
         j = self.make_test_job(allosmod.Job, 'RUNNING')
         d = saliweb.test.RunInDir(j.directory)
         j.check_log_errors()
-        with open('test.o1234.1', 'w') as fh:
-            fh.write('Traceback (most recent call last):')
-        self.assertRaises(allosmod.AllosModLogError, j.check_log_errors)
+        for err in ('Traceback (most recent call last):',
+                    'Summary of failed models', 'awk: fatal'):
+            with open('test.o1234.1', 'w') as fh:
+                fh.write(err)
+            self.assertRaises(allosmod.AllosModLogError, j.check_log_errors)
 
 if __name__ == '__main__':
     unittest.main()
