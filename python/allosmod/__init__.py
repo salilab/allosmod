@@ -125,6 +125,22 @@ class Job(saliweb.backend.Job):
             t.add(d)
             t.close()
 
+    def rm_globs(self, subdir, patterns):
+        """Delete all files in `subdir` that match any of `patterns`"""
+        for pattern in patterns:
+            for g in glob.glob(os.path.join(subdir, pattern)):
+                os.unlink(g)
+
+    def preprocess(self):
+        """Clean up any files left over from a previous run (e.g. if the
+           job failed and has been resubmitted."""
+        self.rm_globs('.',
+                      ("dirlist*", "sge-script.sh*", "jobcounter", "job-state"))
+        for subdir in [d for d in os.listdir('.') if os.path.isdir(d)]:
+            self.rm_globs(subdir, ("error*", "numsim"))
+            for g in glob.glob("%s/pred_dE*" % subdir):
+                shutil.rmtree(g, ignore_errors=False)
+
     def run(self):
         #preprocess job to keep track of iterations
         jobcounter = self.setup_run()

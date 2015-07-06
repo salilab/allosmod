@@ -236,5 +236,23 @@ class JobTests(saliweb.test.TestCase):
                 fh.write(err)
             self.assertRaises(allosmod.AllosModLogError, j.check_log_errors)
 
+    def test_check_preprocess(self):
+        """Test preprocess() method"""
+        j = self.make_test_job(allosmod.Job, 'RUNNING')
+        d = saliweb.test.RunInDir(j.directory)
+        for f in ('dirlist', 'dirlist_all', 'jobcounter', 'job-state', 'pwout',
+                  'sge-script.sh', 'sge-script.sh.o9058604.1'):
+            open(f, 'w').close()
+        os.mkdir('input')
+        for f in ('error', 'error.log', 'numsim', 'qsub.sh'):
+            open('input/%s' % f, 'w').close()
+        os.mkdir('input/pred_dECALCrAS1000')
+        os.mkdir('input/pred_dECALCrAS1000/jobname.pdb_0')
+        j.preprocess()
+        # Most files should have been cleaned up
+        os.unlink('input/qsub.sh')
+        os.rmdir('input')
+        self.assertEqual(os.listdir('.'), ['pwout'])
+
 if __name__ == '__main__':
     unittest.main()
