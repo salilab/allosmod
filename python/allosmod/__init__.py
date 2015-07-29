@@ -46,7 +46,6 @@ class JobCounter(object):
 
 class Job(saliweb.backend.Job):
     runnercls = saliweb.backend.SGERunner
-    runnercls2 = saliweb.backend.DoNothingRunner
     urlout = ''
 
     def debug_log(self, msg):
@@ -176,15 +175,9 @@ sleep 10s
             r = self.runnercls(script)
             r.set_sge_options("-j y -l arch=linux-x64 -l netapp=2G,scratch=2G -l mem_free=5G -l h_rt=90:00:00 -t 1-%i -V" % numsim)
 
-        elif err == 0 and jobcounter == -1:
-            r = self.runnercls2()
         else:
-            script = """
-echo fail
-sleep 10s
-"""
-            r = self.runnercls(script)
-            
+            # No job to run; fall through to postprocess
+            r = saliweb.backend.DoNothingRunner()
         return r
 
     def check_log_errors(self):
