@@ -528,7 +528,7 @@ sub get_submit_page {
     my $aln;
     my $job;
 
-    #skip second page if automated upload of a zip file, e.g. for CrytoSite
+    #skip second page if automated upload of a zip file, e.g. for CryptoSite
     if (defined($zip)) {
 	($aln, $job) = $self->get_alignment();
     } else {
