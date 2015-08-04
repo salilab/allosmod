@@ -701,7 +701,11 @@ sub get_submit_page {
 	    system("echo NRUNS=$glycmod_nruns >> $jobdir/input.dat");
 	    system("echo DEVIATION=4.0 >> $jobdir/input.dat");
 	    system("echo SAMPLING=moderate_cm >> $jobdir/input.dat");	
-	    if ($glycmod_flexible_sites eq "on") { system("echo ATTACH_GAPS=True >> $jobdir/input.dat"); }
+	    if ($glycmod_flexible_sites eq "on") {
+              system("echo ATTACH_GAPS=True >> $jobdir/input.dat");
+            } else {
+              system("echo ATTACH_GAPS=False >> $jobdir/input.dat");
+            }
 	    system("echo REPEAT_OPTIMIZATION=$glycmod_num_opt_steps >> $jobdir/input.dat");
 	}
     }
