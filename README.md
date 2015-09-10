@@ -1,5 +1,6 @@
-[![python coverage](https://salilab.org/coverage/stat/?s=allosmod&t=python)](http://salilab.org/coverage/allosmod/python/)
-[![perl coverage](https://salilab.org/coverage/stat/?s=allosmod&t=perl)](http://salilab.org/coverage/allosmod/perl/)
+[![nightly build](https://salilab.org/nightly/stat/?s=allosmod&t=build)](https://salilab.org/nightly/allosmod/)
+[![python coverage](https://salilab.org/nightly/stat/?s=allosmod&t=python)](https://salilab.org/nightly/allosmod/logs/coverage/python/)
+[![perl coverage](https://salilab.org/nightly/stat/?s=allosmod&t=perl)](https://salilab.org/nightly/allosmod/logs/coverage/perl/)
 
 This is the source code for [AllosMod](http://salilab.org/allosmod/)
 and [AllosMod-FoXS](http://salilab.org/allosmod-foxs/), web services to set up
