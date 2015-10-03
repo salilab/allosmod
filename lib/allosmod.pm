@@ -310,8 +310,8 @@ sub get_alignment {
     my $self = shift;
     my $q = $self->cgi;
 
-    my $seq = $q->param('sequence');
-    my $zip = $q->param('zip');
+    my $seq = $q->param('sequence')||"";
+    my $zip = $q->param('zip')||"";
     $seq =~ s/\s*//g;
     $zip =~ s/\s*//g;
     if ($seq eq "" and $zip eq "") {
