@@ -38,11 +38,11 @@ sub get_project_menu {
     return <<MENU;
 <div id="logo">
 <center>
-<a href="http://modbase.compbio.ucsf.edu/allosmod"><img src="http://modbase.compbio.ucsf.edu/allosmod/html/img/am_logo.gif" /></a>
+<a href="http://modbase.compbio.ucsf.edu/allosmod"><img src="http://modbase.compbio.ucsf.edu/allosmod/html/img/am_logo.gif" alt="AllosMod logo"/></a>
 </center>
 <br />
 <center>
-<a href="http://modbase.compbio.ucsf.edu/foxs"><img src="http://modbase.compbio.ucsf.edu/allosmod/html/img/foxs.gif" /></a>
+<a href="http://modbase.compbio.ucsf.edu/foxs"><img src="http://modbase.compbio.ucsf.edu/allosmod/html/img/foxs.gif" alt="FoXS logo"/></a>
 </center>
 </div><br />
 <h4><small>Developers:</small></h4><p>Dina Schneidman <br />
@@ -65,12 +65,12 @@ sub get_footer {
 <div id="address">
 <center><a href="http://www.ncbi.nlm.nih.gov/pubmed/22403063">
 <b>P. Weinkam, J. Pons, and A. Sali, Proc Natl Acad Sci U S A., (2012) <i>109 (13),</i> 4875-4880</b></a>:
-<a href="http://modbase.compbio.ucsf.edu/allosmod/html/file/Weinkam_PNAS_2012.pdf"><img src="http://modbase.compbio.ucsf.edu/allosmod/html/img/pdf.gif" /></a>,
-S.I.:<a href="http://modbase.compbio.ucsf.edu/allosmod/html/file/Weinkam_PNAS_2012_si.pdf"><img src="http://modbase.compbio.ucsf.edu/allosmod/html/img/pdf.gif" /></a>
+<a href="http://modbase.compbio.ucsf.edu/allosmod/html/file/Weinkam_PNAS_2012.pdf"><img src="http://modbase.compbio.ucsf.edu/allosmod/html/img/pdf.gif" alt="PDF"/></a>,
+S.I.:<a href="http://modbase.compbio.ucsf.edu/allosmod/html/file/Weinkam_PNAS_2012_si.pdf"><img src="http://modbase.compbio.ucsf.edu/allosmod/html/img/pdf.gif" alt="PDF"/></a>
 </center>
 <center><a href="http://www.ncbi.nlm.nih.gov/pubmed/20507903">
 <b>D. Schneidman-Duhovny, M. Hammel, A. Sali, Nucleic Acids Res., (2010) <i>38</i>, W540-4</b></a>:
-<a href="http://modbase.compbio.ucsf.edu/allosmod/html/file/Schneidman-Duhovny_NucAcRes_2010.pdf"><img src="http://modbase.compbio.ucsf.edu/allosmod/html/img/pdf.gif" /></a>
+<a href="http://modbase.compbio.ucsf.edu/allosmod/html/file/Schneidman-Duhovny_NucAcRes_2010.pdf"><img src="http://modbase.compbio.ucsf.edu/allosmod/html/img/pdf.gif" alt="PDF"/></a>
 </center>
 </div>
 FOOTER
@@ -464,10 +464,10 @@ sub get_index_page {
                                -onClick=>"add_structure()")) .
                   $q->p("Sequence to be used in simulation (specify protein and DNA/RNA, input sugar in adv. opt., " . 
 			"see <a href=\"http://modbase.compbio.ucsf.edu/allosmod-foxs/help.cgi?type=help\"> help page</a>)" . $q->br .
-                    $q->textarea({-name=>'sequence', -class=>'sequence'})) .
-              $q->p("<center>" .
-                    $q->input({-type=>"submit", -value=>"Submit"}) .
-                    "</center>");
+                    $q->textarea({-name=>'sequence', -class=>'sequence',
+                                  -rows=>'7', -cols=>'80'})) .
+              $q->p({-class=>'submit'},
+                    $q->input({-type=>"submit", -value=>"Submit"}));
     }
 
     my $greeting = <<GREETING;
