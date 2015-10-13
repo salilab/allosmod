@@ -38,9 +38,7 @@ sub get_project_menu {
     my $htmlroot = $self->htmlroot;
     return <<MENU;
 <div id="logo">
-<left>
-<a href="http://modbase.compbio.ucsf.edu/allosmod"><img src="$htmlroot/img/am_logo.gif" /></a>
-</left>
+<a href="http://modbase.compbio.ucsf.edu/allosmod"><img src="$htmlroot/img/am_logo.gif" alt="AllosMod logo"/></a>
 </div><br />
 <h4><small>Developers:</small></h4><p>Patrick Weinkam<br />
 Ben Webb</p>
@@ -59,11 +57,10 @@ sub get_footer {
     my $htmlroot = $self->htmlroot;
     return <<FOOTER;
 <div id="address">
-<center><a href="http://www.ncbi.nlm.nih.gov/pubmed/22403063">
+<a href="http://www.ncbi.nlm.nih.gov/pubmed/22403063">
 <b>P. Weinkam, J. Pons, and A. Sali, Proc Natl Acad Sci U S A., (2012) <i>109 (13),</i> 4875-4880</b></a>:
-<a href="$htmlroot/file/Weinkam_PNAS_2012.pdf"><img src="$htmlroot/img/pdf.gif" /></a>,
-S.I.:<a href="http://modbase.compbio.ucsf.edu/allosmod/html/file/Weinkam_PNAS_2012_si.pdf"><img src="$htmlroot/img/pdf.gif" /></a>
-</center>
+<a href="$htmlroot/file/Weinkam_PNAS_2012.pdf"><img src="$htmlroot/img/pdf.gif"  alt="PDF"/></a>,
+S.I.:<a href="http://modbase.compbio.ucsf.edu/allosmod/html/file/Weinkam_PNAS_2012_si.pdf"><img src="$htmlroot/img/pdf.gif" alt="PDF"/></a>
 </div>
 FOOTER
 }
@@ -95,7 +92,7 @@ sub get_all_options_prealign {
            "<a onclick=\"\$('#single').slideDown('fast'); \$('#batch').slideUp('fast')\" " .
            "href=\"#\">Model Single Energy Landscape</a>\n" .
            "<div class=\"dropdown\" id=\"single\">\n" .
-	   $q->p("Structures used to define landscape:" . $q->br .
+	   $q->p("Structures used to define landscape:") .
 	          $q->table({-id=>'structures'},
 			   $q->Tr($q->td("PDB code " .
 				  $q->textfield({-name=>'pdbcode',
@@ -103,7 +100,7 @@ sub get_all_options_prealign {
 				  $q->td("or upload PDB file " .
 					 $q->filefield({-name=>'uploaded_file'})))) .
 		  $q->p($q->button(-value=>'Add more structures',
-				  -onClick=>"add_structure()"))) .
+				  -onClick=>"add_structure()")) .
                   $q->p("Sequence to be used in simulation (specify protein and DNA/RNA, input sugar in adv. opt., " . 
 			"see <a href=\"http://modbase.compbio.ucsf.edu/allosmod-foxs/help.cgi?type=help\"> help page</a>)" . $q->br .
 		       $q->textarea({-name=>'sequence', -class=>'sequence'})) .
@@ -114,7 +111,7 @@ sub get_all_options_prealign {
            "href=\"#\">Model Energy Landscapes in Batch Mode</a>\n" .
            "<div class=\"dropdown\" id=\"batch\" style=\"display:none\">\n" .
 	         $q->p("Upload directories zip file:    " . 
-		       $q->td($q->filefield({-name=>"zip"}))) .
+		       $q->filefield({-name=>"zip"})) .
            "\n</div></div>\n";
 
 }
@@ -453,9 +450,8 @@ sub get_index_page {
 		    $q->p("been checked by eye for misalignments (especially near ends of chains)") . $q->br .
 			  $q->hidden('jobname', $job->name) .
 			  $q->hidden('jobemail') .
-			  $q->p("<center>" .
-				$q->input({-type=>"submit", -value=>"Submit"}) .
-				"</center>");
+			  $q->p({-class=>"submit"},
+                                $q->input({-type=>"submit", -value=>"Submit"}));
 	} else {
 	    #single job
 	    $form = $q->p("Verify Alignment:" . $q->br .
@@ -463,9 +459,8 @@ sub get_index_page {
 					-value=>$alignment})) .
 			  $q->hidden('jobname', $job->name) .
 			  $q->hidden('jobemail') .
-			  $q->p("<center>" .
-				$q->input({-type=>"submit", -value=>"Submit"}) .
-				"</center>") .
+			  $q->p({-class=>"submit"},
+                                $q->input({-type=>"submit", -value=>"Submit"})) .
 			  $self->get_all_advanced_options();
 	}
     } else {
@@ -478,16 +473,15 @@ sub get_index_page {
 					   -value=>$self->email,
 					   -size=>"25"})))) .
 	      $self->get_all_options_prealign() .
-              $q->p("<center>" .
-                    $q->input({-type=>"submit", -value=>"Submit"}) .
-                    "</center>");
+              $q->p({-class=>"submit"},
+                    $q->input({-type=>"submit", -value=>"Submit"}));
     }
 
     my $greeting = <<GREETING;
 <p>AllosMod is a web server to set up and run simulations based on a modeled energy 
 landscape that you create. Carefully designed energy landscapes allow efficient molecular 
 dynamics sampling at constant temperatures, thereby providing ergodic 
-sampling of conformational space. Use AllosMod to:<br />
+sampling of conformational space. Use AllosMod to:</p>
 <ul>
 <li>Model energy landscapes for protein, DNA, RNA, and/or sugar with either known or modeled structures</li>
 <li>Sample your energy landscapes to predict often and/or rarely populated conformations</li>
@@ -500,7 +494,7 @@ simulations at once. By creating a single landscape, the server will create inpu
 be used to submit batch jobs. AllosMod will set up many short 
 simulations for each landscape. There are two types of sampling: 1) constant temperature 
 molecular dynamics, which will be completed overnight on a single processor on the 
-user\'s computer (using MODELLER) or 2) quick, unequilibrated simulations performed on our servers 
+user's computer (using MODELLER) or 2) quick, unequilibrated simulations performed on our servers 
 within minutes to hours. Sampling is achieved efficiently by starting each simulation at different 
 points in conformational space and by storing the energies in memory. <br />
 <br />
