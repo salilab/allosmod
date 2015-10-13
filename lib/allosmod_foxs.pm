@@ -76,6 +76,12 @@ S.I.:<a href="http://modbase.compbio.ucsf.edu/allosmod/html/file/Weinkam_PNAS_20
 FOOTER
 }
 
+sub get_page_is_responsive {
+    my ($self, $page_name) = @_;
+    return $self->SUPER::get_page_is_responsive($page_name)
+           || $page_name eq 'index';
+}
+
 sub make_dropdown {
     my ($self, $id, $title, $initially_visible, $text) = @_;
    
@@ -458,7 +464,7 @@ sub get_index_page {
                                -onClick=>"add_structure()")) .
                   $q->p("Sequence to be used in simulation (specify protein and DNA/RNA, input sugar in adv. opt., " . 
 			"see <a href=\"http://modbase.compbio.ucsf.edu/allosmod-foxs/help.cgi?type=help\"> help page</a>)" . $q->br .
-                    $q->textarea({-name=>'sequence', -rows=>7, -cols=>80})) .
+                    $q->textarea({-name=>'sequence', -class=>'sequence'})) .
               $q->p("<center>" .
                     $q->input({-type=>"submit", -value=>"Submit"}) .
                     "</center>");
@@ -470,9 +476,7 @@ sub get_index_page {
 sampling algorithms from AllosMod to generate structures that are directly inputed into FoXS for small angle X-ray 
 scattering profile calculations. The server supports modeling of protein, DNA, RNA, and glycosylation. 
 For help, click <a href="http://modbase.compbio.ucsf.edu/allosmod-foxs/help.cgi?type=help"> here</a>.
-<br />
-<br />&nbsp;</p>
-<br />&nbsp;</p>
+</p>
 GREETING
     return $q->h2({-align=>"center"},
                   "AllosMod-FoXS: Structure Generation and SAXS Profile Calculations") .
