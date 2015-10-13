@@ -489,10 +489,10 @@ landscape that you create. Carefully designed energy landscapes allow efficient 
 dynamics sampling at constant temperatures, thereby providing ergodic 
 sampling of conformational space. Use AllosMod to:<br />
 <ul>
-- Model energy landscapes for protein, DNA, RNA, and/or sugar with either known or modeled structures <br />
-- Sample your energy landscapes to predict often and/or rarely populated conformations <br />
-- Model energy landscapes for ligand-induced structural and/or dynamic changes, i.e. allostery <br />
-- Model energy landscapes for glycosylated proteins (For help, click <a href="http://modbase.compbio.ucsf.edu/allosmod/help.cgi?type=glyc"> here</a>) <br />
+<li>Model energy landscapes for protein, DNA, RNA, and/or sugar with either known or modeled structures</li>
+<li>Sample your energy landscapes to predict often and/or rarely populated conformations</li>
+<li>Model energy landscapes for ligand-induced structural and/or dynamic changes, i.e. allostery</li>
+<li>Model energy landscapes for glycosylated proteins (For help, click <a href="http://modbase.compbio.ucsf.edu/allosmod/help.cgi?type=glyc"> here</a>)</li>
 </ul>
 
 <p>The AllosMod server runs in two modes: 1) single landscape and 2) batch jobs to set up many 
