@@ -17,7 +17,16 @@ For help page to model glycosylated proteins, click <a href="http://modbase.comp
 For instructions on how to input a sequence into the first page, refer to the AllosMod-FoXS 
 <a href="http://modbase.compbio.ucsf.edu/allosmod-foxs/help.cgi?type=help"> help page</a> <br />
 <br />
-The page below provides help to run batch jobs. Each input field in single landscape mode has a corresponding file/section below. 
+
+<a><h4>Running AllosMod locally</h4></a>
+<p>
+This web service is simply an interface to the base
+<a href="https://github.com/salilab/allosmod-lib">AllosMod protocol</a>,
+which can be downloaded and run on any Linux machine or compute cluster.
+</p>
+
+<hr />
+<p>The page below provides help to run batch jobs. Each input field in single landscape mode has a corresponding file/section below. 
 Single landscape runs will output the files described below corresponding to the options set by the user, i.e. the files from a single 
 landscape run can be uploaded as a batch run. <br />
 <br />
