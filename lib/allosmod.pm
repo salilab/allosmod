@@ -103,7 +103,8 @@ sub get_all_options_prealign {
 				  -onClick=>"add_structure()")) .
                   $q->p("Sequence to be used in simulation (specify protein and DNA/RNA, input sugar in adv. opt., " . 
 			"see <a href=\"http://modbase.compbio.ucsf.edu/allosmod-foxs/help.cgi?type=help\"> help page</a>)" . $q->br .
-		       $q->textarea({-name=>'sequence', -class=>'sequence'})) .
+		       $q->textarea({-name=>'sequence', -class=>'sequence',
+                                     -rows=>'7', -cols=>'80'})) .
            "\n</div></div>\n" .
 
            "<div class=\"dropdown_container\">\n" .
