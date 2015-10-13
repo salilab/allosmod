@@ -68,6 +68,12 @@ S.I.:<a href="http://modbase.compbio.ucsf.edu/allosmod/html/file/Weinkam_PNAS_20
 FOOTER
 }
 
+sub get_page_is_responsive {
+    my ($self, $page_name) = @_;
+    return $self->SUPER::get_page_is_responsive($page_name)
+           || $page_name eq 'index';
+}
+
 sub make_dropdown {
     my ($self, $id, $title, $initially_visible, $text) = @_;
    
@@ -100,7 +106,7 @@ sub get_all_options_prealign {
 				  -onClick=>"add_structure()"))) .
                   $q->p("Sequence to be used in simulation (specify protein and DNA/RNA, input sugar in adv. opt., " . 
 			"see <a href=\"http://modbase.compbio.ucsf.edu/allosmod-foxs/help.cgi?type=help\"> help page</a>)" . $q->br .
-		       $q->textarea({-name=>'sequence', -rows=>7, -cols=>77})) .
+		       $q->textarea({-name=>'sequence', -class=>'sequence'})) .
            "\n</div></div>\n" .
 
            "<div class=\"dropdown_container\">\n" .
