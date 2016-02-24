@@ -836,14 +836,26 @@ sub get_results_page {
 
 sub display_ok_job {
     my ($self, $q, $job) = @_;
-    my $return= $q->p("Job '<b>" . $job->name . "</b>' has completed, thank you for using AllosMod-FoXS!");
+    my $return= $q->p("Job '<b>" . $job->name . "</b>' has completed; " .
+                      "thank you for using AllosMod-FoXS!");
 
     $return.= $q->p("<a href=\"" . $job->get_results_file_url("output.zip") .
-                    "\">Download output zip file.</a>");
-    $return.=$q->p("<br />You will receive a separate email containing a link to visualize the SAXS profiles using FoXS.");
+                    "\">Download output zip file</a> " .
+                    "(simulation trajectories).");
+    $return.= $q->p("<a href=\"" . $self->get_foxs_url() .
+                    "\">Visualize SAXS profiles using FoXS</a>.");
 
     $return .= $job->get_results_available_time();
     return $return;
+}
+
+sub get_foxs_url {
+    my ($self) = @_;
+    open my $fh, "<", "urlout"
+	    or die "could not open FoXS URL file: $!";
+    my $line = readline($fh);
+    close $fh;
+    return $line;
 }
 
 sub display_failed_job {
