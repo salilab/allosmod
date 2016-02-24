@@ -1,7 +1,9 @@
 package allosmod_foxs;
-use base qw(saliweb::frontend);
+use saliweb::frontend;
 
 use strict;
+
+our @ISA = "saliweb::frontend";
 
 sub new {
     return saliweb::frontend::new(@_, @CONFIG@);
@@ -360,7 +362,7 @@ sub get_alignment {
     # check email
     my $email = $q->param('jobemail');
     if(($found == 1 or $arraySize > 0) and length $email <= 0) {
-	check_required_email($email);
+	check_optional_email($email);
     }    
 
     my $aln;
@@ -449,7 +451,7 @@ sub get_index_page {
 	      $q->Tr($q->td("Job name "), 
 		     $q->td($q->textfield({-name=>"name",
 					   -size=>"25"}))) .
-              $q->Tr($q->td("Email (Required)"),
+              $q->Tr($q->td("Email (Optional)"),
 		     $q->td($q->textfield({-name=>"jobemail",
 					   -value=>$self->email,
 					   -size=>"25"})))) .
@@ -879,13 +881,6 @@ sub get_help_page {
 	return $self->get_text_file("help_glyc.txt");
     } else {
 	return $self->SUPER::get_help_page($display_type);
-    }
-}
-
-sub check_required_email {
-    my ($email) = @_;
-    if($email !~ m/^[\w\.-]+@[\w-]+\.[\w-]+((\.[\w-]+)*)?$/ ) {
-	throw saliweb::frontend::InputValidationError("Please provide a valid return email address");
     }
 }
 
