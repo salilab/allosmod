@@ -59,7 +59,7 @@ cd output/
     BACKADJ=`awk '($1=="backadj"){print $2}' output/input/foxs.in | sed "s/on/1/g" | sed "s/off/0/g"`
     COARSE=`awk '($1=="coarse"){print $2}' output/input/foxs.in | sed "s/on/1/g" | sed "s/off/0/g"`
     OFFSET=0 #`awk '($1=="offset"){print $2}' output/input/foxs.in | sed "s/on/1/g" | sed "s/off/0/g"`
-    EMAIL=`awk '($1=="email"){print $2}' output/input/foxs.in`
+    EMAIL="none" # FoXS doesn't use the email parameter
     
     #run FoXS
     /modbase5/home/foxs/www/foxs/cgi/input_call.pl output.zip saxs.dat $EMAIL $QMAX $PSIZE $HLAYER $EXVOLUME $IHYDRG $COARSE $OFFSET $BACKADJ >& foxs.log
