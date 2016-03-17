@@ -81,7 +81,7 @@ class Job(saliweb.backend.Job):
     def unzip_input(self):
         """Extract inputs and check for sanity"""
         if os.path.exists('input.zip'):
-            subprocess.check_call(["unzip", "input.zip"])
+            subprocess.check_call(["unzip", "-o", "input.zip"])
         # Test for 0 directories or >100 directories
         num_dirs = num_files = 0
         for d in os.listdir('.'):
