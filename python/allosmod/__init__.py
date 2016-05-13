@@ -223,7 +223,7 @@ sleep 10s
             os.system("echo If less jobs were expected to run, this could be a user/server error >>error.log")
             os.system("mv %s output" % dir)
 
-    def complete(self):
+    def finalize(self):
         if os.path.exists('output/input/saxs.dat'):
             self._complete_foxs()
         else:
