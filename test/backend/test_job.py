@@ -211,7 +211,7 @@ class JobTests(saliweb.test.TestCase):
       0      14091.83789   0.0000   0.0000          0.08367          0.01000
       2         42.00000   0.0000   0.0000          2.00000          0.00000
 """)
-        j.complete()
+        j.finalize()
         # output dir should have been replaced by output.zip
         self.assertEqual(os.listdir('.'), ['output.zip'])
         z = zipfile.ZipFile('output.zip')
