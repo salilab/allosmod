@@ -40,7 +40,7 @@ landscape run can be uploaded as a batch run. <br />
       <p>Name your job so you can refer to it later.
       </p></li><br />
   <li><a id="file"><h5>Directories zip file</h5></a>
-      <p>Upload a zip file containing a set of directories for each landscape that you want to model. To create such a file, put all the input files into one 
+      <p>Upload a zip file containing a set of directories for each landscape that you want to model (no more than 100 such landscapes per job). To create such a file, put all the input files into one 
          directory per landscape and type: zip -r input.zip dir1 dir2... For an example directory, 
          click <a href="http://modbase.compbio.ucsf.edu/allosmod/html/file/input.zip"> here</a>. 
          Each directory should contain the following files:
