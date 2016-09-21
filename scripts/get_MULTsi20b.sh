@@ -71,7 +71,7 @@ for fil in `cat list`; do
     allosmod pdb2ali $fil >>tempms004.ali
 done
 
-cat <<EOF >modeller.in
+cat <<EOF >modalign.py
 from modeller import *
 log.verbose()
 env = environ()
@@ -82,23 +82,22 @@ aln.append(file='tempms004.ali', align_codes=('pm.pdb'
 EOF
 
 for fil in `cat list`; do
-    echo -n ",'"$fil"'" >>modeller.in
+    echo -n ",'"$fil"'" >>modalign.py
 done
-echo "))" >>modeller.in
+echo "))" >>modalign.py
 
-#echo "# The as1.sim.mat similarity matrix is used by default:" >>modeller.in
-#echo "aln.align(gap_penalties_1d=(-600, -400))" >>modeller.in
-echo "aln.salign(overhang=30, gap_penalties_1d=(-450, -50)," >>modeller.in
-echo "alignment_type='tree', output='ALIGNMENT')" >>modeller.in
-echo "aln.write(file='align.ali')" >>modeller.in
+#echo "# The as1.sim.mat similarity matrix is used by default:" >>modalign.py
+#echo "aln.align(gap_penalties_1d=(-600, -400))" >>modalign.py
+echo "aln.salign(overhang=30, gap_penalties_1d=(-450, -50)," >>modalign.py
+echo "alignment_type='tree', output='ALIGNMENT')" >>modalign.py
+echo "aln.write(file='align.ali')" >>modalign.py
 
-/salilab/diva1/home/modeller/modSVN modeller.in 2> /dev/null
-#/salilab/diva1/home/modeller/modpy.sh modeller.in
+python modalign.py >& modalign.log
 
 if test -s align.ali; then
     echo ""
 else
-    tail -n20 modeller.in.log >align.ali
+    tail -n20 modalign.log >align.ali
 fi
 
 #check for improper NRES, ie less than 10 % of the template length
@@ -107,4 +106,4 @@ if test `echo "${testIMPROPER}==1" |bc -l` -eq 1; then
     echo "Dynamically allocated memory, pass error to frontend" >align.ali
 fi
 
-rm tempms004.ali modeller.in modeller.in.log inpseq
+rm tempms004.ali modalign.py modalign.log inpseq
