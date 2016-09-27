@@ -1,6 +1,5 @@
-[![nightly build](https://salilab.org/nightly/stat/?s=allosmod&t=build)](https://salilab.org/nightly/allosmod/)
-[![python coverage](https://salilab.org/nightly/stat/?s=allosmod&t=python)](https://salilab.org/nightly/allosmod/logs/coverage/python/)
-[![perl coverage](https://salilab.org/nightly/stat/?s=allosmod&t=perl)](https://salilab.org/nightly/allosmod/logs/coverage/perl/)
+[![Build Status](https://travis-ci.org/salilab/allosmod.svg?branch=master)](https://travis-ci.org/salilab/allosmod)
+[![codecov](https://codecov.io/gh/salilab/allosmod/branch/master/graph/badge.svg)](https://codecov.io/gh/salilab/allosmod)
 
 This is the source code for [AllosMod](https://salilab.org/allosmod/)
 and [AllosMod-FoXS](https://salilab.org/allosmod-foxs/), web services to set up
