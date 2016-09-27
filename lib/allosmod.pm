@@ -4,7 +4,7 @@ use base qw(saliweb::frontend);
 use strict;
 
 sub new {
-    return saliweb::frontend::new(@_, @CONFIG@);
+    return saliweb::frontend::new(@_, "##CONFIG##");
 }
 
 # Add our own JavaScript and CSS to the page header
