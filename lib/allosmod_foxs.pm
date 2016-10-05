@@ -226,7 +226,7 @@ sub get_sampling_options {
       "\$('#multiconf').slideUp('fast'); \$('#interconf').slideUp('fast'); \$('#comparativemod').slideDown('fast')\" />Generate " .
       "static models using MODELLER that are similar to the input structure(s)" . $q->br .
       "<div class=\"sampopts\" id=\"comparativemod\">\n" .
-      "Number of comparitive models " . $q->textfield({-name=>'comparativemod_nruns', -size=>"3",
+      "Number of comparative models " . $q->textfield({-name=>'comparativemod_nruns', -size=>"3",
                                          -value=>"10"}) .
       "</div>\n\n" .
 
