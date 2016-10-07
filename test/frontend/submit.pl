@@ -54,6 +54,74 @@ sub get_submit_frontend {
     chdir('/') # Allow the temporary directory to be deleted
 }
 
+# Check get_submit_page with ligand binding option
+{
+    my $self = get_submit_frontend($t);
+    my $tmpdir = File::Temp::tempdir(CLEANUP=>1);
+    ok(chdir($tmpdir), "chdir into tempdir");
+    ok(mkdir("incoming"), "mkdir incoming");
+
+    ok(open(FH, "> ligand.file"), "Open ligand.file");
+    print FH "garbage\n";
+    ok(close(FH), "Close ligand.file");
+    open(FH, "ligand.file");
+
+    $self->cgi->param('advancedopt', 'ligandmod');
+    $self->cgi->param('ligandmod_ligfile', \*FH);
+    $self->cgi->param('ligandmod_ligpdb', 'lig.pdb');
+    $self->cgi->param('ligandmod_aspdb', 'as.pdb');
+
+    my $ret = $self->get_submit_page();
+    like($ret, qr/Job Submitted.*Your job has been submitted/ms,
+         "submit page HTML");
+    chdir('/') # Allow the temporary directory to be deleted
+}
+
+# Check get_submit_page with model glycosylation option, add sugars
+{
+    my $self = get_submit_frontend($t);
+    my $tmpdir = File::Temp::tempdir(CLEANUP=>1);
+    ok(chdir($tmpdir), "chdir into tempdir");
+    ok(mkdir("incoming"), "mkdir incoming");
+
+    ok(open(FH, "> glyc.file"), "Open glyc.file");
+    print FH "garbage\n";
+    ok(close(FH), "Close glyc.file");
+    open(FH, "glyc.file");
+
+    $self->cgi->param('advancedopt', 'glycmod');
+    $self->cgi->param('glycmodopt', 'option1');
+    $self->cgi->param('glycmod_flexible_sites', 'on');
+    $self->cgi->param('glycmod_input', \*FH);
+
+    my $ret = $self->get_submit_page();
+    like($ret, qr/Job Submitted.*Your job has been submitted/ms,
+         "submit page HTML");
+    chdir('/') # Allow the temporary directory to be deleted
+}
+#
+# Check get_submit_page with model glycosylation option, sample sugars
+{
+    my $self = get_submit_frontend($t);
+    my $tmpdir = File::Temp::tempdir(CLEANUP=>1);
+    ok(chdir($tmpdir), "chdir into tempdir");
+    ok(mkdir("incoming"), "mkdir incoming");
+
+    ok(open(FH, "> glyc.file"), "Open glyc.file");
+    print FH "garbage\n";
+    ok(close(FH), "Close glyc.file");
+    open(FH, "glyc.file");
+
+    $self->cgi->param('advancedopt', 'glycmod');
+    $self->cgi->param('glycmodopt', 'option2');
+    $self->cgi->param('glycmod_python', \*FH);
+
+    my $ret = $self->get_submit_page();
+    like($ret, qr/Job Submitted.*Your job has been submitted/ms,
+         "submit page HTML");
+    chdir('/') # Allow the temporary directory to be deleted
+}
+
 # Check bad options to get_submit_page
 {
     my $tmpdir = File::Temp::tempdir(CLEANUP=>1);
