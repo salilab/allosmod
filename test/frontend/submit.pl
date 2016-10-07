@@ -135,28 +135,28 @@ sub get_submit_frontend {
               "bad radius";
     like($@, qr/Please provide a sensible radius/, "exception message");
 
-    my $self = get_submit_frontend($t);
+    $self = get_submit_frontend($t);
     $self->cgi->param('glycmod_nruns', '110');
     throws_ok { $self->get_submit_page() }
               saliweb::frontend::InputValidationError,
               "bad num models for glyc";
     like($@, qr/number of models for glyc/, "exception message");
 
-    my $self = get_submit_frontend($t);
+    $self = get_submit_frontend($t);
     $self->cgi->param('glycmod_num_opt_steps', '11');
     throws_ok { $self->get_submit_page() }
               saliweb::frontend::InputValidationError,
               "bad num steps for glyc";
     like($@, qr/number of models for glyc/, "exception message");
 
-    my $self = get_submit_frontend($t);
+    $self = get_submit_frontend($t);
     $self->cgi->param('thermodyn_nruns', '101');
     throws_ok { $self->get_submit_page() }
               saliweb::frontend::InputValidationError,
               "bad num of thermodyn runs";
     like($@, qr/sensible number of runs/, "exception message");
 
-    my $self = get_submit_frontend($t);
+    $self = get_submit_frontend($t);
     $self->cgi->param('thermodyn_mdtemp', 'garbage');
     throws_ok { $self->get_submit_page() }
               saliweb::frontend::InputValidationError,
