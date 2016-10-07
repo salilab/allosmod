@@ -539,7 +539,7 @@ sub get_submit_page {
     my $jobdir = $job->directory;
 
     my $filesize = -s "$jobdir/input.zip";
-    if($filesize == 0) {
+    if(!defined($filesize) || $filesize == 0) {
 	#single job
 
 	# rewrite alignment to file
