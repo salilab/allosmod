@@ -682,7 +682,7 @@ sub get_submit_page {
 	my $rareconf_nruns = $q->param('rareconf_nruns');
 	my $rareconf_locrig = $q->param('rareconf_locrig');
 	my $rareconf_break = $q->param('rareconf_break');
-	my $rareconf_quickcool = $q->param('rareconf_quickcool');
+	my $rareconf_quickcool = $q->param('rareconf_quickcool') || 'off';
 	if(($thermodyn_nruns !~ /^\d+$/) or $thermodyn_nruns <= 0 or $thermodyn_nruns > 100) {
 	    throw saliweb::frontend::InputValidationError("Please provide a sensible number of runs $!");
 	}
