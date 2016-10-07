@@ -677,7 +677,7 @@ sub get_submit_page {
 	throw saliweb::frontend::InputValidationError("Please provide a sensible MD temperature for probable conformations $!");
     }
     if(($rareconf_mdtemp !~ /^\d+$/ and $rareconf_mdtemp !~ /^\d+[\.]\d+$/ and $rareconf_mdtemp ne "scan") or
-       ($rareconf_mdtemp <= 0 and $rareconf_mdtemp ne "scan")) {
+       ($rareconf_mdtemp ne "scan" and $rareconf_mdtemp <= 0)) {
 	throw saliweb::frontend::InputValidationError("Please provide a sensible MD temperature for low probability conformations $!");
     }
     if(($rareconf_cdencutoff !~ /^\d+$/ and $rareconf_cdencutoff !~ /^\d+[\.]\d+$/) or
