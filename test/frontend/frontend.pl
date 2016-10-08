@@ -84,3 +84,22 @@ my $t = new saliweb::Test('allosmod');
                'Sampling Options.*residue charge density/ms',
          'get_all_advanced_options');
 }
+
+# Test get_help_page
+{
+    my $self = $t->make_frontend();
+    $self->{server_name} = "allosmod";
+    my $txt = $self->get_help_page("resources");
+    $txt = $self->get_help_page("glyc");
+    $txt = $self->get_help_page("contact");
+    # Can't assert that the content is OK, because we're probably in the
+    # wrong directory to find it
+}
+
+# Test get_submit_parameter_help
+{
+    my $self = $t->make_frontend();
+    my $help = $self->get_submit_parameter_help();
+    isa_ok($help, 'ARRAY', 'get_submit_parameter_help links');
+    is(scalar(@$help), 2, 'get_submit_parameter_help length');
+}
