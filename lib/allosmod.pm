@@ -381,8 +381,6 @@ sub get_alignment {
 #	my $email = $q->param('jobemail');
 	if($filesize2 == 0) {
 	    return undef, undef;
-#	} elsif(length $email <= 0) {
-#	    check_required_email($email);
 	} else {
 	    $aln = "X";
 	    system("echo XX >>$list");
@@ -402,12 +400,6 @@ sub get_alignment {
 	    throw saliweb::frontend::InputValidationError("Please provide PDB code or upload PDB file $!");
 	}
 	
-	# check email
-#	my $email = $q->param('jobemail');
-#	if(($found == 1 or $arraySize > 0) and length $email <= 0) {
-#	    check_required_email($email);
-#	}    
-
 	my $inpseq = $job->directory . "/" . "inpseq";
 	system("echo $seq >> $inpseq");
 
@@ -881,13 +873,6 @@ sub get_submit_parameter_help {
         $self->parameter("name", "Job name", 1),
         $self->file_parameter("zip", "All input files in a single zip"),
 	    ];
-}
-
-sub check_required_email {
-    my ($email) = @_;
-    if($email !~ m/^[\w\.-]+@[\w-]+\.[\w-]+((\.[\w-]+)*)?$/ ) {
-	throw saliweb::frontend::InputValidationError("Please provide a valid return email address");
-    }
 }
 
 sub format_user_error {
