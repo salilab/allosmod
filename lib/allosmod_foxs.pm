@@ -9,6 +9,28 @@ sub new {
     return saliweb::frontend::new(@_, "##CONFIG##");
 }
 
+# Save an uploaded file into the job directory
+sub write_uploaded_file {
+    my ($infile, $outfile) = @_;
+    open(UPLOAD, "> $outfile")
+	or throw saliweb::frontend::InternalError("Cannot open $outfile: $!");
+    my $file_contents = "";
+    while (<$infile>) {
+        $file_contents .= $_;
+    }
+    print UPLOAD $file_contents;
+    close UPLOAD
+	or throw saliweb::frontend::InternalError("Cannot close $outfile: $!");
+}
+
+sub delete_file_if_empty {
+    my ($fname) = @_;
+    my $filesize = -s $fname;
+    if ($filesize == 0) {
+        unlink $fname or die "Could not unlink $fname: $!";
+    }
+}
+
 # Add our own JavaScript and CSS to the page header
 sub get_start_html_parameters {
   my ($self, $style) = @_;
@@ -506,16 +528,7 @@ sub get_submit_page {
     if(length $user_saxs <= 0) {
 	throw saliweb::frontend::InputValidationError("Please provide SAXS profile $!");
     }
-    my $saxsfile = "$jobdir/saxs.dat";
-    open(UPLOAD, "> $saxsfile")
-	or throw saliweb::frontend::InputValidationError("Cannot open $saxsfile: $!");
-    $file_contents = "";
-    while (<$user_saxs>) {
-        $file_contents .= $_;
-    }
-    print UPLOAD $file_contents;
-    close UPLOAD
-	or throw saliweb::frontend::InputValidationError("Cannot close $saxsfile: $!");
+    write_uploaded_file($user_saxs, "$jobdir/saxs.dat");
     my $filesize = -s "$jobdir/saxs.dat";
     if($filesize == 0) {
 	throw saliweb::frontend::InputValidationError("You have uploaded an empty SAXS profile.");
@@ -576,73 +589,23 @@ sub get_submit_page {
     $file_contents = "";
     my $filesize2;
     if ($advancedopt eq "ligandmod") {
-	my $ligand_input = $q->upload('ligandmod_ligfile');
-	my $ligandfile = "$jobdir/lig.pdb";
-	open(UPLOAD, "> $ligandfile")
-	    or throw saliweb::frontend::InternalError("Cannot open $ligandfile: $!");
-	$file_contents = "";
-	while (<$ligand_input>) {
-		$file_contents .= $_;
-	    }
-	print UPLOAD $file_contents;
-	close UPLOAD
-	    or throw saliweb::frontend::InternalError("Cannot close $ligandfile: $!");
-	$filesize2 = -s "$jobdir/lig.pdb";
-	if($filesize2 == 0) {
-	    system("rm $jobdir/lig.pdb");
-	    }
+        write_uploaded_file($q->upload('ligandmod_ligfile'), "$jobdir/lig.pdb");
+        delete_file_if_empty("$jobdir/lig.pdb");
     }
     if ($advancedopt eq "glycmod") {
 	if ($glycmodopt eq "option1") {
-	    my $glyc_input = $q->upload('glycmod_input');
-	    my $glycfile = "$jobdir/glyc.dat";
-	    open(UPLOAD, "> $glycfile")
-		or throw saliweb::frontend::InternalError("Cannot open $glycfile: $!");
-	    $file_contents = "";
-	    while (<$glyc_input>) {
-		$file_contents .= $_;
-	    }
-	    print UPLOAD $file_contents;
-		close UPLOAD
-		    or throw saliweb::frontend::InternalError("Cannot close $glycfile: $!");
-		$filesize2 = -s "$jobdir/glyc.dat";
-	    if($filesize2 == 0) {
-		system("rm $jobdir/glyc.dat");
-	    }
+            write_uploaded_file($q->upload('glycmod_input'),
+                                "$jobdir/glyc.dat");
+            delete_file_if_empty("$jobdir/glyc.dat");
 	}
 	if ($glycmodopt eq "option2") {
-	    my $glyc_python = $q->upload('glycmod_python');
-	    my $glycpython = "$jobdir/allosmod.py";
-	    open(UPLOAD, "> $glycpython")
-		or throw saliweb::frontend::InternalError("Cannot open $glycpython: $!");
-	    $file_contents = "";
-	    while (<$glyc_python>) {
-		$file_contents .= $_;
-	    }
-	    print UPLOAD $file_contents;
-	    close UPLOAD
-		or throw saliweb::frontend::InternalError("Cannot close $glycpython: $!");
-		$filesize2 = -s "$jobdir/allosmod.py";
-	    if($filesize2 == 0) {
-		system("rm $jobdir/allosmod.py");
-	    }
+            write_uploaded_file($q->upload('glycmod_python'),
+                                "$jobdir/allosmod.py");
+            delete_file_if_empty("$jobdir/allosmod.py");
 	}
 	if ($advancedopt eq "break") {
-	    my $break_file = $q->upload('break_input');
-	    my $breakfile = "$jobdir/break.dat";
-	    open(UPLOAD, "> $breakfile")
-		or throw saliweb::frontend::InternalError("Cannot open $breakfile: $!");
-	    $file_contents = "";
-	    while (<$break_file>) {
-		$file_contents .= $_;
-	    }
-	    print UPLOAD $file_contents;
-	    close UPLOAD
-		or throw saliweb::frontend::InternalError("Cannot close $breakfile: $!");
-	    $filesize2 = -s "$jobdir/break.dat";
-	    if($filesize2 == 0) {
-		system("rm $jobdir/break.dat");
-	    }
+            write_uploaded_file($q->upload('break_input'), "$jobdir/break.dat");
+            delete_file_if_empty("$jobdir/break.dat");
 	}
 
     }

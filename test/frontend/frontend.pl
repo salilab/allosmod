@@ -2,6 +2,8 @@
 
 use saliweb::Test;
 use Test::More 'no_plan';
+use File::Temp;
+use Test::Exception;
 
 BEGIN {
     use_ok('allosmod');
@@ -102,4 +104,45 @@ my $t = new saliweb::Test('allosmod');
     my $help = $self->get_submit_parameter_help();
     isa_ok($help, 'ARRAY', 'get_submit_parameter_help links');
     is(scalar(@$help), 2, 'get_submit_parameter_help length');
+}
+
+# Test write_uploaded_file
+{
+    my $tmpdir = File::Temp::tempdir(CLEANUP=>1);
+
+    ok(open(FH, "> $tmpdir/in.file"), "Open in.file");
+    print FH "garbage\n";
+    ok(close(FH), "Close in.file");
+    ok(open(FH, "< $tmpdir/in.file"), "Open in.file");
+
+    throws_ok { allosmod::write_uploaded_file(\*FH, "/foo/bar/out.file") }
+              qr/Cannot open/, "write_uploaded file, open failure";
+
+    allosmod::write_uploaded_file(\*FH, "$tmpdir/out.file");
+
+    ok(open(FH, "< $tmpdir/out.file"), "Open out.file");
+    my $contents = <FH>;
+    is($contents, "garbage\n", "Check out.file contents");
+    close(FH);
+}
+
+# Test delete_file_if_empty
+{
+    my $tmpdir = File::Temp::tempdir(CLEANUP=>1);
+
+    my $fname = "$tmpdir/in.file";
+    ok(open(FH, "> $fname"), "Open in.file");
+    ok(close(FH), "Close in.file");
+    ok(-e $fname, "file created ok");
+
+    allosmod::delete_file_if_empty($fname);
+    ok(! -e $fname, "file deleted ok");
+
+    ok(open(FH, "> $fname"), "Open in.file");
+    print FH "contents\n";
+    ok(close(FH), "Close in.file");
+    ok(-e $fname, "file created ok");
+
+    allosmod::delete_file_if_empty($fname);
+    ok(-e $fname, "file not deleted");
 }
