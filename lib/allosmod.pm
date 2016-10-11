@@ -377,7 +377,7 @@ sub get_alignment {
     my $jobdir = $job->directory;
 
     my $filesize = -s "$list";
-    if($filesize == 0) {
+    if(!defined($filesize) || $filesize == 0) {
 	#batch job
 	my $user_zip = $q->upload('zip');
 	if($user_zip =~ ".gz" or $user_zip =~ ".tar") {

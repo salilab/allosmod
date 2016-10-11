@@ -165,3 +165,59 @@ sub get_submit_frontend {
 
     chdir('/') # Allow the temporary directory to be deleted
 }
+
+# Check get_alignment, batch job, empty file
+{
+    my $self = $t->make_frontend();
+    my $cgi = $self->cgi;
+
+    my $tmpdir = File::Temp::tempdir(CLEANUP=>1);
+    ok(chdir($tmpdir), "chdir into tempdir");
+    ok(mkdir("incoming"), "mkdir incoming");
+
+    $cgi->param('pdbcode', ());
+    $cgi->param('uploaded_file', ());
+
+    ok(open(FH, "> foo.zip"), "Open foo.zip");
+    ok(close(FH), "Close foo.zip");
+    open(FH, "foo.zip");
+
+    $cgi->param('zip', \*FH);
+    my ($aln, $job) = $self->get_alignment();
+    is($aln, undef);
+    is($job, undef);
+
+    chdir('/') # Allow the temporary directory to be deleted
+}
+
+# Check get_alignment, batch job, non-empty file
+{
+    my $self = $t->make_frontend();
+    my $cgi = $self->cgi;
+
+    my $tmpdir = File::Temp::tempdir(CLEANUP=>1);
+    ok(chdir($tmpdir), "chdir into tempdir");
+    ok(mkdir("incoming"), "mkdir incoming");
+
+    $cgi->param('pdbcode', ());
+    $cgi->param('uploaded_file', ());
+
+    ok(open(FH, "> foo.zip"), "Open foo.zip");
+    print FH "garbage";
+    ok(close(FH), "Close foo.zip");
+    open(FH, "foo.zip");
+
+    $cgi->param('zip', \*FH);
+    my ($aln, $job) = $self->get_alignment();
+    is($aln, "X");
+
+    ok(open(FH, $job->directory . "/input.zip"), "Open input.zip");
+    is(<FH>, "garbage");
+    close(FH);
+
+    ok(open(FH, $job->directory . "/list"), "Open list");
+    is(<FH>, "XX\n");
+    close(FH);
+
+    chdir('/') # Allow the temporary directory to be deleted
+}
