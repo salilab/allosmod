@@ -12,11 +12,9 @@ sub write_uploaded_file {
     my ($infile, $outfile) = @_;
     open(UPLOAD, "> $outfile")
 	or throw saliweb::frontend::InternalError("Cannot open $outfile: $!");
-    my $file_contents = "";
     while (<$infile>) {
-        $file_contents .= $_;
+        print UPLOAD $_;
     }
-    print UPLOAD $file_contents;
     close UPLOAD
 	or throw saliweb::frontend::InternalError("Cannot close $outfile: $!");
 }
