@@ -366,12 +366,7 @@ sub get_alignment {
 	}
         my $buffer;
         my $fullpath = $job->directory . "/" . $upl;
-        open(OUTFILE, '>', $fullpath)
-         or throw saliweb::frontend::InternalError("Cannot open $fullpath: $!");
-        while (<$upl>) {
-          print OUTFILE $_;
-        }
-        close OUTFILE;
+        write_uploaded_file($upl, $fullpath);
 
 	system("echo $upl >>$list");
 
@@ -389,12 +384,7 @@ sub get_alignment {
 	    throw saliweb::frontend::InputValidationError("Please upload a zip file instead of a tar or gzip file");
 	}
 	my $zipfile = $job->directory . "/input.zip";
-	open(OUTFILE, '>', $zipfile)
-	    or throw saliweb::frontend::InternalError("Cannot open $zipfile: $!");
-	while (<$user_zip>) {
-	    print OUTFILE $_;
-	}
-	close OUTFILE;
+        write_uploaded_file($user_zip, $zipfile);
 
 	my $filesize2 = 0;
 	$filesize2 = -s "$zipfile";
