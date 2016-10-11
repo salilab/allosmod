@@ -14,11 +14,9 @@ sub write_uploaded_file {
     my ($infile, $outfile) = @_;
     open(UPLOAD, "> $outfile")
 	or throw saliweb::frontend::InternalError("Cannot open $outfile: $!");
-    my $file_contents = "";
     while (<$infile>) {
-        $file_contents .= $_;
+        print UPLOAD $_;
     }
-    print UPLOAD $file_contents;
     close UPLOAD
 	or throw saliweb::frontend::InternalError("Cannot close $outfile: $!");
 }
@@ -406,12 +404,7 @@ sub get_alignment {
 	}
         my $buffer;
         my $fullpath = $job->directory . "/" . $upl;
-        open(OUTFILE, '>', $fullpath)
-         or throw saliweb::frontend::InternalError("Cannot open $fullpath: $!");
-        while (<$upl>) {
-          print OUTFILE $_;
-        }
-        close OUTFILE;
+        write_uploaded_file($upl, $fullpath);
 
 	system("echo $upl >>$list");
 
