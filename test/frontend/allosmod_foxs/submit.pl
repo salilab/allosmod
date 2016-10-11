@@ -174,3 +174,40 @@ sub get_submit_frontend {
     like($@, qr/number of models for glyc/, "exception message");
     chdir('/') # Allow the temporary directory to be deleted
 }
+
+# Check get_alignment, empty sequence
+{
+    my $self = $t->make_frontend();
+    my $cgi = $self->cgi;
+
+    my $tmpdir = File::Temp::tempdir(CLEANUP=>1);
+    ok(chdir($tmpdir), "chdir into tempdir");
+    ok(mkdir("incoming"), "mkdir incoming");
+
+    $cgi->param("sequence", "    ");
+    throws_ok { $self->get_alignment() }
+              saliweb::frontend::InputValidationError,
+              "no sequence provided";
+    like($@, qr/Please provide sequence/);
+    chdir('/');
+}
+
+# Check get_alignment, no PDB codes
+{
+    my $self = $t->make_frontend();
+    my $cgi = $self->cgi;
+
+    my $tmpdir = File::Temp::tempdir(CLEANUP=>1);
+    ok(chdir($tmpdir), "chdir into tempdir");
+    ok(mkdir("incoming"), "mkdir incoming");
+
+    $cgi->param("sequence", "CGV");
+    $cgi->param("pdbcode", ());
+    $cgi->param("uploaded_file", ());
+
+    throws_ok { $self->get_alignment() }
+              saliweb::frontend::InputValidationError,
+              "no PDB code";
+    like($@, qr/Please provide PDB code/);
+    chdir('/');
+}
