@@ -4,6 +4,7 @@ use saliweb::Test;
 use Test::More 'no_plan';
 use File::Temp;
 use Test::Exception;
+use Test::MockModule;
 
 BEGIN {
     use_ok('allosmod_foxs');
@@ -20,11 +21,32 @@ my $t = new saliweb::Test('allosmod_foxs');
          'Index link');
 }
 
+# Test get_page_is_responsive
+{
+    my $self = $t->make_frontend();
+    is($self->get_page_is_responsive('index'), 1, 'index page responsive');
+}
+
 # Test get_index_page
 {
     my $self = $t->make_frontend();
     my $txt = $self->get_index_page();
     like($txt, qr/AllosMod\-FoXS: Structure Generation and SAXS/ms,
+         'get_index_page');
+}
+
+# Test get_index_page, single job
+{
+    my $self = $t->make_frontend();
+    my $job = $self->make_job('testjob', 'noemail');
+
+    # Force get_alignment() to return as for single job mode
+    my $module = new Test::MockModule('allosmod_foxs');
+    $module->mock('get_alignment', sub { return 'dummyaln', $job; });
+
+    my $txt = $self->get_index_page();
+    like($txt, '/AllosMod\-FoXS: Structure Generation and SAXS' .
+               '.*Alignment:.*dummyaln.*testjob/ms',
          'get_index_page');
 }
 
