@@ -1,5 +1,37 @@
 #!/usr/bin/perl -w
 
+# A file handle object that behaves similarly to those returned by CGI's
+# upload() method
+package TestFh;
+use Fcntl;
+use overload
+    '""' => \&asString;
+
+$FH='fh00000';
+
+sub DESTROY {
+    my $self = shift;
+    close $self;
+}
+
+sub asString {
+    my $self = shift;
+    # get rid of package name
+    (my $i = $$self) =~ s/^\*(\w+::fh\d{5})+//;
+    $i =~ s/%(..)/ chr(hex($1)) /eg;
+    return $i;
+}
+
+sub new {
+    my ($pack, $name) = @_;
+    my $fv = ++$FH . $name;
+    my $ref = \*{"TestFh::$fv"};
+    sysopen($ref, $name, Fcntl::O_RDWR(), 0600) || die "could not open: $!";
+    return bless $ref, $pack;
+}
+
+package main;
+
 use saliweb::Test;
 use Test::More 'no_plan';
 use File::Temp;
@@ -218,6 +250,35 @@ sub get_submit_frontend {
     ok(open(FH, $job->directory . "/list"), "Open list");
     is(<FH>, "XX\n");
     close(FH);
+
+    chdir('/') # Allow the temporary directory to be deleted
+}
+
+# Check get_alignment, uploaded file
+{
+    my $self = $t->make_frontend();
+    my $cgi = $self->cgi;
+
+    my $tmpdir = File::Temp::tempdir(CLEANUP=>1);
+    ok(chdir($tmpdir), "chdir into tempdir");
+    ok(mkdir("incoming"), "mkdir incoming");
+
+    # Make dummy alignment so we don't have to run get_MULTsi20b.sh script
+    $self->{config}->{allosmod}->{script_directory} = "/bin/true ";
+    ok(open(FH, "> incoming/align.ali"), "Open align.ali");
+    print FH "dummy alignment";
+    ok(close(FH), "Close align.ali");
+
+    ok(open(FH, "> test.pdb"), "Open test.pdb");
+    print FH "garbage";
+    ok(close(FH), "Close test.pdb");
+
+    $cgi->param('sequence', 'ACGV');
+    $cgi->param('pdbcode', ());
+    $cgi->param('uploaded_file', (TestFh->new('test.pdb')));
+
+    my ($aln, $job) = $self->get_alignment();
+    is($aln, "dummy alignment");
 
     chdir('/') # Allow the temporary directory to be deleted
 }
