@@ -20,6 +20,12 @@ my $t = new saliweb::Test('allosmod');
          'Index link');
 }
 
+# Test get_page_is_responsive
+{
+    my $self = $t->make_frontend();
+    is($self->get_page_is_responsive('index'), 1, 'index page responsive');
+}
+
 # Test get_index_page
 {
     my $self = $t->make_frontend();
