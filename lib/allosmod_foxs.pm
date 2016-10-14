@@ -60,11 +60,11 @@ sub get_project_menu {
     return <<MENU;
 <div id="logo">
 <center>
-<a href="http://modbase.compbio.ucsf.edu/allosmod"><img src="http://modbase.compbio.ucsf.edu/allosmod/html/img/am_logo.gif" alt="AllosMod logo"/></a>
+<a href="//modbase.compbio.ucsf.edu/allosmod"><img src="//modbase.compbio.ucsf.edu/allosmod/html/img/am_logo.gif" alt="AllosMod logo"/></a>
 </center>
 <br />
 <center>
-<a href="http://modbase.compbio.ucsf.edu/foxs"><img src="http://modbase.compbio.ucsf.edu/allosmod/html/img/foxs.gif" alt="FoXS logo"/></a>
+<a href="//modbase.compbio.ucsf.edu/foxs"><img src="//modbase.compbio.ucsf.edu/allosmod/html/img/foxs.gif" alt="FoXS logo"/></a>
 </center>
 </div><br />
 <h4><small>Developers:</small></h4><p>Dina Schneidman <br />
@@ -85,14 +85,14 @@ sub get_footer {
     my $htmlroot = $self->htmlroot;
     return <<FOOTER;
 <div id="address">
-<center><a href="http://www.ncbi.nlm.nih.gov/pubmed/22403063">
+<center><a href="https://www.ncbi.nlm.nih.gov/pubmed/22403063">
 <b>P. Weinkam, J. Pons, and A. Sali, Proc Natl Acad Sci U S A., (2012) <i>109 (13),</i> 4875-4880</b></a>:
-<a href="http://modbase.compbio.ucsf.edu/allosmod/html/file/Weinkam_PNAS_2012.pdf"><img src="http://modbase.compbio.ucsf.edu/allosmod/html/img/pdf.gif" alt="PDF"/></a>,
-S.I.:<a href="http://modbase.compbio.ucsf.edu/allosmod/html/file/Weinkam_PNAS_2012_si.pdf"><img src="http://modbase.compbio.ucsf.edu/allosmod/html/img/pdf.gif" alt="PDF"/></a>
+<a href="//modbase.compbio.ucsf.edu/allosmod/html/file/Weinkam_PNAS_2012.pdf"><img src="//modbase.compbio.ucsf.edu/allosmod/html/img/pdf.gif" alt="PDF"/></a>,
+S.I.:<a href="//modbase.compbio.ucsf.edu/allosmod/html/file/Weinkam_PNAS_2012_si.pdf"><img src="//modbase.compbio.ucsf.edu/allosmod/html/img/pdf.gif" alt="PDF"/></a>
 </center>
-<center><a href="http://www.ncbi.nlm.nih.gov/pubmed/20507903">
+<center><a href="https://www.ncbi.nlm.nih.gov/pubmed/20507903">
 <b>D. Schneidman-Duhovny, M. Hammel, A. Sali, Nucleic Acids Res., (2010) <i>38</i>, W540-4</b></a>:
-<a href="http://modbase.compbio.ucsf.edu/allosmod/html/file/Schneidman-Duhovny_NucAcRes_2010.pdf"><img src="http://modbase.compbio.ucsf.edu/allosmod/html/img/pdf.gif" alt="PDF"/></a>
+<a href="//modbase.compbio.ucsf.edu/allosmod/html/file/Schneidman-Duhovny_NucAcRes_2010.pdf"><img src="//modbase.compbio.ucsf.edu/allosmod/html/img/pdf.gif" alt="PDF"/></a>
 </center>
 </div>
 FOOTER
@@ -166,8 +166,8 @@ sub get_advanced_modeling_options {
 		  "<div class=\"glycmodopt\" id=\"option2\" style=\"display:none\">\n" .
 
 		  "WARNING: Rigid bodies can cause problems during simulations, care should be given here" . $q->br .
-		  "See the <a href=\"http://modbase.compbio.ucsf.edu/allosmod/help.cgi?type=glyc\"> glycosylation help page</a> for more information" . $q->br .
-	       	  "Upload the allosmod.py file generated for this protein using Option 1 on the <a href=\"http://modbase.compbio.ucsf.edu/allosmod\"> AllosMod server</a>" .
+		  "See the <a href=\"//modbase.compbio.ucsf.edu/allosmod/help.cgi?type=glyc\"> glycosylation help page</a> for more information" . $q->br .
+	       	  "Upload the allosmod.py file generated for this protein using Option 1 on the <a href=\"//modbase.compbio.ucsf.edu/allosmod\"> AllosMod server</a>" .
 				$q->filefield({-name=>"glycmod_python"}) . $q->br .
 
                   "</div>\n\n" .
@@ -188,7 +188,7 @@ sub get_advanced_modeling_options {
 	          "Standard deviation of restraint " . $q->textfield({-name=>'addbond_stdev', -size=>"3",
                                          -value=>"3.0"}) . $q->br .
 	          "Residue indices (for simulated sequence) separated by commas, one pair per line. " .
-				"(for example, click <a href=\"http://modbase.compbio.ucsf.edu/allosmod/html/file/bonds.dat\"> here</a>)" . 
+				"(for example, click <a href=\"//modbase.compbio.ucsf.edu/allosmod/html/file/bonds.dat\"> here</a>)" . 
 				$q->textarea({-name=>'addbond_indices', -rows=>5, -cols=>10,
                                          -value=>""}) . $q->br .
 
@@ -204,7 +204,7 @@ sub get_advanced_modeling_options {
 	          "Standard deviation of restraint " . $q->textfield({-name=>'addupper_stdev', -size=>"3",
                                          -value=>"2.0"}) . $q->br .
 	          "Residue indices (for simulated sequence) separated by commas, one pair per line. " .
-				"(for example, click <a href=\"http://modbase.compbio.ucsf.edu/allosmod/html/file/bonds.dat\"> here</a>)" . 
+				"(for example, click <a href=\"//modbase.compbio.ucsf.edu/allosmod/html/file/bonds.dat\"> here</a>)" . 
 				$q->textarea({-name=>'addupper_indices', -rows=>5, -cols=>10,
                                          -value=>""}) . $q->br .
 
@@ -220,7 +220,7 @@ sub get_advanced_modeling_options {
 	          "Standard deviation of restraint " . $q->textfield({-name=>'addlower_stdev', -size=>"3",
                                          -value=>"1.0"}) . $q->br .
 	          "Residue indices (for simulated sequence) separated by commas, one pair per line. " .
-				"(for example, click <a href=\"http://modbase.compbio.ucsf.edu/allosmod/html/file/bonds.dat\"> here</a>)" . 
+				"(for example, click <a href=\"//modbase.compbio.ucsf.edu/allosmod/html/file/bonds.dat\"> here</a>)" . 
 				$q->textarea({-name=>'addlower_indices', -rows=>5, -cols=>10,
                                          -value=>""}) . $q->br .
 
@@ -480,7 +480,7 @@ sub get_index_page {
               $q->p($q->button(-value=>'Add more structures',
                                -onClick=>"add_structure()")) .
                   $q->p("Sequence to be used in simulation (specify protein and DNA/RNA, input sugar in adv. opt., " . 
-			"see <a href=\"http://modbase.compbio.ucsf.edu/allosmod-foxs/help.cgi?type=help\"> help page</a>)" . $q->br .
+			"see <a href=\"//modbase.compbio.ucsf.edu/allosmod-foxs/help.cgi?type=help\"> help page</a>)" . $q->br .
                     $q->textarea({-name=>'sequence', -class=>'sequence',
                                   -rows=>'7', -cols=>'80'})) .
               $q->p({-class=>'submit'},
@@ -488,11 +488,11 @@ sub get_index_page {
     }
 
     my $greeting = <<GREETING;
-<p>AllosMod-FoXS combines the <a href="http://modbase.compbio.ucsf.edu/allosmod/"> AllosMod</a> and 
-<a href="http://modbase.compbio.ucsf.edu/foxs/index.html"> FoXS</a> web servers. Our combined server allows various 
+<p>AllosMod-FoXS combines the <a href="//modbase.compbio.ucsf.edu/allosmod/"> AllosMod</a> and 
+<a href="//modbase.compbio.ucsf.edu/foxs/index.html"> FoXS</a> web servers. Our combined server allows various 
 sampling algorithms from AllosMod to generate structures that are directly inputed into FoXS for small angle X-ray 
 scattering profile calculations. The server supports modeling of protein, DNA, RNA, and glycosylation. 
-For help, click <a href="http://modbase.compbio.ucsf.edu/allosmod-foxs/help.cgi?type=help"> here</a>.
+For help, click <a href="//modbase.compbio.ucsf.edu/allosmod-foxs/help.cgi?type=help"> here</a>.
 </p>
 GREETING
     return $q->h2({-align=>"center"},
@@ -851,7 +851,7 @@ sub format_user_error {
     if ($exc->isa('saliweb::frontend::InputValidationError')) {
 	$ret .= $q->p("&nbsp;");
 	$ret .= $q->p($q->b("WARNING: If you hit the back button in your web browser, your job may not submit properly."));
-        $ret .= $q->p($q->b("Please click <a href=\"http://modbase.compbio.ucsf.edu/allosmod-foxs\"> HERE</a> to reset the page."));
+        $ret .= $q->p($q->b("Please click <a href=\"//modbase.compbio.ucsf.edu/allosmod-foxs\"> HERE</a> to reset the page."));
     }
     return $ret;
 }

@@ -58,7 +58,7 @@ sub get_project_menu {
     my $htmlroot = $self->htmlroot;
     return <<MENU;
 <div id="logo">
-<a href="http://modbase.compbio.ucsf.edu/allosmod"><img src="$htmlroot/img/am_logo.gif" alt="AllosMod logo"/></a>
+<a href="//modbase.compbio.ucsf.edu/allosmod"><img src="$htmlroot/img/am_logo.gif" alt="AllosMod logo"/></a>
 </div><br />
 <h4><small>Developers:</small></h4><p>Patrick Weinkam<br />
 Ben Webb</p>
@@ -77,10 +77,10 @@ sub get_footer {
     my $htmlroot = $self->htmlroot;
     return <<FOOTER;
 <div id="address">
-<a href="http://www.ncbi.nlm.nih.gov/pubmed/22403063">
+<a href="https://www.ncbi.nlm.nih.gov/pubmed/22403063">
 <b>P. Weinkam, J. Pons, and A. Sali, Proc Natl Acad Sci U S A., (2012) <i>109 (13),</i> 4875-4880</b></a>:
 <a href="$htmlroot/file/Weinkam_PNAS_2012.pdf"><img src="$htmlroot/img/pdf.gif"  alt="PDF"/></a>,
-S.I.:<a href="http://modbase.compbio.ucsf.edu/allosmod/html/file/Weinkam_PNAS_2012_si.pdf"><img src="$htmlroot/img/pdf.gif" alt="PDF"/></a>
+S.I.:<a href="//modbase.compbio.ucsf.edu/allosmod/html/file/Weinkam_PNAS_2012_si.pdf"><img src="$htmlroot/img/pdf.gif" alt="PDF"/></a>
 </div>
 FOOTER
 }
@@ -122,7 +122,7 @@ sub get_all_options_prealign {
 		  $q->p($q->button(-value=>'Add more structures',
 				  -onClick=>"add_structure()")) .
                   $q->p("Sequence to be used in simulation (specify protein and DNA/RNA, input sugar in adv. opt., " . 
-			"see <a href=\"http://modbase.compbio.ucsf.edu/allosmod-foxs/help.cgi?type=help\"> help page</a>)" . $q->br .
+			"see <a href=\"//modbase.compbio.ucsf.edu/allosmod-foxs/help.cgi?type=help\"> help page</a>)" . $q->br .
 		       $q->textarea({-name=>'sequence', -class=>'sequence',
                                      -rows=>'7', -cols=>'80'})) .
            "\n</div></div>\n" .
@@ -185,8 +185,8 @@ sub get_advanced_modeling_options {
 		  "<div class=\"glycmodopt\" id=\"option2\" style=\"display:none\">\n" .
 
 		  "WARNING: Rigid bodies can cause problems during simulations, care should be given here" . $q->br .
-		  "See the <a href=\"http://modbase.compbio.ucsf.edu/allosmod/help.cgi?type=glyc\"> glycosylation help page</a> for more information" . $q->br .
-	       	  "Upload the allosmod.py file generated for this protein using Option 1 on the <a href=\"http://modbase.compbio.ucsf.edu/allosmod\"> AllosMod server</a>" .
+		  "See the <a href=\"//modbase.compbio.ucsf.edu/allosmod/help.cgi?type=glyc\"> glycosylation help page</a> for more information" . $q->br .
+	       	  "Upload the allosmod.py file generated for this protein using Option 1 on the <a href=\"//modbase.compbio.ucsf.edu/allosmod\"> AllosMod server</a>" .
 				$q->filefield({-name=>"glycmod_python"}) . $q->br .
 
                   "</div>\n\n" .
@@ -207,7 +207,7 @@ sub get_advanced_modeling_options {
 	          "Standard deviation of restraint " . $q->textfield({-name=>'addbond_stdev', -size=>"3",
                                          -value=>"3.0"}) . $q->br .
 	          "Residue indices (for simulated sequence) separated by commas, one pair per line. " .
-				"(for example, click <a href=\"http://modbase.compbio.ucsf.edu/allosmod/html/file/bonds.dat\"> here</a>)" . 
+				"(for example, click <a href=\"//modbase.compbio.ucsf.edu/allosmod/html/file/bonds.dat\"> here</a>)" . 
 				$q->textarea({-name=>'addbond_indices', -rows=>5, -cols=>10,
                                          -value=>""}) . $q->br .
 
@@ -223,7 +223,7 @@ sub get_advanced_modeling_options {
 	          "Standard deviation of restraint " . $q->textfield({-name=>'addupper_stdev', -size=>"3",
                                          -value=>"2.0"}) . $q->br .
 	          "Residue indices (for simulated sequence) separated by commas, one pair per line. " .
-				"(for example, click <a href=\"http://modbase.compbio.ucsf.edu/allosmod/html/file/bonds.dat\"> here</a>)" . 
+				"(for example, click <a href=\"//modbase.compbio.ucsf.edu/allosmod/html/file/bonds.dat\"> here</a>)" . 
 				$q->textarea({-name=>'addupper_indices', -rows=>5, -cols=>10,
                                          -value=>""}) . $q->br .
 
@@ -239,7 +239,7 @@ sub get_advanced_modeling_options {
 	          "Standard deviation of restraint " . $q->textfield({-name=>'addlower_stdev', -size=>"3",
                                          -value=>"1.0"}) . $q->br .
 	          "Residue indices (for simulated sequence) separated by commas, one pair per line. " .
-				"(for example, click <a href=\"http://modbase.compbio.ucsf.edu/allosmod/html/file/bonds.dat\"> here</a>)" . 
+				"(for example, click <a href=\"//modbase.compbio.ucsf.edu/allosmod/html/file/bonds.dat\"> here</a>)" . 
 				$q->textarea({-name=>'addlower_indices', -rows=>5, -cols=>10,
                                          -value=>""}) . $q->br .
 
@@ -489,7 +489,7 @@ sampling of conformational space. Use AllosMod to:</p>
 <li>Model energy landscapes for protein, DNA, RNA, and/or sugar with either known or modeled structures</li>
 <li>Sample your energy landscapes to predict often and/or rarely populated conformations</li>
 <li>Model energy landscapes for ligand-induced structural and/or dynamic changes, i.e. allostery</li>
-<li>Model energy landscapes for glycosylated proteins (For help, click <a href="http://modbase.compbio.ucsf.edu/allosmod/help.cgi?type=glyc"> here</a>)</li>
+<li>Model energy landscapes for glycosylated proteins (For help, click <a href="//modbase.compbio.ucsf.edu/allosmod/help.cgi?type=glyc"> here</a>)</li>
 </ul>
 
 <p>The AllosMod server runs in two modes: 1) single landscape and 2) batch jobs to set up many 
@@ -505,9 +505,9 @@ AllosMod has several options for conformational sampling and contains tools for 
 For more details click on the "About AllosMod" link above and read the paper listed below. <br />
 <br />
 ***<a style="color:red">NEW</a>*** The AllosMod server is integrated with the 
-<a href="http://modbase.compbio.ucsf.edu/foxs/index.html"> FoXS server</a> for rigid body modeling of 
+<a href="//modbase.compbio.ucsf.edu/foxs/index.html"> FoXS server</a> for rigid body modeling of 
 small angle X-ray scattering profiles. Our combined server is 
-<a href="http://modbase.compbio.ucsf.edu/allosmod-foxs"> AllosMod-FoXS</a>.
+<a href="//modbase.compbio.ucsf.edu/allosmod-foxs"> AllosMod-FoXS</a>.
 <br />&nbsp;</p>
 GREETING
 
@@ -848,7 +848,7 @@ sub format_user_error {
     if ($exc->isa('saliweb::frontend::InputValidationError')) {
 	$ret .= $q->p("&nbsp;");
 	$ret .= $q->p($q->b("WARNING: If you hit the back button in your web browser, your job may not submit properly."));
-        $ret .= $q->p($q->b("Please click <a href=\"http://modbase.compbio.ucsf.edu/allosmod\"> HERE</a> to reset the page."));
+        $ret .= $q->p($q->b("Please click <a href=\"//modbase.compbio.ucsf.edu/allosmod\"> HERE</a> to reset the page."));
     }
     return $ret;
 }
