@@ -4,6 +4,7 @@ use saliweb::Test;
 use Test::More 'no_plan';
 use File::Temp;
 use Test::Exception;
+use Test::MockModule;
 
 BEGIN {
     use_ok('allosmod');
@@ -31,6 +32,34 @@ my $t = new saliweb::Test('allosmod');
     my $self = $t->make_frontend();
     my $txt = $self->get_index_page();
     like($txt, qr/AllosMod server/ms,
+         'get_index_page');
+}
+
+# Test get_index_page, batch job
+{
+    my $self = $t->make_frontend();
+    my $job = $self->make_job('testjob', 'noemail');
+
+    # Force get_alignment() to return as for batch mode
+    my $module = new Test::MockModule('allosmod');
+    $module->mock('get_alignment', sub { return 'X', $job; });
+
+    my $txt = $self->get_index_page();
+    like($txt, qr/AllosMod server.*Click submit to run your batch job/ms,
+         'get_index_page');
+}
+
+# Test get_index_page, single job
+{
+    my $self = $t->make_frontend();
+    my $job = $self->make_job('testjob', 'noemail');
+
+    # Force get_alignment() to return as for single job mode
+    my $module = new Test::MockModule('allosmod');
+    $module->mock('get_alignment', sub { return 'dummyaln', $job; });
+
+    my $txt = $self->get_index_page();
+    like($txt, qr/AllosMod server.*Verify Alignment.*testjob/ms,
          'get_index_page');
 }
 
