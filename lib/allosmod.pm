@@ -9,7 +9,7 @@ sub new {
 
 # Save an uploaded file into the job directory
 sub write_uploaded_file {
-    my ($infile, $outfile) = @_;
+    my ($outfile, $infile) = @_;
     open(UPLOAD, "> $outfile")
 	or throw saliweb::frontend::InternalError("Cannot open $outfile: $!");
     while (<$infile>) {
@@ -366,7 +366,7 @@ sub get_alignment {
 	}
         my $buffer;
         my $fullpath = $job->directory . "/" . $upl;
-        write_uploaded_file($upl, $fullpath);
+        write_uploaded_file($fullpath, $upl);
 
 	system("echo $upl >>$list");
 
@@ -384,7 +384,7 @@ sub get_alignment {
 	    throw saliweb::frontend::InputValidationError("Please upload a zip file instead of a tar or gzip file");
 	}
 	my $zipfile = $job->directory . "/input.zip";
-        write_uploaded_file($user_zip, $zipfile);
+        write_uploaded_file($zipfile, $user_zip);
 
 	my $filesize2 = 0;
 	$filesize2 = -s "$zipfile";
@@ -599,24 +599,24 @@ sub get_submit_page {
 	my $file_contents = "";
 	my $filesize2;
 	if ($advancedopt eq "ligandmod") {
-            write_uploaded_file($q->upload('ligandmod_ligfile'),
-                                "$jobdir/lig.pdb");
+            write_uploaded_file("$jobdir/lig.pdb",
+                                $q->upload('ligandmod_ligfile'));
             delete_file_if_empty("$jobdir/lig.pdb");
 	}
 	if ($advancedopt eq "glycmod") {
 	    if ($glycmodopt eq "option1") {
-                write_uploaded_file($q->upload('glycmod_input'),
-                                    "$jobdir/glyc.dat");
+                write_uploaded_file("$jobdir/glyc.dat",
+                                    $q->upload('glycmod_input'));
                 delete_file_if_empty("$jobdir/glyc.dat");
 	    }
 	    if ($glycmodopt eq "option2") {
-                write_uploaded_file($q->upload('glycmod_python'),
-                                    "$jobdir/allosmod.py");
+                write_uploaded_file("$jobdir/allosmod.py",
+                                    $q->upload('glycmod_python'));
                 delete_file_if_empty("$jobdir/allosmod.py");
 	    }
 	    if ($advancedopt eq "break") {
-                write_uploaded_file($q->upload('break_input'),
-                                    "$jobdir/break.dat");
+                write_uploaded_file("$jobdir/break.dat",
+                                    $q->upload('break_input'));
                 delete_file_if_empty("$jobdir/break.dat");
 	    }
 

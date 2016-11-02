@@ -129,10 +129,10 @@ my $t = new saliweb::Test('allosmod_foxs');
     ok(close(FH), "Close in.file");
     ok(open(FH, "< $tmpdir/in.file"), "Open in.file");
 
-    throws_ok { allosmod_foxs::write_uploaded_file(\*FH, "/foo/bar/out.file") }
+    throws_ok { allosmod_foxs::write_uploaded_file("/foo/bar/out.file", \*FH) }
               qr/Cannot open/, "write_uploaded file, open failure";
 
-    allosmod_foxs::write_uploaded_file(\*FH, "$tmpdir/out.file");
+    allosmod_foxs::write_uploaded_file("$tmpdir/out.file", \*FH);
 
     ok(open(FH, "< $tmpdir/out.file"), "Open out.file");
     my $contents = <FH>;

@@ -11,7 +11,7 @@ sub new {
 
 # Save an uploaded file into the job directory
 sub write_uploaded_file {
-    my ($infile, $outfile) = @_;
+    my ($outfile, $infile) = @_;
     open(UPLOAD, "> $outfile")
 	or throw saliweb::frontend::InternalError("Cannot open $outfile: $!");
     while (<$infile>) {
@@ -404,7 +404,7 @@ sub get_alignment {
 	}
         my $buffer;
         my $fullpath = $job->directory . "/" . $upl;
-        write_uploaded_file($upl, $fullpath);
+        write_uploaded_file($fullpath, $upl);
 
 	system("echo $upl >>$list");
 
@@ -521,7 +521,7 @@ sub get_submit_page {
     if(length $user_saxs <= 0) {
 	throw saliweb::frontend::InputValidationError("Please provide SAXS profile $!");
     }
-    write_uploaded_file($user_saxs, "$jobdir/saxs.dat");
+    write_uploaded_file("$jobdir/saxs.dat", $user_saxs);
     my $filesize = -s "$jobdir/saxs.dat";
     if($filesize == 0) {
 	throw saliweb::frontend::InputValidationError("You have uploaded an empty SAXS profile.");
@@ -582,22 +582,23 @@ sub get_submit_page {
     $file_contents = "";
     my $filesize2;
     if ($advancedopt eq "ligandmod") {
-        write_uploaded_file($q->upload('ligandmod_ligfile'), "$jobdir/lig.pdb");
+        write_uploaded_file("$jobdir/lig.pdb", $q->upload('ligandmod_ligfile'));
         delete_file_if_empty("$jobdir/lig.pdb");
     }
     if ($advancedopt eq "glycmod") {
 	if ($glycmodopt eq "option1") {
-            write_uploaded_file($q->upload('glycmod_input'),
-                                "$jobdir/glyc.dat");
+            write_uploaded_file("$jobdir/glyc.dat",
+                                $q->upload('glycmod_input'));
             delete_file_if_empty("$jobdir/glyc.dat");
 	}
 	if ($glycmodopt eq "option2") {
-            write_uploaded_file($q->upload('glycmod_python'),
-                                "$jobdir/allosmod.py");
+            write_uploaded_file("$jobdir/allosmod.py",
+                                $q->upload('glycmod_python'));
             delete_file_if_empty("$jobdir/allosmod.py");
 	}
 	if ($advancedopt eq "break") {
-            write_uploaded_file($q->upload('break_input'), "$jobdir/break.dat");
+            write_uploaded_file("$jobdir/break.dat",
+                                $q->upload('break_input'));
             delete_file_if_empty("$jobdir/break.dat");
 	}
 
