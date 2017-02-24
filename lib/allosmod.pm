@@ -1,7 +1,7 @@
 package allosmod;
-use base qw(saliweb::frontend);
-
+use saliweb::frontend;
 use strict;
+our @ISA = "saliweb::frontend";
 
 sub new {
     return saliweb::frontend::new(@_, "##CONFIG##");
@@ -364,11 +364,12 @@ sub get_alignment {
         if(length $upl > 40) { 
 	    throw saliweb::frontend::InputValidationError("Please limit the file name length to a maximum of 40 characters");
 	}
+        my $filename = sanitize_filename($upl);
         my $buffer;
-        my $fullpath = $job->directory . "/" . $upl;
+        my $fullpath = $job->directory . "/" . $filename;
         write_uploaded_file($fullpath, $upl);
 
-	system("echo $upl >>$list");
+	system("echo $filename >>$list");
 
         $upl_num++;
       }

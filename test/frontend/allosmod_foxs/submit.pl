@@ -23,8 +23,11 @@ sub asString {
 }
 
 sub new {
-    my ($pack, $name) = @_;
-    my $fv = ++$FH . $name;
+    my ($pack, $name, $reported_name) = @_;
+    if (not defined $reported_name) {
+        $reported_name = $name;
+    }
+    my $fv = ++$FH . $reported_name;
     my $ref = \*{"TestFh::$fv"};
     sysopen($ref, $name, Fcntl::O_RDWR(), 0600) || die "could not open: $!";
     return bless $ref, $pack;
@@ -266,10 +269,15 @@ sub get_submit_frontend {
     $cgi->param('jobemail', '');
     $cgi->param('sequence', 'ACGV');
     $cgi->param('pdbcode', ());
-    $cgi->param('uploaded_file', (TestFh->new('test.pdb')));
+    $cgi->param('uploaded_file', (TestFh->new('test.pdb',
+                                              '../../foo bar&;baz')));
 
     my ($aln, $job) = $self->get_alignment();
     is($aln, "dummy alignment");
+
+    ok(open(FH, $job->directory . "/list"), "Open list");
+    is(<FH>, "foobarbaz\n");
+    close(FH);
 
     chdir('/') # Allow the temporary directory to be deleted
 }
