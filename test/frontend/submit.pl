@@ -280,5 +280,9 @@ sub get_submit_frontend {
     my ($aln, $job) = $self->get_alignment();
     is($aln, "dummy alignment");
 
+    ok(open(FH, $job->directory . "/list"), "Open list");
+    is(<FH>, "test.pdb\n");
+    close(FH);
+
     chdir('/') # Allow the temporary directory to be deleted
 }
