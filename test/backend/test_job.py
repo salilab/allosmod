@@ -231,7 +231,8 @@ class JobTests(saliweb.test.TestCase):
         d = saliweb.test.RunInDir(j.directory)
         j.check_log_errors()
         for err in ('Traceback (most recent call last):',
-                    'Summary of failed models', 'awk: fatal'):
+                    'Summary of failed models', 'awk: foo bar fatal',
+                    'awk: line:2   ^ syntax error'):
             with open('test.o1234.1', 'w') as fh:
                 fh.write(err)
             self.assertRaises(allosmod.AllosModLogError, j.check_log_errors)

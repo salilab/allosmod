@@ -187,7 +187,8 @@ sleep 10s
             for line in open(logfile):
                 if 'Traceback (most recent call last)' in line \
                    or 'Summary of failed models' in line \
-                   or 'awk: fatal' in line:
+                   or ('awk: ' in line and \
+                       ('error' in line or 'fatal' in line)):
                     raise AllosModLogError("Job reported an error in %s: %s"
                                            % (logfile, line))
 
