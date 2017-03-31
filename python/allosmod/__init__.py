@@ -180,10 +180,16 @@ sleep 10s
             r = saliweb.backend.DoNothingRunner()
         return r
 
+    def get_all_error_log(self):
+        """Yield all error.log files"""
+        for dirpath, dirnames, filenames in os.walk('.'):
+            if 'error.log' in filenames:
+                yield os.path.join(dirpath, 'error.log')
+
     def check_log_errors(self):
         """Check log files for error messages"""
-        sge_logs = glob.glob("*.o*")
-        for logfile in sge_logs:
+        logs = glob.glob("*.o*") + list(self.get_all_error_log())
+        for logfile in logs:
             for line in open(logfile):
                 if 'Traceback (most recent call last)' in line \
                    or 'Summary of failed models' in line \
