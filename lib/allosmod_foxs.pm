@@ -781,7 +781,7 @@ sub get_submit_page {
 
 sub allow_file_download {
     my ($self, $file) = @_;
-    return $file eq 'output.zip';
+    return $file eq 'output.zip' || $file eq 'failure.log';
 }
 
 sub get_results_page {
