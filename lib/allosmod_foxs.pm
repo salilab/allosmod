@@ -820,7 +820,7 @@ sub get_foxs_url {
 
 sub display_failed_job {
     my ($self, $q, $job) = @_;
-    my $return= $q->p("AllosMod-FoXS was unable to complete your request: job '<b>" . $job->name);
+    my $return= $q->p("AllosMod-FoXS was unable to complete your request: job '<b>" . $job->name . '</b>');
     $return.= $q->p("For more information, you can " .
                     "<a href=\"" . $job->get_results_file_url("failure.log") .
                     "\">download the log file</a>." .
