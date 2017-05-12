@@ -774,7 +774,7 @@ sub get_submit_page {
 
 sub allow_file_download {
     my ($self, $file) = @_;
-    return $file eq 'output.zip';
+    return $file eq 'output.zip' || $file eq 'failure.log';
 }
 
 sub get_results_page {
@@ -802,7 +802,7 @@ sub display_ok_job {
 
 sub display_failed_job {
     my ($self, $q, $job) = @_;
-    my $return= $q->p("AllosMod was unable to complete your request: job '<b>" . $job->name);
+    my $return= $q->p("AllosMod was unable to complete your request: job '<b>" . $job->name . " '</b>");
     $return.=$q->p("This is usually caused by incorrect inputs " .
                    "(e.g. alignment file, PDB files, etc.).");
     $return.=$q->p("For a discussion of some common input errors, please see " .

@@ -22,6 +22,8 @@ my $t = new saliweb::Test('allosmod');
 
     is($self->allow_file_download('output.zip'), 1,
        "                    good file 1");
+    is($self->allow_file_download('failure.log'), 1,
+       "                    good file 2");
 }
 
 # Check display_ok_job
