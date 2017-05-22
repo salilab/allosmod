@@ -4,7 +4,10 @@
   background: #efefef; 
   background: linear-gradient(top, #efefef 0%, #bbbbbb 100%);  
   background: -moz-linear-gradient(top, #efefef 0%, #bbbbbb 100%); 
+  background: -webkit-gradient(top, #efefef 0%,#bbbbbb 100%);
   background: -webkit-linear-gradient(top, #efefef 0%,#bbbbbb 100%); 
+  background: -o-linear-gradient(top, #efefef 0%,#bbbbbb 100%);
+  background: -ms-linear-gradient(top, #efefef 0%,#bbbbbb 100%);
   box-shadow: 0px 0px 9px rgba(0,0,0,0.15);
   padding: 0 20px;
   border-radius: 10px;  
