@@ -1,6 +1,6 @@
 [![Build Status](https://travis-ci.org/salilab/allosmod.svg?branch=master)](https://travis-ci.org/salilab/allosmod)
 [![codecov](https://codecov.io/gh/salilab/allosmod/branch/master/graph/badge.svg)](https://codecov.io/gh/salilab/allosmod)
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/114da59eb5354e1aa4701717a400d7ba)](https://www.codacy.com/app/benmwebb/allosmod?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=salilab/allosmod&amp;utm_campaign=Badge_Grade)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/114da59eb5354e1aa4701717a400d7ba)](https://www.codacy.com/app/salilab/allosmod?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=salilab/allosmod&amp;utm_campaign=Badge_Grade)
 
 This is the source code for [AllosMod](https://salilab.org/allosmod/)
 and [AllosMod-FoXS](https://salilab.org/allosmod-foxs/), web services to set up
