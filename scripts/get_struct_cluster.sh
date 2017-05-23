@@ -44,7 +44,7 @@ for es in `echo $ESIZE | awk '{for(a=1;a<=$1;a++){print a}}'`; do
 	    sout=`awk '($1=="'${R_BEST[${ibest}]}'"){print $0}' tempgsc_rmsd |sort -nk3 | awk '(NR==1){print $2}'`
 	    rout=`allosmod min_rmsd $PM ${es}_${ifit}/$sout | awk 'BEGIN{a=0.0}{a=$3}END{print a}'`
 	    wout=`$SCRIPT_DIR/pchop foxs_ens${es}.log $esp1 ${ifit} | grep $sout | awk 'BEGIN{a=1.0}{a=$3}END{print a}'`
-	    echo -n ${sout}" "$rout" "$wout" " >>struct_cluster_${es}.out
+	    echo -n "${sout} $rout $wout " >>struct_cluster_${es}.out
 	    awk '($2!="'${sout}'"){print $0}' tempgsc_rmsd > tempgsx412; mv tempgsx412 tempgsc_rmsd
 	done
 	echo "" >>struct_cluster_${es}.out

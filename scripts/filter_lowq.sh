@@ -1,8 +1,5 @@
 #!/bin/bash
 
-# Absolute path containing this and other scripts
-SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
-
 FIL_PM=$1
 LS2PDB=$2 #used to list all pdb's: ls input/pred_dE*/*_[0-9]
 

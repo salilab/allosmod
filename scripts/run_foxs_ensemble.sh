@@ -16,8 +16,6 @@ if test -z $PM; then echo error determining PM file run_foxs_ensemble.sh; exit; 
 cd input/
 ls -1d pred_dE*/*[0-9]/pm.pdb.B[1-9]* >list_${JOBNAME}
 
-NUMRUN=${#R_JOBNAME[@]}
-
 echo "jobname=${JOBNAME}" >qsub.sh
 
 cat <<EOF >> qsub.sh

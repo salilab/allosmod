@@ -56,9 +56,7 @@ npdb=0
 if test -e energy_soap.dat; then rm energy_soap.dat; fi
 for s in `cat $LIST`; do
     npdb=$((${npdb} + 1))
-    bndir=`dirname $s`
     awk 'BEGIN{a=0}{a+=$2}END{print "'${s}' "a}' temp_gss33/${npdb}.profile >>energy_soap.dat
-#    mv temp_gss33/${npdb}.profile ${s}.profile
 done
 
 rm -rf temp_gss33

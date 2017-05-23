@@ -4,9 +4,6 @@
 
 DIR=$1 #path to alignment and list files
 
-# Absolute path containing this and other scripts
-SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
-
 # Get the 'allosmod' binary in the path
 . /etc/profile
 module load allosmod
@@ -127,8 +124,6 @@ for fil in `cat list`; do
     fi
 done
 ISPM=`grep -n pm.pdb align.ali | grep structureX | awk 'BEGIN{FS=":"}{print $1}' | head -n1`
-if test -z $ISPM; then LINE2REP=`grep -n pm.pdb align.ali | grep sequence | awk 'BEGIN{FS=":"}{print $1}' | head -n1`; fi
 if test -z $ISPM; then errorfil=1; fi
 
 if test `echo "$errorfil==1" |bc -l` -eq 1; then echo errorfil > align.ali; exit; fi
-

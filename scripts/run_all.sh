@@ -3,9 +3,6 @@
 . /etc/profile
 module load allosmod
 
-LOCAL_SCRATCH=$1
-GLOBAL_SCRATCH=$2
-
 if test -e dirlist; then rm dirlist; fi
 
 for d in `ls -1d *`; do

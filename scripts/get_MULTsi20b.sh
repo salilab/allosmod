@@ -4,9 +4,6 @@
 INPFIL=$1 #file containing sequence used experiment (one letter code)
 DIR=$2 #path to INPFIL and list
 
-# Absolute path containing this and other scripts
-SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
-
 # Get the 'allosmod' binary in the path
 . /etc/profile
 module load allosmod
@@ -82,7 +79,7 @@ aln.append(file='tempms004.ali', align_codes=('pm.pdb'
 EOF
 
 for fil in `cat list`; do
-    echo -n ",'"$fil"'" >>modalign.py
+    echo -n ",'$fil'" >>modalign.py
 done
 echo "))" >>modalign.py
 
