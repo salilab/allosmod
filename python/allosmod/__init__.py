@@ -189,14 +189,23 @@ sleep 10s
     def check_log_errors(self):
         """Check log files for error messages"""
         logs = glob.glob("*.o*") + list(self.get_all_error_log())
+        error = None
         for logfile in logs:
             for line in open(logfile):
-                if 'Traceback (most recent call last)' in line \
+                if error is None and \
+                   'Traceback (most recent call last)' in line \
                    or 'Summary of failed models' in line \
                    or ('awk: ' in line and \
                        ('error' in line or 'fatal' in line)):
-                    raise AllosModLogError("Job reported an error in %s: %s"
-                                           % (logfile, line))
+                    error = (logfile, line)
+                # If AllosMod internally handled a Python traceback, it is not
+                # considered an error, but rather a problem for the user
+                # to correct
+                if 'MODELLER has failed to create an initial model' in line:
+                    error = None
+        if error:
+            raise AllosModLogError("Job reported an error in %s: %s"
+                                   % (logfile, line))
 
     def postprocess(self):
         self.check_log_errors()

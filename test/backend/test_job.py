@@ -236,6 +236,12 @@ class JobTests(saliweb.test.TestCase):
             with open('test.o1234.1', 'w') as fh:
                 fh.write(err)
             self.assertRaises(allosmod.AllosModLogError, j.check_log_errors)
+        # Tracebacks handled internally by AllosMod aren't considered errors
+        with open('test.o1234.1', 'w') as fh:
+            fh.write("Traceback (most recent call last):\n")
+            fh.write("MODELLER has failed to create an initial model "
+                     "of the following structure:\n")
+        j.check_log_errors()
 
     def test_check_preprocess(self):
         """Test preprocess() method"""
