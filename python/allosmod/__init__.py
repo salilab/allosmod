@@ -204,8 +204,7 @@ sleep 10s
                 if 'MODELLER has failed to create an initial model' in line:
                     error = None
         if error:
-            raise AllosModLogError("Job reported an error in %s: %s"
-                                   % (logfile, line))
+            raise AllosModLogError("Job reported an error in %s: %s" % error)
 
     def postprocess(self):
         self.check_log_errors()
