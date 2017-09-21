@@ -17,7 +17,7 @@ install:
   - git clone --depth=5 https://github.com/salilab/saliweb
   - (cd saliweb && scons modeller_key=UNKNOWN pythondir=$PYTHONPATH perldir=~/perl5/lib/perl5 prefix=~/usr webdir=~/www install)
 script:
-  - scons coverage=true test
+  - scons coverage=true python=$(which python) test
 after_success:
   - bash <(curl -s https://codecov.io/bash)
   - cover -report codecov
