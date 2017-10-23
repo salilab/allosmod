@@ -205,7 +205,7 @@ sleep 10s
                     error = None
                 # Certain AllosMod-specific exceptions are also intended for
                 # the user to correct
-                if 'BondTypeError' in line:
+                if 'BondTypeError' in line or 'InvalidResidueError' in line:
                     error = None
         if error:
             raise AllosModLogError("Job reported an error in %s: %s" % error)
