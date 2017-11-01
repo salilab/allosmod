@@ -829,7 +829,7 @@ sub display_failed_job {
     }
     $return.= $q->p("For more information, you can " .
                     "<a href=\"" . $job->get_results_file_url("failure.log") .
-                    "\">download the log file</a>$outzip." .
+                    "\">download the log file</a>$outzip. " .
                     "If the problem is not clear from this log, " .
                     "please <a href=\"" .
                     $self->contact_url . "\">contact us</a> for " .
