@@ -820,7 +820,8 @@ sub get_foxs_url {
 
 sub display_failed_job {
     my ($self, $q, $job) = @_;
-    my $return= $q->p("AllosMod-FoXS was unable to complete your request: job '<b>" . $job->name . "'</b>");
+    my $return= $q->p("AllosMod-FoXS was unable to complete your request: " .
+                      " job '<b>" . $job->name . "</b>'");
     my $outzip = "";
     if (-f "output.zip") {
         $outzip = " and the <a href=\""

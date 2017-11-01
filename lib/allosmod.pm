@@ -802,7 +802,8 @@ sub display_ok_job {
 
 sub display_failed_job {
     my ($self, $q, $job) = @_;
-    my $return= $q->p("AllosMod was unable to complete your request: job '<b>" . $job->name . " '</b>");
+    my $return= $q->p("AllosMod was unable to complete your request: " .
+                      "job '<b>" . $job->name . "</b>'");
     $return.=$q->p("This is usually caused by incorrect inputs " .
                    "(e.g. alignment file, PDB files, etc.).");
     $return.=$q->p("For a discussion of some common input errors, please see " .
