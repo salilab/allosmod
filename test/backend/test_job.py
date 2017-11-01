@@ -181,8 +181,8 @@ class JobTests(saliweb.test.TestCase):
         j.send_user_email = test_foxs
         j.send_job_completed_email()
 
-    def test_complete_nofoxs(self):
-        """Test job completion, no FoXS"""
+    def test_complete_nofoxs_ok(self):
+        """Test job completion, no FoXS, all OK"""
         j = self.make_test_job(allosmod.Job, 'RUNNING')
         d = saliweb.test.RunInTempDir()
         subd = 'output/land1/pred_dECALCrAS1000/land1.pdb_0'
@@ -224,6 +224,40 @@ class JobTests(saliweb.test.TestCase):
         self.assertEqual(contents,
                          '10.00000 0.0000 0.0000 1.00000 0.00000\n'
                          '42.00000 0.0000 0.0000 2.00000 0.00000\n')
+
+    def test_complete_nofoxs_failure(self):
+        """Test job completion, no FoXS, failure encountered"""
+        j = self.make_test_job(allosmod.Job, 'RUNNING')
+        d = saliweb.test.RunInTempDir()
+        with open('failure.log', 'w') as fh:
+            fh.write('error')
+        os.mkdir('output')
+        j.finalize()
+        # output dir should have been replaced by output.zip
+        self.assertEqual(sorted(os.listdir('.')), ['failure.log', 'output.zip'])
+
+    def test_make_failure_log_ok(self):
+        """Test make_failure_log() method, no failures"""
+        j = self.make_test_job(allosmod.Job, 'RUNNING')
+        d = saliweb.test.RunInDir(j.directory)
+        j.make_failure_log()
+        self.assertFalse(j.has_failure_log())
+
+    def test_make_failure_log_errs(self):
+        """Test make_failure_log() method, with errors"""
+        j = self.make_test_job(allosmod.Job, 'RUNNING')
+        d = saliweb.test.RunInDir(j.directory)
+        os.mkdir('subdir')
+        with open(os.path.join('subdir', 'error.log'), 'w') as fh:
+            fh.write('error')
+        j.make_failure_log()
+        self.assertTrue(j.has_failure_log())
+        with open('failure.log') as fh:
+            contents = fh.read()
+        self.assertEqual(contents, "\nOne or more errors were detected and "
+                         "the job did not complete successfully.\nPlease see "
+                         "the following files inside output.zip for more "
+                         "information:\n./subdir/error.log\n")
 
     def test_check_log_errors(self):
         """Test check_log_errors() method"""

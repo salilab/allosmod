@@ -780,10 +780,10 @@ sub allow_file_download {
 sub get_results_page {
     my ($self, $job) = @_;
     my $q = $self->cgi;
-    if (-f 'output.zip') {
-        return $self->display_ok_job($q, $job);
-    } else {
+    if (-f 'failure.log') {
         return $self->display_failed_job($q, $job);
+    } else {
+        return $self->display_ok_job($q, $job);
     }
 }
 
@@ -809,10 +809,16 @@ sub display_failed_job {
                    "the " .
                    $q->a({-href=>$self->help_url . "#errors"}, "help page") .
                    ".");
+    my $outzip = "";
+    if (-f "output.zip") {
+        $outzip = " and the <a href=\""
+                  . $job->get_results_file_url("output.zip") .
+                  "\">partial output zip file</a>";
+    }
     $return.= $q->p("For more information, you can " .
                     "<a href=\"" . $job->get_results_file_url("failure.log") .
-                    "\">download the log file</a>." .
-                    "If the problem is not clear from this log, " .
+                    "\">download the log file</a>$outzip." .
+                    "If the problem is not clear from this, " .
                     "please <a href=\"" .
                     $self->contact_url . "\">contact us</a> for " .
                     "further assistance.");

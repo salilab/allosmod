@@ -787,10 +787,10 @@ sub allow_file_download {
 sub get_results_page {
     my ($self, $job) = @_;
     my $q = $self->cgi;
-    if (-f 'output.zip') {
-        return $self->display_ok_job($q, $job);
-    } else {
+    if (-f 'failure.log') {
         return $self->display_failed_job($q, $job);
+    } else {
+        return $self->display_ok_job($q, $job);
     }
 }
 
@@ -821,9 +821,15 @@ sub get_foxs_url {
 sub display_failed_job {
     my ($self, $q, $job) = @_;
     my $return= $q->p("AllosMod-FoXS was unable to complete your request: job '<b>" . $job->name . "'</b>");
+    my $outzip = "";
+    if (-f "output.zip") {
+        $outzip = " and the <a href=\""
+                  . $job->get_results_file_url("output.zip") .
+                  "\">partial output zip file</a>";
+    }
     $return.= $q->p("For more information, you can " .
                     "<a href=\"" . $job->get_results_file_url("failure.log") .
-                    "\">download the log file</a>." .
+                    "\">download the log file</a>$outzip." .
                     "If the problem is not clear from this log, " .
                     "please <a href=\"" .
                     $self->contact_url . "\">contact us</a> for " .

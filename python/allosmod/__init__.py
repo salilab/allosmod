@@ -210,16 +210,38 @@ sleep 10s
         if error:
             raise AllosModLogError("Job reported an error in %s: %s" % error)
 
+    def make_failure_log(self):
+        """Check for user errors and report them to the user.
+           This is helpful in a top-level file because the error.log files
+           are often buried several directories deep inside output.zip."""
+        logs = list(self.get_all_error_log())
+        error_logs = [l for l in logs if os.stat(l).st_size > 0]
+        if error_logs:
+            with open('failure.log', 'w') as fh:
+                fh.write("""
+One or more errors were detected and the job did not complete successfully.
+Please see the following files inside output.zip for more information:
+%s
+""" % "\n".join(error_logs))
+
+    def has_failure_log(self):
+        """Return True iff a failure log file exists."""
+        return os.path.exists('failure.log')
+
     def postprocess(self):
         self.check_log_errors()
+        self.make_failure_log()
         MAXJOBS = 200
         jobcounter = JobCounter().get()
+        # Terminate early if failure occurred
+        if self.has_failure_log():
+            jobcounter = -1
         self.debug_log("post jobctr %d" % jobcounter)
 
         #submit next job
         if jobcounter > -1 and jobcounter < MAXJOBS:
             self.reschedule_run()
-        #sims are finished
+        #sims are finished (or failed)
         if jobcounter == -1:
             os.mkdir("output")
             with open("dirlist_all") as fh:
@@ -270,11 +292,12 @@ sleep 10s
     def _complete_nofoxs(self):
         """Complete a regular AllosMod run"""
         # Collect energies
-        for g in glob.glob("output/*/pred_dE*/*"):
-            self.collect_energies(g)
+        if not self.has_failure_log():
+            for g in glob.glob("output/*/pred_dE*/*"):
+                self.collect_energies(g)
 
-        for g in glob.glob("output/*/scan"):
-            os.unlink(g)
+            for g in glob.glob("output/*/scan"):
+                os.unlink(g)
 
         # zip outputs
         z = zipfile.ZipFile('output.zip', 'w', allowZip64=True)
@@ -286,6 +309,10 @@ sleep 10s
 
     def _complete_foxs(self):
         """Complete an AllosMod-FoXS run"""
+        # Skip FoXS if something failed
+        if self.has_failure_log():
+            self._complete_nofoxs()
+            return
         # Make directory group writeable so FoXS can access it
         os.chmod(".", 0775)
         subprocess.call([os.path.join(self.config.script_directory,

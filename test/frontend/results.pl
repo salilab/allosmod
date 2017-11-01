@@ -32,23 +32,45 @@ my $t = new saliweb::Test('allosmod');
     my $job = new saliweb::frontend::CompletedJob($frontend,
                         {name=>'testjob', passwd=>'foo', directory=>'/foo/bar',
                          archive_time=>'2009-01-01 08:45:00'});
-    my $ret = $frontend->display_ok_job($frontend->{CGI}, $job); 
+    my $ret = $frontend->display_ok_job($frontend->{CGI}, $job);
     like($ret, '/Job.*testjob.*has completed.*output\.zip.*' .
                'Download output zip file/ms', 'display_ok_job');
 }
 
-# Check display_failed_job
+# Check display_failed_job (no output.zip)
 {
     my $frontend = $t->make_frontend();
     my $job = new saliweb::frontend::CompletedJob($frontend,
                         {name=>'testjob', passwd=>'foo', directory=>'/foo/bar',
                          archive_time=>'2009-01-01 08:45:00'});
-    my $ret = $frontend->display_failed_job($frontend->{CGI}, $job); 
+    my $tmpdir = tempdir(CLEANUP=>1);
+    ok(chdir($tmpdir), "chdir into tempdir");
+    my $ret = $frontend->display_failed_job($frontend->{CGI}, $job);
     like($ret, '/AllosMod was unable to complete your request.*' .
                'some common input errors.*' .
                'you can.*failure\.log.*download the log file.*' .
                'contact us/ms',
          'display_failed_job');
+    chdir("/");
+}
+
+# Check display_failed_job (with output.zip)
+{
+    my $frontend = $t->make_frontend();
+    my $job = new saliweb::frontend::CompletedJob($frontend,
+                        {name=>'testjob', passwd=>'foo', directory=>'/foo/bar',
+                         archive_time=>'2009-01-01 08:45:00'});
+    my $tmpdir = tempdir(CLEANUP=>1);
+    ok(chdir($tmpdir), "chdir into tempdir");
+    ok(open(FH, "> output.zip"), "Open output.zip");
+    ok(close(FH), "Close output.zip");
+    my $ret = $frontend->display_failed_job($frontend->{CGI}, $job);
+    like($ret, '/AllosMod was unable to complete your request.*' .
+               'some common input errors.*' .
+               'you can.*failure\.log.*download the log file.*' .
+               'output\.zip.*partial output zip file.*contact us/ms',
+         'display_failed_job');
+    chdir("/");
 }
 
 # Check get_results_page
@@ -59,17 +81,19 @@ my $t = new saliweb::Test('allosmod');
                          archive_time=>'2009-01-01 08:45:00'});
     my $tmpdir = tempdir(CLEANUP=>1);
     ok(chdir($tmpdir), "chdir into tempdir");
-
-    my $ret = $frontend->get_results_page($job);
-    like($ret, '/was unable to complete your request/',
-         'get_results_page (failed job)');
-
     ok(open(FH, "> output.zip"), "Open output.zip");
     ok(close(FH), "Close output.zip");
 
     $ret = $frontend->get_results_page($job);
     like($ret, '/Job.*testjob.*has completed/',
-         '                 (successful job)');
+         'get_results_page (successful job)');
+
+    ok(open(FH, "> failure.log"), "Open failure.log");
+    ok(close(FH), "Close failure.log");
+
+    my $ret = $frontend->get_results_page($job);
+    like($ret, '/was unable to complete your request/',
+         '                 (failed job)');
 
     chdir("/");
 }
