@@ -229,7 +229,9 @@ Please see the following files inside output.zip for more information:
         return os.path.exists('failure.log')
 
     def postprocess(self):
-        self.check_log_errors()
+        # If a manually-created failure.log exists, pass that back to the user
+        if not self.has_failure_log():
+            self.check_log_errors()
         self.make_failure_log()
         MAXJOBS = 200
         jobcounter = JobCounter().get()
