@@ -195,6 +195,7 @@ sleep 10s
                 if error is None and \
                    'Traceback (most recent call last)' in line \
                    or 'Summary of failed models' in line \
+                   or ': command not found' in line \
                    or ('awk: ' in line and \
                        ('error' in line or 'fatal' in line)):
                     error = (logfile, line)
