@@ -1,6 +1,7 @@
 #!/bin/bash
 
 . /etc/profile
+module load Sali
 module load allosmod
 
 if test -e dirlist; then rm dirlist; fi

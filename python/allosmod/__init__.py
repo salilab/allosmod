@@ -164,6 +164,7 @@ class Job(saliweb.backend.Job):
         self.debug_log("run err %d" % err)
         if err == 0 and jobcounter != -1:
             script = """
+module load Sali
 cd %s
 source ./qsub.sh
 pwd
