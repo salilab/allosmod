@@ -174,7 +174,7 @@ sleep 10s
             with open("%s/numsim" % dir) as fh:
                 numsim = int(fh.readline())
             r = self.runnercls(script)
-            r.set_sge_options("-j y -l arch=lx-amd64 -l netapp=2G,scratch=2G -l mem_free=5G -l h_rt=90:00:00 -t 1-%i -V" % numsim)
+            r.set_sge_options("-j y -l arch=lx-amd64 -l scratch=2G -l mem_free=5G -l h_rt=90:00:00 -t 1-%i -V" % numsim)
 
         else:
             # No job to run; fall through to postprocess
