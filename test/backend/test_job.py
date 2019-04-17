@@ -236,6 +236,20 @@ class JobTests(saliweb.test.TestCase):
         # output dir should have been replaced by output.zip
         self.assertEqual(sorted(os.listdir('.')), ['failure.log', 'output.zip'])
 
+    def test_complete_foxs_failure(self):
+        """Test job completion, with FoXS, failure encountered"""
+        j = self.make_test_job(allosmod.Job, 'RUNNING')
+        d = saliweb.test.RunInTempDir()
+        os.mkdir('output')
+        os.mkdir('output/input')
+        with open('output/input/saxs.dat', 'w') as fh:
+            fh.write('test')
+        with open('failure.log', 'w') as fh:
+            fh.write('error')
+        j.finalize()
+        # output dir should have been replaced by output.zip
+        self.assertEqual(sorted(os.listdir('.')), ['failure.log', 'output.zip'])
+
     def test_make_failure_log_ok(self):
         """Test make_failure_log() method, no failures"""
         j = self.make_test_job(allosmod.Job, 'RUNNING')
