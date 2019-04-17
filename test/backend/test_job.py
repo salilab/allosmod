@@ -5,6 +5,13 @@ import saliweb.test
 import saliweb.backend
 import os
 
+def _make_zip_or_send_output(ok):
+    fname = 'zip_or_send_output.sh'
+    with open(fname, 'w') as fh:
+        fh.write("#!/bin/sh\n")
+        fh.write("echo '%s' > urlout\n" % ("http://foo" if ok else "fail"))
+    os.chmod(fname, 493) # 493 = octal 755
+
 class JobTests(saliweb.test.TestCase):
     """Check custom Job class"""
 
@@ -236,8 +243,8 @@ class JobTests(saliweb.test.TestCase):
         # output dir should have been replaced by output.zip
         self.assertEqual(sorted(os.listdir('.')), ['failure.log', 'output.zip'])
 
-    def test_complete_foxs_failure(self):
-        """Test job completion, with FoXS, failure encountered"""
+    def test_complete_foxs_allosmod_failure(self):
+        """Test job completion, with FoXS, AllosMod failure encountered"""
         j = self.make_test_job(allosmod.Job, 'RUNNING')
         d = saliweb.test.RunInTempDir()
         os.mkdir('output')
@@ -249,6 +256,36 @@ class JobTests(saliweb.test.TestCase):
         j.finalize()
         # output dir should have been replaced by output.zip
         self.assertEqual(sorted(os.listdir('.')), ['failure.log', 'output.zip'])
+
+    def test_complete_foxs_ok(self):
+        """Test OK job completion, with FoXS"""
+        j = self.make_test_job(allosmod.Job, 'RUNNING')
+        d = saliweb.test.RunInTempDir()
+        os.mkdir('output')
+        os.mkdir('output/input')
+        with open('output/input/saxs.dat', 'w') as fh:
+            fh.write('test')
+        # Mock out run-FoXS script
+        j.config.script_directory = os.getcwd()
+        _make_zip_or_send_output(ok=True)
+        j.finalize()
+        # output dir not replaced with output.zip (normally this is done
+        # by the run-FoXS script, but it was mocked out)
+        self.assertEqual(sorted(os.listdir('.')),
+                         ['output', 'urlout', 'zip_or_send_output.sh'])
+
+    def test_complete_foxs_failure(self):
+        """Test OK job completion, with FoXS, FoXS failure"""
+        j = self.make_test_job(allosmod.Job, 'RUNNING')
+        d = saliweb.test.RunInTempDir()
+        os.mkdir('output')
+        os.mkdir('output/input')
+        with open('output/input/saxs.dat', 'w') as fh:
+            fh.write('test')
+        # Mock out run-FoXS script
+        j.config.script_directory = os.getcwd()
+        _make_zip_or_send_output(ok=False)
+        self.assertRaises(allosmod.FoXSError, j.finalize)
 
     def test_make_failure_log_ok(self):
         """Test make_failure_log() method, no failures"""
