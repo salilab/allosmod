@@ -425,5 +425,42 @@ class JobTests(saliweb.test.TestCase):
         os.rmdir('input')
         self.assertEqual(os.listdir('.'), ['pwout'])
 
+    def test_postprocess_manual_failure_log(self):
+        """Test postprocess() with a manually-created failure.log"""
+        j = self.make_test_job(allosmod.Job, 'RUNNING')
+        d = saliweb.test.RunInDir(j.directory)
+        with open('failure.log', 'w') as fh:
+            fh.write("manual failure: command not found\n")
+        with open('jobcounter', 'w') as fh:
+            fh.write('-1')
+        os.mkdir('test_dir1')
+        for f in ('error', 'error.log', 'numsim', 'qsub.sh'):
+            with open('test_dir1/%s' % f, 'w') as fh:
+                pass
+        with open('dirlist_all', 'w') as fh:
+            fh.write('test_dir1')
+        j.postprocess()
+
+    def test_postprocess_max_jobs(self):
+        """Test postprocess() with max jobs exceeded"""
+        j = self.make_test_job(allosmod.Job, 'RUNNING')
+        d = saliweb.test.RunInDir(j.directory)
+        with open('jobcounter', 'w') as fh:
+            fh.write('500')
+        os.mkdir('test_dir1')
+        for f in ('error', 'error.log', 'numsim', 'qsub.sh'):
+            with open('test_dir1/%s' % f, 'w') as fh:
+                pass
+        with open('dirlist_all', 'w') as fh:
+            fh.write('test_dir1')
+        j.postprocess()
+        with open('error.log') as fh:
+            contents = fh.read()
+        self.assertEqual(contents,
+              'Number of jobs have reached a maximum: 200\n'
+              'If less jobs were expected to run, this could be a '
+              'user/server error\n')
+
+
 if __name__ == '__main__':
     unittest.main()

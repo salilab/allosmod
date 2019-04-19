@@ -267,7 +267,6 @@ Please see the following files inside output.zip for more information:
         if jobcounter >= MAXJOBS:
             os.system("echo Number of jobs have reached a maximum: %i >>error.log" % MAXJOBS)
             os.system("echo If less jobs were expected to run, this could be a user/server error >>error.log")
-            os.system("mv %s output" % dir)
 
     def finalize(self):
         if os.path.exists('output/input/saxs.dat'):
