@@ -12,6 +12,14 @@ def _make_zip_or_send_output(ok):
         fh.write("echo '%s' > urlout\n" % ("http://foo" if ok else "fail"))
     os.chmod(fname, 493) # 493 = octal 755
 
+def _make_run_all(outdir, dirs):
+    fname = os.path.join(outdir, 'run_all.sh')
+    with open(fname, 'w') as fh:
+        fh.write("#!/bin/sh\n")
+        for d in dirs:
+            fh.write("echo '%s' > dirlist\n" % d)
+    os.chmod(fname, 493) # 493 = octal 755
+
 class JobTests(saliweb.test.TestCase):
     """Check custom Job class"""
 
@@ -82,6 +90,72 @@ class JobTests(saliweb.test.TestCase):
         os.mkdir('test_dir2')
         job_counter = j.setup_run()
         self.assertEqual(job_counter, 1)
+
+    def test_run_first_pass(self):
+        """Test run() method, first pass"""
+        script_dir = saliweb.test.TempDir()
+        j = self.make_test_job(allosmod.Job, 'RUNNING')
+        j.config.input_archive_directory = None
+        j.config.local_scratch = ''
+        j.config.global_scratch = ''
+        d = saliweb.test.RunInTempDir()
+        os.mkdir('test_dir1')
+        for f in ('list', 'input.dat', 'align.ali'):
+            with open('test_dir1/%s' % f, 'w') as fh:
+                fh.write('')
+        with open('test_dir1/error', 'w') as fh:
+            fh.write('0')
+        with open('test_dir1/numsim', 'w') as fh:
+            fh.write('0')
+        # Mock out run_all script
+        j.config.script_directory = script_dir.tmpdir
+        _make_run_all(script_dir.tmpdir, ('test_dir1',))
+        j.run()
+
+    def test_run_first_pass_error(self):
+        """Test run() method, first pass, error encountered"""
+        script_dir = saliweb.test.TempDir()
+        j = self.make_test_job(allosmod.Job, 'RUNNING')
+        j.config.input_archive_directory = None
+        j.config.local_scratch = ''
+        j.config.global_scratch = ''
+        d = saliweb.test.RunInTempDir()
+        os.mkdir('test_dir1')
+        for f in ('list', 'input.dat', 'align.ali'):
+            with open('test_dir1/%s' % f, 'w') as fh:
+                fh.write('')
+        with open('test_dir1/error', 'w') as fh:
+            fh.write('1')
+        with open('test_dir1/numsim', 'w') as fh:
+            fh.write('0')
+        # Mock out run_all script
+        j.config.script_directory = script_dir.tmpdir
+        _make_run_all(script_dir.tmpdir, ('test_dir1',))
+        r = j.run()
+        self.assertEqual(r.__class__, saliweb.backend.DoNothingRunner)
+
+    def test_run_last_pass(self):
+        """Test run() method, last pass"""
+        script_dir = saliweb.test.TempDir()
+        j = self.make_test_job(allosmod.Job, 'RUNNING')
+        j.config.input_archive_directory = None
+        j.config.local_scratch = ''
+        j.config.global_scratch = ''
+        d = saliweb.test.RunInTempDir()
+        with open('jobcounter', 'w') as fh:
+            fh.write('-1')
+        os.mkdir('test_dir1')
+        for f in ('list', 'input.dat', 'align.ali'):
+            with open('test_dir1/%s' % f, 'w') as fh:
+                fh.write('')
+        with open('test_dir1/error', 'w') as fh:
+            fh.write('0')
+        with open('test_dir1/numsim', 'w') as fh:
+            fh.write('0')
+        # Mock out run_all script
+        j.config.script_directory = script_dir.tmpdir
+        _make_run_all(script_dir.tmpdir, ('test_dir1',))
+        j.run()
 
     def test_unzip_input_no_zip(self):
         """Test unzip_input() with no zip file"""
