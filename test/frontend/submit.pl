@@ -89,6 +89,73 @@ sub get_submit_frontend {
     chdir('/') # Allow the temporary directory to be deleted
 }
 
+# Check get_submit_page with extra bonds
+{
+    my $self = get_submit_frontend($t);
+    my $tmpdir = File::Temp::tempdir(CLEANUP=>1);
+    ok(chdir($tmpdir), "chdir into tempdir");
+    ok(mkdir("incoming"), "mkdir incoming");
+    $self->cgi->param('addbond_indices', '1,2');
+    $self->cgi->param('addbond_dist', '3.8');
+    $self->cgi->param('addbond_stdev', '3.0');
+    $self->cgi->param('addupper_indices', '3,4');
+    $self->cgi->param('addupper_dist', '5.0');
+    $self->cgi->param('addupper_stdev', '2.0');
+    $self->cgi->param('addlower_indices', '5,6');
+    $self->cgi->param('addlower_dist', '10.0');
+    $self->cgi->param('addlower_stdev', '1.0');
+    my $ret = $self->get_submit_page();
+    like($ret, qr/Job Submitted.*Your job has been submitted/ms,
+         "submit page HTML");
+    chdir('/') # Allow the temporary directory to be deleted
+}
+
+# Check get_submit_page with multiconf sampletype, email
+{
+    my $self = get_submit_frontend($t);
+    my $tmpdir = File::Temp::tempdir(CLEANUP=>1);
+    ok(chdir($tmpdir), "chdir into tempdir");
+    ok(mkdir("incoming"), "mkdir incoming");
+    $self->cgi->param('sampletype', 'multiconf');
+    $self->cgi->param('jobemail', 'testemail');
+    my $ret = $self->get_submit_page();
+    like($ret, '/Job Submitted.*Your job has been submitted.*' .
+               'You will be notified at testemail/ms',
+         "submit page HTML");
+    chdir('/') # Allow the temporary directory to be deleted
+}
+
+# Check get_submit_page with interconf sampletype
+{
+    my $self = get_submit_frontend($t);
+    my $tmpdir = File::Temp::tempdir(CLEANUP=>1);
+    ok(chdir($tmpdir), "chdir into tempdir");
+    ok(mkdir("incoming"), "mkdir incoming");
+    $self->cgi->param('sampletype', 'interconf');
+    $self->cgi->param('interconf_nruns', '5');
+    $self->cgi->param('interconf_mdtemp', '300');
+    $self->cgi->param('interconf_locrig', 'on');
+    my $ret = $self->get_submit_page();
+    like($ret, qr/Job Submitted.*Your job has been submitted/ms,
+         "submit page HTML");
+    chdir('/') # Allow the temporary directory to be deleted
+}
+
+# Check get_submit_page with thermodyn sampletype
+{
+    my $self = get_submit_frontend($t);
+    my $tmpdir = File::Temp::tempdir(CLEANUP=>1);
+    ok(chdir($tmpdir), "chdir into tempdir");
+    ok(mkdir("incoming"), "mkdir incoming");
+    $self->cgi->param('sampletype', 'thermodyn');
+    $self->cgi->param('thermodyn_nruns', '5');
+    $self->cgi->param('thermodyn_mdtemp', '300');
+    my $ret = $self->get_submit_page();
+    like($ret, qr/Job Submitted.*Your job has been submitted/ms,
+         "submit page HTML");
+    chdir('/') # Allow the temporary directory to be deleted
+}
+
 # Check get_submit_page with ligand binding option
 {
     my $self = get_submit_frontend($t);
@@ -113,6 +180,30 @@ sub get_submit_frontend {
 }
 
 # Check get_submit_page with model glycosylation option, add sugars
+{
+    my $self = get_submit_frontend($t);
+    my $tmpdir = File::Temp::tempdir(CLEANUP=>1);
+    ok(chdir($tmpdir), "chdir into tempdir");
+    ok(mkdir("incoming"), "mkdir incoming");
+
+    ok(open(FH, "> glyc.file"), "Open glyc.file");
+    print FH "garbage\n";
+    ok(close(FH), "Close glyc.file");
+    open(FH, "glyc.file");
+
+    $self->cgi->param('advancedopt', 'glycmod');
+    $self->cgi->param('glycmodopt', 'option1');
+    $self->cgi->param('glycmod_flexible_sites', 'off');
+    $self->cgi->param('glycmod_input', \*FH);
+
+    my $ret = $self->get_submit_page();
+    like($ret, qr/Job Submitted.*Your job has been submitted/ms,
+         "submit page HTML");
+    chdir('/') # Allow the temporary directory to be deleted
+}
+
+# Check get_submit_page with model glycosylation option, add sugars,
+# flexible sites
 {
     my $self = get_submit_frontend($t);
     my $tmpdir = File::Temp::tempdir(CLEANUP=>1);
