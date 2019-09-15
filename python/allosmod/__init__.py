@@ -318,7 +318,7 @@ Please see the following files inside output.zip for more information:
             self._complete_nofoxs()
             return
         # Make directory group writeable so FoXS can access it
-        os.chmod(".", 0775)
+        os.chmod(".", 0o775)
         subprocess.call([os.path.join(self.config.script_directory,
                                       "zip_or_send_output.sh")])
         with open("urlout") as fh:
