@@ -343,7 +343,7 @@ sub get_alignment {
     }
 
     my $job = $self->make_job($q->param("name") || "job");
-    my @pdbcodes = $q->param("pdbcode");
+    my @pdbcodes = $q->multi_param("pdbcode");
     my @uplfiles = $q->upload("uploaded_file");
 
     # Handle PDB codes
