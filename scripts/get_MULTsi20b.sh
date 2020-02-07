@@ -89,7 +89,7 @@ echo "aln.salign(overhang=30, gap_penalties_1d=(-450, -50)," >>modalign.py
 echo "alignment_type='tree', output='ALIGNMENT')" >>modalign.py
 echo "aln.write(file='align.ali')" >>modalign.py
 
-python modalign.py >& modalign.log
+python3 modalign.py >& modalign.log
 
 if test -s align.ali; then
     echo ""
