@@ -34,7 +34,7 @@ sub get_start_html_parameters {
   my ($self, $style) = @_;
   my %param = $self->SUPER::get_start_html_parameters($style);
   push @{$param{-script}}, {-language => 'JavaScript',
-                            -src => 'html/jquery-1.8.1.min.js' };
+                            -src => '/jquery/latest/jquery.min.js' };
   push @{$param{-script}}, {-language => 'JavaScript',
                             -src => 'html/allosmod_foxs.js' };
   push @{$param{-style}->{'-src'}}, 'html/allosmod_foxs.css';
