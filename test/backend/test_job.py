@@ -70,7 +70,8 @@ class JobTests(saliweb.test.TestCase):
         """Test setup_run() method, first pass, no directories"""
         j = self.make_test_job(allosmod.Job, 'RUNNING')
         d = saliweb.test.RunInTempDir()
-        open('dummy', 'w') # touch a dummy file
+        with open('dummy', 'w') as fh:
+            pass  # touch a dummy file
         job_counter = j.setup_run()
         self.assertEqual(job_counter, -99)
 
@@ -161,7 +162,8 @@ class JobTests(saliweb.test.TestCase):
         """Test unzip_input() with no zip file"""
         j = self.make_test_job(allosmod.Job, 'RUNNING')
         d = saliweb.test.RunInTempDir()
-        open('input.txt', 'w')
+        with open('input.txt', 'w') as fh:
+            pass
         j.unzip_input()
         # files were moved to input/
         os.unlink('input/input.txt')
@@ -217,7 +219,8 @@ class JobTests(saliweb.test.TestCase):
         j = self.make_test_job(allosmod.Job, 'RUNNING')
         d = saliweb.test.RunInTempDir()
         z = zipfile.ZipFile('input.zip', 'w')
-        t = open('tempz', 'w')
+        with open('tempz', 'w') as fh:
+            pass
         for i in range(3):
             dirname = 'dir%d' % i
             if i != 0: z.write('tempz', '%s/list' % dirname)
@@ -232,7 +235,9 @@ class JobTests(saliweb.test.TestCase):
 
     def make_zip(self, numdirs):
         z = zipfile.ZipFile('input.zip', 'w')
-        t = open('tempz', 'w')
+        # Make empty file
+        with open('tempz', 'w') as fh:
+            pass
         for i in range(numdirs):
             dirname = 'dir%d' % i
             z.write('tempz', '%s/list' % dirname)

@@ -189,10 +189,8 @@ sleep 10s
 
     def check_log_errors(self):
         """Check log files for error messages"""
-        logs = glob.glob("*.o*") + list(self.get_all_error_log())
-        error = None
-        for logfile in logs:
-            for line in open(logfile):
+        def check_file(fh, logfile, error):
+            for line in fh:
                 if error is None and \
                    'Traceback (most recent call last)' in line \
                    or 'Summary of failed models' in line \
@@ -210,6 +208,13 @@ sleep 10s
                 if 'BondTypeError' in line or 'InvalidResidueError' in line \
                    or 'NoSugarsError' in line:
                     error = None
+            return error
+
+        logs = glob.glob("*.o*") + list(self.get_all_error_log())
+        error = None
+        for logfile in logs:
+            with open(logfile) as fh:
+                error = check_file(fh, logfile, error)
         if error:
             raise AllosModLogError("Job reported an error in %s: %s" % error)
 
