@@ -6,6 +6,8 @@ class Config(saliweb.backend.Config):
         saliweb.backend.Config.populate(self, config)
         # Read our service-specific configuration
         self.script_directory = config.get('allosmod', 'script_directory')
+        self.script_directory_local = config.get(
+                           'allosmod', 'script_directory_local')
 
 
 vars = Variables('config.py')

@@ -418,7 +418,7 @@ sub get_alignment {
 
     #preprocess PDB files and get sequence alignment
     my $jobdir = $job->directory;
-    my $script_dir = $self->{config}->{allosmod}->{script_directory};
+    my $script_dir = $self->{config}->{allosmod}->{script_directory_local};
     open(FOO, "$script_dir/get_MULTsi20b.sh inpseq $jobdir |") || die "dont let script output to std out";
     close(FOO);
 
@@ -536,7 +536,7 @@ sub get_submit_page {
     close(FILE);
 
     #check alignment is valid
-    my $script_dir = $self->{config}->{allosmod}->{script_directory};
+    my $script_dir = $self->{config}->{allosmod}->{script_directory_local};
     open(FOO, "$script_dir/check_align.sh $jobdir |") || die "dont let script output to std out";
     close(FOO);
     my $tempfile = "$jobdir/align.ali";

@@ -4,6 +4,7 @@ files = Glob("*")
 
 files = [f for f in files if 'SConscript' not in str(f)]
 
-i = env.Install(env['config'].script_directory, files)
-env.Alias('install', i)
-env.Default(i)
+for d in (env['config'].script_directory, env['config'].script_directory_local):
+    i = env.Install(d, files)
+    env.Alias('install', i)
+    env.Default(i)
