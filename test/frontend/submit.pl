@@ -53,7 +53,7 @@ sub get_submit_frontend {
     my $self = $t->make_frontend();
     my $cgi = $self->cgi;
 
-    $self->{config}->{allosmod}->{script_directory} = "/bin/true ";
+    $self->{config}->{allosmod}->{script_directory_local} = "/bin/true ";
 
     $cgi->param('jobname', 'test');
     $cgi->param('alignment', 'testali.ali');
@@ -358,7 +358,7 @@ sub get_submit_frontend {
     ok(mkdir("incoming"), "mkdir incoming");
 
     # Make dummy alignment so we don't have to run get_MULTsi20b.sh script
-    $self->{config}->{allosmod}->{script_directory} = "/bin/true ";
+    $self->{config}->{allosmod}->{script_directory_local} = "/bin/true ";
     ok(open(FH, "> incoming/align.ali"), "Open align.ali");
     print FH "dummy alignment";
     ok(close(FH), "Close align.ali");
