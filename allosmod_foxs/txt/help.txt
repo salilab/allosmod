@@ -2,7 +2,7 @@
 <br />
 <p>
 The AllosMod-FoXS server is a combination of <a href="http://modbase.compbio.ucsf.edu/foxs/index.html"> FoXS</a> and 
-<a href="http://modbase.compbio.ucsf.edu/allosmod/index.html"> AllosMod</a>. AllosMod is a server to sample protein conformations, which 
+<a href="http://modbase.compbio.ucsf.edu/allosmod/"> AllosMod</a>. AllosMod is a server to sample protein conformations, which
 was originally created to study allosteric proteins. FoXS is a server to do rigid body modeling of small angle X-ray scattering (SAXS) 
 profiles. The combined server is meant to create a user friendly way to generate structures to compare to experimental SAXS profiles. <br />
 <br />
