@@ -1,7 +1,7 @@
 <h1>AllosMod Help Pages</h1>
 <div id="logo">
 <left>
-<a href="http://modbase.compbio.ucsf.edu/allosmod"><img src="http://modbase.compbio.ucsf.edu/allosmod/html/img/am_logo.gif" /></a>
+<a href="https://modbase.compbio.ucsf.edu/allosmod"><img src="//modbase.compbio.ucsf.edu/allosmod/html/img/am_logo.gif" /></a>
 </left>
 </div><br />
 <p>
@@ -12,10 +12,10 @@ the rest of the protein, i.e. the regulated region. Varying the radius of the al
 across the structure, thereby driving the simulation to sample different regions of the conformational
 space relevant to the allosteric transition.<br />
 <br />
-For help page to model glycosylated proteins, click <a href="http://modbase.compbio.ucsf.edu/allosmod/help.cgi?type=glyc"> here</a>. <br />
+For help page to model glycosylated proteins, click <a href="https://modbase.compbio.ucsf.edu/allosmod/help.cgi?type=glyc"> here</a>. <br />
 <br />
 For instructions on how to input a sequence into the first page, refer to the AllosMod-FoXS 
-<a href="http://modbase.compbio.ucsf.edu/allosmod-foxs/help.cgi?type=help"> help page</a> <br />
+<a href="https://modbase.compbio.ucsf.edu/allosmod-foxs/help.cgi?type=help"> help page</a> <br />
 <br />
 
 <a><h4>Running AllosMod locally</h4></a>
@@ -42,7 +42,7 @@ landscape run can be uploaded as a batch run. <br />
   <li><a id="file"><h5>Directories zip file</h5></a>
       <p>Upload a zip file containing a set of directories for each landscape that you want to model (no more than 100 such landscapes per job). To create such a file, put all the input files into one 
          directory per landscape and type: zip -r input.zip dir1 dir2... For an example directory, 
-         click <a href="http://modbase.compbio.ucsf.edu/allosmod/html/file/input.zip"> here</a>. 
+         click <a href="https://modbase.compbio.ucsf.edu/allosmod/html/file/input.zip"> here</a>.
          Each directory should contain the following files:
       </p></li>
 
@@ -50,8 +50,8 @@ landscape run can be uploaded as a batch run. <br />
          <br /><b>Alignment file:</b> (align.ali) contains one entry for each PDB file. Another entry (named pm.pdb) pertains to the sequence to be simulated. 
                   This alignment file should be generated after an alignment procedure, as this alignment will be used to generate restraints for the simulation. 
                   Multiple chains can be specified by using a "/" as a separator, the same specifications 
-		  used in MODELLER. There are many ways to create an alignment file including: 1) <a href="http://salilab.org/modeller/tutorial/basic.html">MODELLER</a>
-		  and 2) <a href="http://www.ebi.ac.uk/Tools/msa/clustalw2/">ClustalW</a>. A suggested alignment file will be made if the uploaded alignment file 
+		  used in MODELLER. There are many ways to create an alignment file including: 1) <a href="https://salilab.org/modeller/tutorial/basic.html">MODELLER</a>
+		  and 2) <a href="https://www.ebi.ac.uk/Tools/msa/clustalw2/">ClustalW</a>. A suggested alignment file will be made if the uploaded alignment file
 		  is faulty. <br />
 		  ***<a style="color:red">WARNING</a>*** Small errors in the alignment can cause big errors during a simulation due to energy conservation problems. 
 		  Make sure there are no misalignments in which adjacent residues are aligned far apart in sequence (alignment programs often do this at the beginning 	
@@ -118,7 +118,7 @@ landscape run can be uploaded as a batch run. <br />
 				   The residue index corresponds to the position in the input alignment file. Therefore, if there are multiple chains, the index for the 
 				   first residue in the second chain will be one more than the index for the last residue in the first chain 
 				   (refer to any output PDB for simplicity).
-				   (for example, click <a href="http://modbase.compbio.ucsf.edu/allosmod/html/file/bonds.dat"> here</a>) </ul>  <br />
+				   (for example, click <a href="https://modbase.compbio.ucsf.edu/allosmod/html/file/bonds.dat"> here</a>) </ul>  <br />
 
 	 <br /><b> Alter residue contact energies (optional):</b> break.dat contains a list of residues whose pairwise contact energies (delEmax) 
 			    will be scaled by a specifed value. Each line contains one residue index (corresponding to simulated sequence) in the first 
@@ -144,13 +144,13 @@ landscape run can be uploaded as a batch run. <br />
 	pm.pdb.B30000001.pdb) as well other data files. AllosMod implements the Automodel class used in MODELLER for comparative modeling, 
 	however the optimization and refinement steps have been modified to allow for constant temperature molecular dynamics simulations. For 
 	each run directory, there is a file allosmod.py. This file contains the method consttemp that controls the simulation schedule and temperature (MDtemp). 
-	For help with script details, refer to the <a href="http://salilab.org/modeller/manual/"> MODELLER help pages</a>.
+	For help with script details, refer to the <a href="https://salilab.org/modeller/manual/"> MODELLER help pages</a>.
 </p><br />
 
 <a name="analysis"><h4>To analyze the simulation</h4></a>
 <p>
 	Download a zip file containing example directories and analysis scripts to run on any linux/unix based machine 
-	(click <a href="http://modbase.compbio.ucsf.edu/allosmod/html/file/analysis.zip">here</a>).  The allosmod_analysis.sh script will check the simulations for possible 
+	(click <a href="https://modbase.compbio.ucsf.edu/allosmod/html/file/analysis.zip">here</a>).  The allosmod_analysis.sh script will check the simulations for possible
 	errors as well as output several files including: 1) energies 2) Boltzmann weighted probabilities 3) local structural similarity metrics Qi.  
 	See README file for a full description.
 </p><br />
