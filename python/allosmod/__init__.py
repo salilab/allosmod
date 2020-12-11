@@ -213,7 +213,7 @@ sleep 10s
         logs = glob.glob("*.o*") + list(self.get_all_error_log())
         error = None
         for logfile in logs:
-            with open(logfile) as fh:
+            with open(logfile, encoding='latin1') as fh:
                 error = check_file(fh, logfile, error)
         if error:
             raise AllosModLogError("Job reported an error in %s: %s" % error)
