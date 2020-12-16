@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/salilab/allosmod.svg?branch=master)](https://travis-ci.org/salilab/allosmod)
+[![Build Status](https://github.com/salilab/allosmod/workflows/build/badge.svg?branch=master)](https://github.com/salilab/allosmod/actions?query=workflow%3Abuild)
 [![codecov](https://codecov.io/gh/salilab/allosmod/branch/master/graph/badge.svg)](https://codecov.io/gh/salilab/allosmod)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/114da59eb5354e1aa4701717a400d7ba)](https://www.codacy.com/app/salilab/allosmod?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=salilab/allosmod&amp;utm_campaign=Badge_Grade)
 
