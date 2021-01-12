@@ -41,11 +41,13 @@ local_scratch: /tmp
 global_scratch: /scrapp
 """
 
+
 def make_config(fname, archive_dir=None):
     with open(fname, 'w') as fh:
         fh.write(basic_config)
         if archive_dir:
             fh.write("input_archive_directory: %s\n" % archive_dir)
+
 
 class Tests(saliweb.test.TestCase):
     """Check custom Config class"""
@@ -66,6 +68,7 @@ class Tests(saliweb.test.TestCase):
         c = allosmod.Config('test.config')
         self.assertEqual(c.input_archive_directory, "test/archive")
         os.unlink('test.config')
+
 
 if __name__ == '__main__':
     unittest.main()

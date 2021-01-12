@@ -5,12 +5,14 @@ import saliweb.test
 import saliweb.backend
 import os
 
+
 def _make_zip_or_send_output(ok):
     fname = 'zip_or_send_output.sh'
     with open(fname, 'w') as fh:
         fh.write("#!/bin/sh\n")
         fh.write("echo '%s' > urlout\n" % ("http://foo" if ok else "fail"))
-    os.chmod(fname, 493) # 493 = octal 755
+    os.chmod(fname, 493)  # 493 = octal 755
+
 
 def _make_run_all(outdir, dirs):
     fname = os.path.join(outdir, 'run_all.sh')
@@ -18,14 +20,15 @@ def _make_run_all(outdir, dirs):
         fh.write("#!/bin/sh\n")
         for d in dirs:
             fh.write("echo '%s' > dirlist\n" % d)
-    os.chmod(fname, 493) # 493 = octal 755
+    os.chmod(fname, 493)  # 493 = octal 755
+
 
 class JobTests(saliweb.test.TestCase):
     """Check custom Job class"""
 
     def test_init(self):
         """Test creation of Job object"""
-        j = self.make_test_job(allosmod.Job, 'RUNNING')
+        _ = self.make_test_job(allosmod.Job, 'RUNNING')
 
     def test_debug_log(self):
         """Test debug_log() method"""
@@ -50,6 +53,7 @@ class JobTests(saliweb.test.TestCase):
         with open('dirlist') as fh:
             contents = fh.read()
         self.assertEqual(contents, 'bar\n')
+        del d
 
     def test_setup_run_after_last_sim(self):
         """Test setup_run() method after last simulation is done"""
@@ -65,15 +69,17 @@ class JobTests(saliweb.test.TestCase):
             contents = fh.read()
         # should be untouched
         self.assertEqual(contents, 'foo\n')
+        del d
 
     def test_setup_run_first_pass_no_dirs(self):
         """Test setup_run() method, first pass, no directories"""
         j = self.make_test_job(allosmod.Job, 'RUNNING')
         d = saliweb.test.RunInTempDir()
-        with open('dummy', 'w') as fh:
+        with open('dummy', 'w'):
             pass  # touch a dummy file
         job_counter = j.setup_run()
         self.assertEqual(job_counter, -99)
+        del d
 
     def test_setup_run_first_pass_one_dir(self):
         """Test setup_run() method, first pass, one directory"""
@@ -82,6 +88,7 @@ class JobTests(saliweb.test.TestCase):
         os.mkdir('test_dir1')
         job_counter = j.setup_run()
         self.assertEqual(job_counter, -99)
+        del d
 
     def test_setup_run_first_pass_multiple_dirs(self):
         """Test setup_run() method, first pass, multiple directories"""
@@ -91,6 +98,7 @@ class JobTests(saliweb.test.TestCase):
         os.mkdir('test_dir2')
         job_counter = j.setup_run()
         self.assertEqual(job_counter, 1)
+        del d
 
     def test_run_first_pass(self):
         """Test run() method, first pass"""
@@ -112,6 +120,7 @@ class JobTests(saliweb.test.TestCase):
         j.config.script_directory = script_dir.tmpdir
         _make_run_all(script_dir.tmpdir, ('test_dir1',))
         j.run()
+        del d
 
     def test_run_first_pass_error(self):
         """Test run() method, first pass, error encountered"""
@@ -134,6 +143,7 @@ class JobTests(saliweb.test.TestCase):
         _make_run_all(script_dir.tmpdir, ('test_dir1',))
         r = j.run()
         self.assertEqual(r.__class__, saliweb.backend.DoNothingRunner)
+        del d
 
     def test_run_last_pass(self):
         """Test run() method, last pass"""
@@ -157,23 +167,26 @@ class JobTests(saliweb.test.TestCase):
         j.config.script_directory = script_dir.tmpdir
         _make_run_all(script_dir.tmpdir, ('test_dir1',))
         j.run()
+        del d
 
     def test_unzip_input_no_zip(self):
         """Test unzip_input() with no zip file"""
         j = self.make_test_job(allosmod.Job, 'RUNNING')
         d = saliweb.test.RunInTempDir()
-        with open('input.txt', 'w') as fh:
+        with open('input.txt', 'w'):
             pass
         j.unzip_input()
         # files were moved to input/
         os.unlink('input/input.txt')
         os.rmdir('input')
+        del d
 
     def test_unzip_input_no_files(self):
         """Test unzip_input() with no files"""
         j = self.make_test_job(allosmod.Job, 'RUNNING')
         d = saliweb.test.RunInTempDir()
         self.assertRaises(saliweb.backend.SanityError, j.unzip_input)
+        del d
 
     def test_unzip_input_too_many_dirs(self):
         """Test unzip_input() with too many directories"""
@@ -181,6 +194,7 @@ class JobTests(saliweb.test.TestCase):
         d = saliweb.test.RunInTempDir()
         self.make_zip(101)
         self.assertRaises(saliweb.backend.SanityError, j.unzip_input)
+        del d
 
     def test_unzip_input_ok(self):
         """Test unzip_input() with ok input"""
@@ -190,6 +204,7 @@ class JobTests(saliweb.test.TestCase):
         j.unzip_input()
         self.assertTrue(os.path.exists('dir0'))
         self.assertTrue(os.path.exists('dir1'))
+        del d
 
     def test_archive_inputs_no_archive(self):
         """Test archive_inputs() with no archive dir set"""
@@ -199,6 +214,7 @@ class JobTests(saliweb.test.TestCase):
         self.make_zip(2)
         j.unzip_input()
         j.archive_inputs()
+        del d
 
     def test_archive_inputs(self):
         """Test archive_inputs()"""
@@ -213,30 +229,35 @@ class JobTests(saliweb.test.TestCase):
         self.assertEqual(len(files), 2)
         self.assertTrue(files[0].endswith('testjob_dir0.tar.gz'))
         self.assertTrue(files[1].endswith('testjob_dir1.tar.gz'))
+        del d
 
     def test_unzip_input_bad_dirs(self):
         """Test unzip_input() with only invalid directories"""
         j = self.make_test_job(allosmod.Job, 'RUNNING')
         d = saliweb.test.RunInTempDir()
         z = zipfile.ZipFile('input.zip', 'w')
-        with open('tempz', 'w') as fh:
+        with open('tempz', 'w'):
             pass
         for i in range(3):
             dirname = 'dir%d' % i
-            if i != 0: z.write('tempz', '%s/list' % dirname)
-            if i != 1: z.write('tempz', '%s/input.dat' % dirname)
-            if i != 2: z.write('tempz', '%s/align.ali' % dirname)
+            if i != 0:
+                z.write('tempz', '%s/list' % dirname)
+            if i != 1:
+                z.write('tempz', '%s/input.dat' % dirname)
+            if i != 2:
+                z.write('tempz', '%s/align.ali' % dirname)
         z.close()
         os.unlink('tempz')
         j.unzip_input()
         # Only input/ should remain; bad dirs should have been deleted
         self.assertEqual(os.listdir('.'), ['input'])
         self.assertEqual(os.listdir('input'), [])
+        del d
 
     def make_zip(self, numdirs):
         z = zipfile.ZipFile('input.zip', 'w')
         # Make empty file
-        with open('tempz', 'w') as fh:
+        with open('tempz', 'w'):
             pass
         for i in range(numdirs):
             dirname = 'dir%d' % i
@@ -249,9 +270,10 @@ class JobTests(saliweb.test.TestCase):
         """Test send_job_completed_email, no FoXS"""
         j = self.make_test_job(allosmod.Job, 'RUNNING')
         j.urlout = 'nofoxs'
+
         def test_nofoxs(subject, body):
-            self.assertEqual(subject,
-                         "Sali lab AllosMod service: Job testjob complete")
+            self.assertEqual(
+                subject, "Sali lab AllosMod service: Job testjob complete")
         j.send_user_email = test_nofoxs
         j.send_job_completed_email()
 
@@ -259,9 +281,11 @@ class JobTests(saliweb.test.TestCase):
         """Test send_job_completed_email, with FoXS"""
         j = self.make_test_job(allosmod.Job, 'RUNNING')
         j.urlout = 'foxs_url'
+
         def test_foxs(subject, body):
-            self.assertEqual(subject,
-                         "Sali lab AllosMod-FoXS service: Job testjob complete")
+            self.assertEqual(
+                subject,
+                "Sali lab AllosMod-FoXS service: Job testjob complete")
             self.assertTrue("You may also download simulation trajectories"
                             in body)
         j.send_user_email = test_foxs
@@ -310,6 +334,7 @@ class JobTests(saliweb.test.TestCase):
         self.assertEqual(contents,
                          '10.00000 0.0000 0.0000 1.00000 0.00000\n'
                          '42.00000 0.0000 0.0000 2.00000 0.00000\n')
+        del d
 
     def test_complete_nofoxs_failure(self):
         """Test job completion, no FoXS, failure encountered"""
@@ -320,7 +345,9 @@ class JobTests(saliweb.test.TestCase):
         os.mkdir('output')
         j.finalize()
         # output dir should have been replaced by output.zip
-        self.assertEqual(sorted(os.listdir('.')), ['failure.log', 'output.zip'])
+        self.assertEqual(sorted(os.listdir('.')),
+                         ['failure.log', 'output.zip'])
+        del d
 
     def test_complete_foxs_allosmod_failure(self):
         """Test job completion, with FoXS, AllosMod failure encountered"""
@@ -334,7 +361,9 @@ class JobTests(saliweb.test.TestCase):
             fh.write('error')
         j.finalize()
         # output dir should have been replaced by output.zip
-        self.assertEqual(sorted(os.listdir('.')), ['failure.log', 'output.zip'])
+        self.assertEqual(sorted(os.listdir('.')),
+                         ['failure.log', 'output.zip'])
+        del d
 
     def test_complete_foxs_ok(self):
         """Test OK job completion, with FoXS"""
@@ -352,6 +381,7 @@ class JobTests(saliweb.test.TestCase):
         # by the run-FoXS script, but it was mocked out)
         self.assertEqual(sorted(os.listdir('.')),
                          ['output', 'urlout', 'zip_or_send_output.sh'])
+        del d
 
     def test_complete_foxs_failure(self):
         """Test OK job completion, with FoXS, FoXS failure"""
@@ -365,6 +395,7 @@ class JobTests(saliweb.test.TestCase):
         j.config.script_directory = os.getcwd()
         _make_zip_or_send_output(ok=False)
         self.assertRaises(allosmod.FoXSError, j.finalize)
+        del d
 
     def test_make_failure_log_ok(self):
         """Test make_failure_log() method, no failures"""
@@ -372,6 +403,7 @@ class JobTests(saliweb.test.TestCase):
         d = saliweb.test.RunInDir(j.directory)
         j.make_failure_log()
         self.assertFalse(j.has_failure_log())
+        del d
 
     def test_make_failure_log_errs(self):
         """Test make_failure_log() method, with errors"""
@@ -388,6 +420,7 @@ class JobTests(saliweb.test.TestCase):
                          "the job did not complete successfully.\nPlease see "
                          "the following files inside output.zip for more "
                          "information:\n./subdir/error.log\n")
+        del d
 
     def test_check_log_errors(self):
         """Test check_log_errors() method"""
@@ -411,6 +444,7 @@ class JobTests(saliweb.test.TestCase):
             fh.write("Traceback (most recent call last):\n")
             fh.write("BondTypeError\n")
         j.check_log_errors()
+        del d
 
     def test_check_preprocess(self):
         """Test preprocess() method"""
@@ -429,6 +463,7 @@ class JobTests(saliweb.test.TestCase):
         os.unlink('input/qsub.sh')
         os.rmdir('input')
         self.assertEqual(os.listdir('.'), ['pwout'])
+        del d
 
     def test_postprocess_manual_failure_log(self):
         """Test postprocess() with a manually-created failure.log"""
@@ -445,6 +480,7 @@ class JobTests(saliweb.test.TestCase):
         with open('dirlist_all', 'w') as fh:
             fh.write('test_dir1')
         j.postprocess()
+        del d
 
     def test_postprocess_max_jobs(self):
         """Test postprocess() with max jobs exceeded"""
@@ -461,10 +497,12 @@ class JobTests(saliweb.test.TestCase):
         j.postprocess()
         with open('error.log') as fh:
             contents = fh.read()
-        self.assertEqual(contents,
-              'Number of jobs have reached a maximum: 200\n'
-              'If less jobs were expected to run, this could be a '
-              'user/server error\n')
+        self.assertEqual(
+            contents,
+            'Number of jobs have reached a maximum: 200\n'
+            'If less jobs were expected to run, this could be a '
+            'user/server error\n')
+        del d
 
 
 if __name__ == '__main__':

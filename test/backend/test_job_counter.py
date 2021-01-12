@@ -4,6 +4,7 @@ import saliweb.test
 import saliweb.backend
 import os
 
+
 class Tests(saliweb.test.TestCase):
     """Check JobCounter class"""
 
@@ -23,6 +24,7 @@ class Tests(saliweb.test.TestCase):
             contents = fh.read()
         self.assertEqual(contents, '99\n')
         os.unlink('jobcounter')
+
 
 if __name__ == '__main__':
     unittest.main()

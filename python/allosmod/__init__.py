@@ -4,21 +4,18 @@ import subprocess
 import zipfile
 import glob
 import os
-import re
-import copy
-import math
-import random
 import shutil
 import tarfile
 import time
-from operator import itemgetter 
-from os import path, access, R_OK
+
 
 class FoXSError(Exception):
     pass
 
+
 class AllosModLogError(Exception):
     pass
+
 
 def zip_dir(z, dirpath):
     """Recursively add a directory to a zipfile"""
@@ -26,6 +23,7 @@ def zip_dir(z, dirpath):
     for root, dirs, files in os.walk(dirpath):
         for f in files:
             z.write(root + '/' + f)
+
 
 class JobCounter(object):
     """Track where in a multi-step job we are.
@@ -56,7 +54,7 @@ class Job(saliweb.backend.Job):
     def setup_run(self):
         """Determine where we are in a multi-run job"""
         job_counter = JobCounter()
-        if os.path.exists("dirlist"): # after first pass
+        if os.path.exists("dirlist"):  # after first pass
             with open('dirlist') as fh:
                 dirs = fh.readlines()
             if len(dirs) > 1:
@@ -70,7 +68,7 @@ class Job(saliweb.backend.Job):
                 # All sims complete
                 job_counter.set(-1)
 
-        else: # first pass
+        else:  # first pass
             dirs = [d for d in os.listdir('.') if os.path.isdir(d)]
             if len(dirs) > 1:
                 job_counter.set(1)
@@ -133,18 +131,18 @@ class Job(saliweb.backend.Job):
     def preprocess(self):
         """Clean up any files left over from a previous run (e.g. if the
            job failed and has been resubmitted."""
-        self.rm_globs('.',
-                      ("dirlist*", "sge-script.sh*", "jobcounter", "job-state"))
+        self.rm_globs(
+            '.', ("dirlist*", "sge-script.sh*", "jobcounter", "job-state"))
         for subdir in [d for d in os.listdir('.') if os.path.isdir(d)]:
             self.rm_globs(subdir, ("error*", "numsim"))
             for g in glob.glob("%s/pred_dE*" % subdir):
                 shutil.rmtree(g, ignore_errors=False)
 
     def run(self):
-        #preprocess job to keep track of iterations
+        # preprocess job to keep track of iterations
         jobcounter = self.setup_run()
         self.debug_log("run jobctr %d" % jobcounter)
-        #unzip input.zip, check inputs, make input scripts for subdirs
+        # unzip input.zip, check inputs, make input scripts for subdirs
         if jobcounter == 1 or jobcounter == -99:
             self.unzip_input()
             self.archive_inputs()
@@ -154,9 +152,9 @@ class Job(saliweb.backend.Job):
                              self.config.global_scratch])
             shutil.copy("dirlist", "dirlist_all")
 
-        #create sge script
+        # create sge script
         with open("dirlist") as fh:
-            #keep track of current job's directory
+            # keep track of current job's directory
             dir = fh.readline().rstrip('\r\n')
 
         with open("%s/error" % dir) as fh:
@@ -174,7 +172,9 @@ sleep 10s
             with open("%s/numsim" % dir) as fh:
                 numsim = int(fh.readline())
             r = self.runnercls(script)
-            r.set_sge_options("-j y -l arch=lx-amd64 -l scratch=2G -l mem_free=5G -l h_rt=90:00:00 -t 1-%i -V" % numsim)
+            r.set_sge_options(
+                "-j y -l arch=lx-amd64 -l scratch=2G -l mem_free=5G "
+                "-l h_rt=90:00:00 -t 1-%i -V" % numsim)
 
         else:
             # No job to run; fall through to postprocess
@@ -195,7 +195,7 @@ sleep 10s
                    'Traceback (most recent call last)' in line \
                    or 'Summary of failed models' in line \
                    or ': command not found' in line \
-                   or ('awk: ' in line and \
+                   or ('awk: ' in line and
                        ('error' in line or 'fatal' in line)):
                     error = (logfile, line)
                 # If AllosMod internally handled a Python traceback, it is not
@@ -223,7 +223,7 @@ sleep 10s
            This is helpful in a top-level file because the error.log files
            are often buried several directories deep inside output.zip."""
         logs = list(self.get_all_error_log())
-        error_logs = [l for l in logs if os.stat(l).st_size > 0]
+        error_logs = [log for log in logs if os.stat(log).st_size > 0]
         if error_logs:
             with open('failure.log', 'w') as fh:
                 fh.write("""
@@ -248,16 +248,18 @@ Please see the following files inside output.zip for more information:
             jobcounter = -1
         self.debug_log("post jobctr %d" % jobcounter)
 
-        #submit next job
+        # submit next job
         if jobcounter > -1 and jobcounter < MAXJOBS:
             self.reschedule_run()
-        #sims are finished (or failed)
+        # sims are finished (or failed)
         if jobcounter == -1:
             os.mkdir("output")
             with open("dirlist_all") as fh:
                 r_dirs = [line.rstrip('\r\n') for line in fh]
-            #if input dir made because no directory is uploaded, delete unecessary files
-            os.system("rm -rf input/dirlist input/dirlist_all input/jobcounter input/output input/pwout") #input/input.zip
+            # if input dir made because no directory is uploaded,
+            # delete unecessary files
+            os.system("rm -rf input/dirlist input/dirlist_all "
+                      "input/jobcounter input/output input/pwout")
             os.system("cp error.log input/error.log output/")
             for dir in r_dirs:
                 os.system("rm %s/numsim" % dir)
@@ -267,11 +269,13 @@ Please see the following files inside output.zip for more information:
                 os.system("mv %s output" % dir)
 
             os.system("rm -rf dirlist dirlist_all jobcounter")
-                
-        #handle error
+
+        # handle error
         if jobcounter >= MAXJOBS:
-            os.system("echo Number of jobs have reached a maximum: %i >>error.log" % MAXJOBS)
-            os.system("echo If less jobs were expected to run, this could be a user/server error >>error.log")
+            os.system("echo Number of jobs have reached a maximum: "
+                      "%i >>error.log" % MAXJOBS)
+            os.system("echo If less jobs were expected to run, this "
+                      "could be a user/server error >>error.log")
 
     def finalize(self):
         if os.path.exists('output/input/saxs.dat'):
@@ -287,6 +291,7 @@ Please see the following files inside output.zip for more information:
         with open(os.path.join(subdir, 'pm.pdb.D00000001')) as fh:
             energies = []
             # Accumulate the energy for the last step in each MD simulation
+            prevline = None
             for line in fh:
                 if line.startswith('# Molecular dynamics simulation'):
                     energies.append(prevline.split())
@@ -339,15 +344,16 @@ Please see the following files inside output.zip for more information:
 
         if self.urlout == 'nofoxs':
             subject = 'Sali lab AllosMod service: Job %s complete' \
-                     % self.name
+                      % self.name
             body = 'Your job %s has finished.\n\n' % self.name + \
                    'Results can be found at %s\n' % self.url
         else:
             subject = 'Sali lab AllosMod-FoXS service: Job %s complete' \
-                     % self.name
-            body = 'Your job %s has finished.\n\n' % self.name + \
-                   'Results can be found at %s\n' % self.urlout + \
-                   'You may also download simulation trajectories at %s\n' % self.url
+                      % self.name
+            body = ('Your job %s has finished.\n\n' % self.name +
+                    'Results can be found at %s\n' % self.urlout +
+                    'You may also download simulation trajectories'
+                    'at %s\n' % self.url)
         self.send_user_email(subject, body)
 
 
@@ -357,8 +363,8 @@ class Config(saliweb.backend.Config):
         # Read our service-specific configuration
         self.script_directory = config.get('allosmod', 'script_directory')
         if config.has_option('allosmod', 'input_archive_directory'):
-            self.input_archive_directory = config.get('allosmod',
-                                                      'input_archive_directory')
+            self.input_archive_directory = config.get(
+                'allosmod', 'input_archive_directory')
         else:
             self.input_archive_directory = None
         self.local_scratch = config.get('allosmod', 'local_scratch')
