@@ -560,7 +560,7 @@ sub get_submit_page {
     }
     
     # handle advanced options
-    my $advancedopt = $q->param('advancedopt');
+    my $advancedopt = $q->param('advancedopt') || '';
     my $ligandmod_rAS = $q->param('ligandmod_rAS');
     my $ligandmod_ligpdb = $q->param('ligandmod_ligpdb');
     my $ligandmod_aspdb = $q->param('ligandmod_aspdb');
