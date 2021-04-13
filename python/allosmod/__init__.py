@@ -203,6 +203,8 @@ sleep 10s
                 # to correct
                 if 'MODELLER has failed to create an initial model' in line:
                     error = None
+                if 'not aligned, continue anyways' in line:
+                    error = None
                 # Certain AllosMod-specific exceptions are also intended for
                 # the user to correct
                 if 'BondTypeError' in line or 'InvalidResidueError' in line \

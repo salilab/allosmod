@@ -420,6 +420,10 @@ class JobTests(saliweb.test.TestCase):
                 fh.write("MODELLER has failed to create an initial model "
                          "of the following structure:\n")
             j.check_log_errors()
+            with open('test.o1234.1', 'w') as fh:
+                fh.write("Traceback (most recent call last):\n")
+                fh.write("pm_abSpoT_RRM.pdb not aligned, continue anyways\n")
+            j.check_log_errors()
             # Certain AllosMod exceptions are for the user to correct
             with open('test.o1234.1', 'w') as fh:
                 fh.write("Traceback (most recent call last):\n")
