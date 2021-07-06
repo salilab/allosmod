@@ -3,6 +3,7 @@ import zipfile
 import allosmod
 import saliweb.test
 import saliweb.backend
+import tempfile
 import os
 
 
@@ -111,7 +112,7 @@ class JobTests(saliweb.test.TestCase):
             with open('test_dir1/numsim', 'w') as fh:
                 fh.write('0')
             # Mock out run_all script
-            with saliweb.test.temporary_directory() as script_dir:
+            with tempfile.TemporaryDirectory() as script_dir:
                 j.config.script_directory = script_dir
                 _make_run_all(script_dir, ('test_dir1',))
                 j.run()
@@ -132,7 +133,7 @@ class JobTests(saliweb.test.TestCase):
             with open('test_dir1/numsim', 'w') as fh:
                 fh.write('0')
             # Mock out run_all script
-            with saliweb.test.temporary_directory() as script_dir:
+            with tempfile.TemporaryDirectory() as script_dir:
                 j.config.script_directory = script_dir
                 _make_run_all(script_dir, ('test_dir1',))
                 r = j.run()
@@ -156,7 +157,7 @@ class JobTests(saliweb.test.TestCase):
             with open('test_dir1/numsim', 'w') as fh:
                 fh.write('0')
             # Mock out run_all script
-            with saliweb.test.temporary_directory() as script_dir:
+            with tempfile.TemporaryDirectory() as script_dir:
                 j.config.script_directory = script_dir
                 _make_run_all(script_dir, ('test_dir1',))
                 j.run()
@@ -207,7 +208,7 @@ class JobTests(saliweb.test.TestCase):
         """Test archive_inputs()"""
         j = self.make_test_job(allosmod.Job, 'RUNNING')
         with saliweb.test.temporary_working_directory():
-            with saliweb.test.temporary_directory() as archive:
+            with tempfile.TemporaryDirectory() as archive:
                 j.config.input_archive_directory = archive
                 self.make_zip(2)
                 j.unzip_input()
