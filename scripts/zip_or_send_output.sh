@@ -62,9 +62,9 @@ cd output/
     EMAIL="none" # FoXS doesn't use the email parameter
     
     #run FoXS
-    /modbase5/home/foxs/www/foxs/cgi/input_call.pl output.zip saxs.dat $EMAIL $QMAX $PSIZE $HLAYER $EXVOLUME $IHYDRG $COARSE $OFFSET $BACKADJ >& foxs.log
+    /usr/bin/web_service.py run https://modbase.compbio.ucsf.edu/foxs/job pdbfile=@output.zip profile=@saxs.dat q=$QMAX psize=$PSIZE hlayer=$HLAYER exvolume=$EXVOLUME ihydrogens=$IHYDRG residue=$COARSE offset=$OFFSET background=$BACKADJ >& foxs.log
     echo output.zip saxs.dat $EMAIL $QMAX $PSIZE $HLAYER $EXVOLUME $IHYDRG $COARSE $OFFSET $BACKADJ >>foxs.log
-    grep "http:" foxs.log | tail -n1 > urlout
+    perl -n -e '/will be found at (http.*)/ && print $1' < foxs.log > urlout
     if (test ! -s urlout); then
 #	echo ...FoXS run error, please contact system administrator >urlout
 	echo fail >urlout
