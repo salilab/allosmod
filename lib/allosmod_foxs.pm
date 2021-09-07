@@ -781,7 +781,8 @@ sub get_submit_page {
 
 sub allow_file_download {
     my ($self, $file) = @_;
-    return $file eq 'output.zip' || $file eq 'failure.log';
+    return $file eq 'output.zip' || $file eq 'failure.log'
+           || $file eq 'foxs.log';
 }
 
 sub get_results_page {
@@ -802,8 +803,20 @@ sub display_ok_job {
     $return.= $q->p("<a href=\"" . $job->get_results_file_url("output.zip") .
                     "\">Download output zip file</a> " .
                     "(simulation trajectories).");
-    $return.= $q->p("<a href=\"" . $self->get_foxs_url() .
-                    "\">Visualize SAXS profiles using FoXS</a>.");
+    my $foxs = $self->get_foxs_url();
+    if ($foxs =~ /^fail/) {
+        $return .= $q->p("Unfortunately, FoXS failed to produce any outputs. "
+		        . "Please check your input profile; this is usually "
+			. "caused by uploading an invalid SAXS profile. "
+			. "<a href=\"https://modbase.compbio.ucsf.edu/foxs/html/examples/lyzexp.dat\">Here is an example.</a>");
+        $return .= $q->p("The <a href=\"" .
+		        $job->get_results_file_url("foxs.log")
+			. "\">FoXS log file</a> may also give more "
+			. "information on the error.");
+    } else {
+        $return.= $q->p("<a href=\"" . $foxs .
+                        "\">Visualize SAXS profiles using FoXS</a>.");
+    }
 
     $return .= $job->get_results_available_time();
     return $return;
