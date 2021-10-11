@@ -335,6 +335,10 @@ Please see the following files inside output.zip for more information:
             urltest = fh.readlines()
         self.urlout = urltest[-1].strip()
         if self.urlout == 'fail':
+            with open('foxs.log') as fh:
+                if '<error type="input_validation">' in fh.read():
+                    self.urlout = 'nofoxs'
+                    return
             raise FoXSError("FoXS failed to generate outputs")
 
     def send_job_completed_email(self):

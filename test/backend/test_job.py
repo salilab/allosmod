@@ -365,10 +365,12 @@ class JobTests(saliweb.test.TestCase):
             self.assertEqual(sorted(os.listdir('.')),
                              ['output', 'urlout', 'zip_or_send_output.sh'])
 
-    def test_complete_foxs_failure(self):
-        """Test OK job completion, with FoXS, FoXS failure"""
+    def test_complete_foxs_system_failure(self):
+        """Test OK job completion, with FoXS, FoXS system failure"""
         j = self.make_test_job(allosmod.Job, 'RUNNING')
         with saliweb.test.temporary_working_directory():
+            with open('foxs.log', 'w') as fh:
+                fh.write('garbage')
             os.mkdir('output')
             os.mkdir('output/input')
             with open('output/input/saxs.dat', 'w') as fh:
@@ -377,6 +379,22 @@ class JobTests(saliweb.test.TestCase):
             j.config.script_directory = os.getcwd()
             _make_zip_or_send_output(ok=False)
             self.assertRaises(allosmod.FoXSError, j.finalize)
+
+    def test_complete_foxs_user_failure(self):
+        """Test OK job completion, with FoXS, FoXS user failure"""
+        j = self.make_test_job(allosmod.Job, 'RUNNING')
+        with saliweb.test.temporary_working_directory():
+            with open('foxs.log', 'w') as fh:
+                fh.write('<error type="input_validation">'
+                         'The uploaded zip file contains no PDBs</error>')
+            os.mkdir('output')
+            os.mkdir('output/input')
+            with open('output/input/saxs.dat', 'w') as fh:
+                fh.write('test')
+            # Mock out run-FoXS script
+            j.config.script_directory = os.getcwd()
+            _make_zip_or_send_output(ok=False)
+            j.finalize()
 
     def test_make_failure_log_ok(self):
         """Test make_failure_log() method, no failures"""
