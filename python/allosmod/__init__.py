@@ -175,6 +175,7 @@ sleep 10s
             r.set_sge_options(
                 "-j y -l arch=lx-amd64 -l scratch=2G -l mem_free=5G "
                 "-l h_rt=90:00:00 -t 1-%i -V" % numsim)
+            r.set_sge_name(self.name)
 
         else:
             # No job to run; fall through to postprocess
