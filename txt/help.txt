@@ -63,7 +63,7 @@ landscape run can be uploaded as a batch run. <br />
 	          by LIGPDB in input.dat). A radius (rAS) around the ligand is used to define the allosteric site. If lig.pdb is excluded, 
 		  AllosMod will set up a landscape with as many energy minima as are described by structures in the list file. <br />
 	 <br /><b>Input file:</b> (input.dat) contains one line per parameter as follows:
-	     <br /> NRUNS = X <ul> is the number of independent simulations to run. </ul>
+	     <br /> NRUNS = X <ul> is the number of independent simulations to run. (No more than 100, please.) </ul>
 	     <br /> rAS = X (optional) <ul> 
 				 is the radius (in &Aring;ngstroms) around the coordinates of the ligand that will specify the allosteric site. If the file lig.pdb 
 				 is included, the allosteric site will be calculated using rAS and the coordinates in LIGPDB. Therefore, lig.pdb 
