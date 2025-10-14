@@ -71,4 +71,3 @@ cd output/
     fi
 
     rm -rf [1-9] [1-9][0-9]
-    rm -rf output

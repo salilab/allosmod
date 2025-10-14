@@ -360,10 +360,8 @@ class JobTests(saliweb.test.TestCase):
             j.config.script_directory = os.getcwd()
             _make_zip_or_send_output(ok=True)
             j.finalize()
-            # output dir not replaced with output.zip (normally this is done
-            # by the run-FoXS script, but it was mocked out)
             self.assertEqual(sorted(os.listdir('.')),
-                             ['output', 'urlout', 'zip_or_send_output.sh'])
+                             ['urlout', 'zip_or_send_output.sh'])
 
     def test_complete_foxs_system_failure(self):
         """Test OK job completion, with FoXS, FoXS system failure"""

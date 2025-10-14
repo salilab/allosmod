@@ -341,6 +341,7 @@ Please see the following files inside output.zip for more information:
                     self.urlout = 'nofoxs'
                     return
             raise FoXSError("FoXS failed to generate outputs")
+        shutil.rmtree('output')
 
     def send_job_completed_email(self):
         """Email the user (if requested) to let them know job results are
