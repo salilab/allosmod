@@ -338,7 +338,7 @@ Please see the following files inside output.zip for more information:
         if self.urlout == 'fail':
             with open('foxs.log') as fh:
                 if '<error type="input_validation">' in fh.read():
-                    self.urlout = 'nofoxs'
+                    self.urlout = 'badinput'
                     return
             raise FoXSError("FoXS failed to generate outputs")
         shutil.rmtree('output')
@@ -356,10 +356,16 @@ Please see the following files inside output.zip for more information:
         else:
             subject = 'Sali lab AllosMod-FoXS service: Job %s complete' \
                       % self.name
-            body = ('Your job %s has finished.\n\n' % self.name +
-                    'Results can be found at %s\n' % self.urlout +
-                    'You may also download simulation trajectories'
-                    'at %s\n' % self.url)
+            if self.urlout in ('toobig', 'badinput'):
+                body = ('Your job %s has finished.\n\n' % self.name +
+                        'Unfortunately FoXS could not be run, but you can '
+                        'download simulation trajectories (and potentially '
+                        'run FoXS standalone) from %s\n' % self.url)
+            else:
+                body = ('Your job %s has finished.\n\n' % self.name +
+                        'Results can be found at %s\n' % self.urlout +
+                        'You may also download simulation trajectories'
+                        'at %s\n' % self.url)
         self.send_user_email(subject, body)
 
 

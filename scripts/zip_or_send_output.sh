@@ -60,7 +60,15 @@ cd output/
     COARSE=`awk '($1=="coarse"){print $2}' output/input/foxs.in | sed "s/on/1/g" | sed "s/off/0/g"`
     OFFSET=0 #`awk '($1=="offset"){print $2}' output/input/foxs.in | sed "s/on/1/g" | sed "s/off/0/g"`
     EMAIL="none" # FoXS doesn't use the email parameter
-    
+
+    rm -rf [1-9] [1-9][0-9]
+
+    # Skip FoXS if output.zip is larger than 800MB
+    if [ $(stat -c '%s' output.zip) -gt 838860800 ]; then
+      echo toobig >urlout
+      exit 0
+    fi
+
     #run FoXS
     /usr/bin/web_service.py run https://modbase.compbio.ucsf.edu/foxs/job pdbfile=@output.zip profile=@saxs.dat q=$QMAX psize=$PSIZE hlayer=$HLAYER exvolume=$EXVOLUME ihydrogens=$IHYDRG residue=$COARSE offset=$OFFSET background=$BACKADJ >& foxs.log
     echo output.zip saxs.dat $EMAIL $QMAX $PSIZE $HLAYER $EXVOLUME $IHYDRG $COARSE $OFFSET $BACKADJ >>foxs.log
@@ -69,5 +77,3 @@ cd output/
 #	echo ...FoXS run error, please contact system administrator >urlout
 	echo fail >urlout
     fi
-
-    rm -rf [1-9] [1-9][0-9]

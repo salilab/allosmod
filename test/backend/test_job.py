@@ -277,6 +277,19 @@ class JobTests(saliweb.test.TestCase):
         j.send_user_email = test_foxs
         j.send_job_completed_email()
 
+    def test_email_foxs_failed(self):
+        """Test send_job_completed_email, with FoXS (failed)"""
+        j = self.make_test_job(allosmod.Job, 'RUNNING')
+        j.urlout = 'toobig'
+
+        def test_foxs(subject, body):
+            self.assertEqual(
+                subject,
+                "Sali lab AllosMod-FoXS service: Job testjob complete")
+            self.assertIn("Unfortunately FoXS could not be run", body)
+        j.send_user_email = test_foxs
+        j.send_job_completed_email()
+
     def test_complete_nofoxs_ok(self):
         """Test job completion, no FoXS, all OK"""
         j = self.make_test_job(allosmod.Job, 'RUNNING')
